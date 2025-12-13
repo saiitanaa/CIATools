@@ -10,6 +10,8 @@ Then run CIATools.exe.
 
 Note that if you are using version 1.0, you must rename your files as follows:
 
+This problem has been fixed in v2.0 and you no longer need to touch CIABUILDER.bat!
+
 //
 - homebrew.rsf
 - homebrew.elf
@@ -25,7 +27,7 @@ Optional but recommended:
 
 I recommend modifying the CIABUILDER.bat file located in this path (CIATools\builder_files_sources) to properly configure your .cia (such as the 'Homebrew Name', 'Creator Name', file names, etc.).
 
-Otherwise, this step is not mandatory, but you must rename your files as mentioned above.
+Otherwise, this step is not mandatory, but you must rename your files as mentioned above. 
 
 ## Credit
 
