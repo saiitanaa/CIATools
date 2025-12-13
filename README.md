@@ -26,3 +26,9 @@ Optional but recommended:
 I recommend modifying the CIABUILDER.bat file located in this path (CIATools\builder_files_sources) to properly configure your .cia (such as the 'Homebrew Name', 'Creator Name', file names, etc.).
 
 Otherwise, this step is not mandatory, but you must rename your files as mentioned above.
+
+## Credit
+
+Thanks to Manurocker95 for creating CIABUILDER.bat
+
+Original CIABUILDER.bat project: https://github.com/Manurocker95/CIABUILDER
