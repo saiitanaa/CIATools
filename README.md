@@ -18,6 +18,7 @@ Note that if you are using version 1.0, you must rename your files as follows:
 - banner.bnr
 - audio.wav
 - homebrew.3ds
+
 //
 
 Optional but recommended:
