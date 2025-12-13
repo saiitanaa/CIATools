@@ -10,7 +10,7 @@ Then run CIATools.exe.
 
 Note that if you are using version 1.0, you must rename your files as follows:
 
-This problem has been fixed in v2.0 and you no longer need to touch CIABUILDER.bat!
+**This problem has been fixed in v2.0 and you no longer need to touch CIABUILDER.bat!**
 
 //
 - homebrew.rsf
