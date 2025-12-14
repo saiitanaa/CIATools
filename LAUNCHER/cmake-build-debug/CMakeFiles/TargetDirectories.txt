@@ -1,0 +1,3 @@
+C:/Users/saysaa/Desktop/CIATools/LAUNCHER/cmake-build-debug/CMakeFiles/LAUNCHER.dir
+C:/Users/saysaa/Desktop/CIATools/LAUNCHER/cmake-build-debug/CMakeFiles/edit_cache.dir
+C:/Users/saysaa/Desktop/CIATools/LAUNCHER/cmake-build-debug/CMakeFiles/rebuild_cache.dir
