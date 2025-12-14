@@ -49,6 +49,6 @@ Otherwise, this step is not mandatory, but you must rename your files as mention
 
 ## Credit
 
-Thanks to Manurocker95 for creating CIABUILDER.bat
+Thanks to Manurocker95 for creating CIABUILDER.bat which was used in version 1.0
 
 Original CIABUILDER.bat project: https://github.com/Manurocker95/CIABUILDER
