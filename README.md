@@ -20,6 +20,8 @@ delete.py will delete the temporary files used for compilation to simplify the p
 
 ## How to use CIATools?
 
+**Very important! Please install Python and add it to your PATH.**
+
 Simply drag and drop all the files needed to compile your .cia into this path `CIATools\USER_FILES`.
 
 Then run CIATools.exe.
