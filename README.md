@@ -5,7 +5,7 @@ _________________________________________
 ## What does the program do?
 
 CIATools.exe launches `CIATools_HUD.exe`, located at `CIATools\CIATools_HUD\CIATools_HUD\bin\Debug\net8.0-windows`.
-For v3 and above, `CIATools_HUD.exe` is located at `CIATools\CIATools_HUD\CIATools_HUD\bin\Release\net8.0-windows`
+**For V3 and above**, `CIATools_HUD.exe` is located at `CIATools\CIATools_HUD\CIATools_HUD\bin\Release\net8.0-windows`
 
 CIATools_HUD.exe is the program interface.
 
