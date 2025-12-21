@@ -17,7 +17,11 @@ compile.py will then launch `CIABUILDER.bat` from `CIATools\builder_files_source
 
 delete.py will delete the temporary files used for compilation to simplify the program's use.
 
+**For compiling .3dsx files**
 
+CIATools converts your .3dsx file to .3ds and .elf files.
+
+Then it converts the .3ds and .elf files to .cia files.
 
 ## How to use CIATools?
 
