@@ -1,1 +1,16 @@
+# Python
+__pycache__/
+*.pyc
 
+# Build
+*.exe
+*.bin
+*.elf
+*.3dsx
+*.cia
+bin/
+obj/
+
+# System
+.DS_Store
+Thumbs.db
