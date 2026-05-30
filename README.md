@@ -38,6 +38,7 @@ The all-in-one tool for compiling your projects into `.cia` format with ease.
 ### Compile
 
 **For Windows** : `dotnet publish -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true`
+
 **For Linux** : `dotnet publish -c Release -r linux-x64 --self-contained true -p:PublishSingleFile=true`
 
 ---
