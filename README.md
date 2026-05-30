@@ -1,8 +1,6 @@
 <img width="1000" height="200" alt="BannerCIATools" src="https://github.com/user-attachments/assets/1c882709-0a5d-464e-b4dc-7455125c3a10" />
 
-# CIATools
-
-The all-in-one tool for compiling your projects into `.cia` format with ease.
+# The all-in-one tool for compiling your projects into `.cia` format with ease.
 
 ### About
 `CIAToolsR` is a complete rewrite of the original tool, designed to be more stable, faster, and above all, **cross-platform**. We have migrated to an **Avalonia UI** architecture for a fluid experience on both Windows and Linux, while automating the entire compilation chain to save you from dealing with manual script handling.
