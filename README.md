@@ -1,4 +1,4 @@
-<img width="256" height="256" alt="CIATools" src="https://github.com/user-attachments/assets/424a972a-a80a-43eb-86f2-ffa79b0306bf" />
+<img width="1000" height="200" alt="Plan de travail 1" src="https://github.com/user-attachments/assets/7d9efa5e-888b-4106-9aed-cb090627dc36" />
 
 # CIATools
 
