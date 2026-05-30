@@ -45,3 +45,9 @@
 
 ### Credits
 * **Manurocker95** for the original base of `CIABUILDER.bat`.
+
+---
+
+### Assets
+
+<img width="64" height="64" alt="CIATools" src="https://github.com/user-attachments/assets/ab250833-6c03-4ff4-b2f9-2d1c6001ce2f" />
