@@ -31,8 +31,7 @@ The all-in-one tool for compiling your projects into `.cia` format with ease.
    - Locate `CIAToolsR.exe` and open it.
   
 4. **Linux**
-   - Rename the folder to `CIAToolsR`.
-   - Open a terminal and run these commands: `chmod +x CIAToolsR` and `./CIAToolsR`.
+   - Open a terminal and run these commands: `chmod +x NameOfFolder` and `./CIAToolsR`.
 
 ---
 
