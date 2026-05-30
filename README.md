@@ -1,3 +1,5 @@
+<img width="500" height="500" alt="CIATools" src="https://github.com/user-attachments/assets/424a972a-a80a-43eb-86f2-ffa79b0306bf" />
+
 # CIATools
 
 The all-in-one tool for compiling your projects into `.cia` format with ease.
