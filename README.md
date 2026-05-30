@@ -51,3 +51,6 @@
 ### Assets
 
 <img width="64" height="64" alt="CIATools" src="https://github.com/user-attachments/assets/ab250833-6c03-4ff4-b2f9-2d1c6001ce2f" />
+<img width="64" height="64" alt="icon_app" src="https://github.com/user-attachments/assets/ac2329bf-ce90-46f3-9cb0-3663bb042638" />
+<img width="64" height="64" alt="Plan de travail 1" src="https://github.com/user-attachments/assets/441fb0d3-be10-4a52-a651-42e3570a9492" />
+
