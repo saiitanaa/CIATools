@@ -31,7 +31,7 @@
    - Locate `CIAToolsR.exe` and open it.
   
 4. **Linux**
-   - Open a terminal and run these commands: `cd ~/CIAToolsR-linux64` and `chmod +x *` and `./CIAToolsR`.
+   - Open a terminal and run these commands: `cd ~/CIAToolsR-linux64` - `chmod +x CIAToolsR` - `cd RSF-Creator` - `chmod +x RSF-Creator` - `cd ..` - `./CIAToolsR`.
 
 ---
 
