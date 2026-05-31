@@ -31,7 +31,7 @@
    - Locate `CIAToolsR.exe` and open it.
   
 4. **Linux**
-   - Open a terminal and run these commands: `cd ~/CIAToolsR-linux64` and `chmod +x CIAToolsR` and `./CIAToolsR`.
+   - Open a terminal and run these commands: `cd ~/CIAToolsR-linux64` and `chmod +x *` and `./CIAToolsR`.
 
 ---
 
