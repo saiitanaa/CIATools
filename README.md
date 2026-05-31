@@ -17,11 +17,11 @@
 
 ### Compatibility
 
-CIATools version 5 or earlier is compatible only with Windows 10 & 11 (64-bit)
+CIATools **version 5 or earlier** is compatible only with Windows 10 & 11 (64-bit)
 
-CIATools version 6 or later is compatible with Windows 10 & 11 (64-bit) and Linux (64-bit)
+CIATools **version 6 or later** is compatible with Windows 10 & 11 (64-bit) and Linux (64-bit)
 
-CIAToolsXP is a derivative version, compatible with Windows XP, Vista, 7, 8, 8.1, 10, and 11 (32-bit).
+CIAToolsXP is a **derivative version**, compatible with Windows XP, Vista, 7, 8, 8.1, 10, and 11 (32-bit).
 
 ---
 ### Usage Guide
