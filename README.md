@@ -21,7 +21,7 @@
    - Python must be installed and added to your `PATH`.
    - Use the "Install Python dependencies" button in the app to configure the environment automatically.
 
-2. **Workflow**
+2. **Using**
    - Place your assets (icons, banners, binaries) in the `/USER_FILES` folder.
    - Launch the application.
    - Configure your preferences via the interface (Console, Auto-close, etc.).
