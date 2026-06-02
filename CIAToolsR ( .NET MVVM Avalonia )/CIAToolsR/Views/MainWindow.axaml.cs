@@ -1,3 +1,4 @@
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
@@ -30,7 +31,20 @@ namespace CIAToolsR.Views
             }
         }
 
-        public string rootFolder = AppDomain.CurrentDomain.BaseDirectory;
+        public static string FindRootPath()
+        {
+            string? dir = AppDomain.CurrentDomain.BaseDirectory;
+
+            while (dir != null)
+            {
+                if (File.Exists(Path.Combine(dir, "root_path")))
+                    return dir;
+
+                dir = Directory.GetParent(dir)?.FullName;
+            }
+
+            throw new DirectoryNotFoundException("Impossible de trouver root_path");
+        }
 
         private void OnDragOver(object? sender, DragEventArgs e)
         {
@@ -77,10 +91,55 @@ namespace CIAToolsR.Views
             }
         }
 
+        public async void OnSetAuthorName(object sender, RoutedEventArgs e)
+        {
+            var dialog = new Window
+            {
+                Width = 300,
+                Height = 120,
+                Title = "Author Name"
+            };
+
+            var textBox = new TextBox();
+
+            var button = new Button
+            {
+                Content = "Save"
+            };
+
+            button.Click += async (_, _) =>
+            {
+                await SaveCreatorAsync(FindRootPath(), textBox.Text ?? "");
+                dialog.Close();
+            };
+
+            dialog.Content = new StackPanel
+            {
+                Margin = new Thickness(10),
+                Children =
+        {
+            textBox,
+            button
+        }
+            };
+
+            await dialog.ShowDialog(this);
+        }
+
+        public static async Task SaveCreatorAsync(string rootPath, string creatorName)
+        {
+            string userFilesPath = Path.Combine(rootPath, "builder_files_sources");
+            Directory.CreateDirectory(userFilesPath);
+
+            string creatorPath = Path.Combine(userFilesPath, "AUTHOR.txt");
+
+            await File.WriteAllTextAsync(creatorPath, creatorName.Trim());
+        }
+
         public void OnRSFCREATOR(object sender, RoutedEventArgs e)
         {
-            var linux_path = Path.Combine(rootFolder, "RSF-Creator", "RSF-Creator");
-            var win_path = Path.Combine(rootFolder, "RSF-Creator", "RSF-Creator.exe");
+            var linux_path = Path.Combine(FindRootPath(), "RSF-Creator", "RSF-Creator");
+            var win_path = Path.Combine(FindRootPath(), "RSF-Creator", "RSF-Creator.exe");
 
             try
             {
@@ -114,7 +173,7 @@ namespace CIAToolsR.Views
 
         private async Task RunUpdateCheckLogicAsync()
         {
-            string currentVersion = "7.0.1";
+            string currentVersion = "7.1.1";
             var client = new GitHubClient(new ProductHeaderValue("CIAToolsR"));
 
             try

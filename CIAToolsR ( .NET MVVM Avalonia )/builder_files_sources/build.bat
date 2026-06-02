@@ -114,8 +114,18 @@ REM ============================
 
 echo Building %HOME_NAME%...
 
+set "CREATOR=NameOfTheCreator"
+
+if exist "AUTHOR.txt" (
+    set /p CREATOR=<"AUTHOR.txt"
+)
+
+if "%CREATOR%"=="" (
+    set "CREATOR=PleaseDefineCreatorName"
+)
+
 bannertool.exe makebanner -i "%WORK_DIR%%BANNER_FILE%" -a "%WORK_DIR%%AUDIO_FILE%" -o banner.bnr
-bannertool.exe makesmdh -s "%HOME_NAME%" -l "%HOME_NAME%" -p "NameOfTheCreator" -i "%WORK_DIR%%ICON_FILE%" -o icon.icn
+bannertool.exe makesmdh -s "%HOME_NAME%" -l "%HOME_NAME%" -p "%CREATOR%" -i "%WORK_DIR%%ICON_FILE%" -o icon.icn
 
 makerom -f cia -o "%HOME_NAME%.cia" -DAPP_ENCRYPTED=false -rsf homebrew.rsf -target t -exefslogo -elf "%ELF_FILE%" -icon icon.icn -banner banner.bnr
 makerom -f cci -o "%HOME_NAME%.3ds" -DAPP_ENCRYPTED=true -rsf homebrew.rsf -target t -exefslogo -elf "%ELF_FILE%" -icon icon.icn -banner banner.bnr

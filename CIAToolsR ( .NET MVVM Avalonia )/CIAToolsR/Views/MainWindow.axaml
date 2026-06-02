@@ -7,7 +7,7 @@
         x:Class="CIAToolsR.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Icon="/Assets/icon.ico"
-        Title="{Binding Current_os, StringFormat='CIAToolsR - {0}.V7.0.1'}"
+        Title="{Binding Current_os, StringFormat='CIAToolsR - {0}.V7.1.1'}"
         DragDrop.AllowDrop="True">
 
     <Window.Resources>
@@ -111,6 +111,7 @@
                         <materialIcons:MaterialIcon Kind="Tools" IconSize="38" />
                     </MenuItem.Header>
                     <MenuItem Header="_Start RSF-Creator" Click="OnRSFCREATOR"/>
+					<MenuItem Header="_Set Author name" Click="OnSetAuthorName"/>
                     <MenuItem Header="_Clean USER_FILES" Click="OnClearMenuClick"/>
                     <MenuItem Header="_Check Update" Click="OnCheckUpdateAsyncClick"/>
                     <CheckBox Content=" - Console" IsChecked="{Binding Console}"/>
