@@ -43,7 +43,7 @@ namespace CIAToolsR.Views
                 dir = Directory.GetParent(dir)?.FullName;
             }
 
-            throw new DirectoryNotFoundException("Impossible de trouver root_path");
+            throw new DirectoryNotFoundException("root_path ???");
         }
 
         private void OnDragOver(object? sender, DragEventArgs e)
@@ -97,7 +97,7 @@ namespace CIAToolsR.Views
             {
                 Width = 300,
                 Height = 120,
-                Title = "Author Name"
+                Title = "Set Homebrew Author"
             };
 
             var textBox = new TextBox();
@@ -117,10 +117,10 @@ namespace CIAToolsR.Views
             {
                 Margin = new Thickness(10),
                 Children =
-        {
-            textBox,
-            button
-        }
+                {
+                    textBox,
+                    button
+                }
             };
 
             await dialog.ShowDialog(this);
@@ -128,7 +128,7 @@ namespace CIAToolsR.Views
 
         public static async Task SaveCreatorAsync(string rootPath, string creatorName)
         {
-            string userFilesPath = Path.Combine(rootPath, "builder_files_sources");
+            string userFilesPath = Path.Combine(rootPath, "USER_FILES");
             Directory.CreateDirectory(userFilesPath);
 
             string creatorPath = Path.Combine(userFilesPath, "AUTHOR.txt");
@@ -136,44 +136,76 @@ namespace CIAToolsR.Views
             await File.WriteAllTextAsync(creatorPath, creatorName.Trim());
         }
 
+        public void OnRestoreAuthor(object? sender, RoutedEventArgs e)
+        {
+            string rootPath = FindRootPath();
+            string userFilesPath = Path.Combine(rootPath, "USER_FILES");
+            string creatorPath = Path.Combine(userFilesPath, "AUTHOR.txt");
+            try
+            {
+                Directory.CreateDirectory(userFilesPath);
+                File.Create(creatorPath).Close();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Failed! : {ex.Message}");
+            }
+        }
+
         public void OnRSFCREATOR(object sender, RoutedEventArgs e)
         {
-            var linux_path = Path.Combine(FindRootPath(), "RSF-Creator", "RSF-Creator");
-            var win_path = Path.Combine(FindRootPath(), "RSF-Creator", "RSF-Creator.exe");
+            var rootPath = FindRootPath();
+            var rsfFolder = Path.Combine(rootPath, "RSF-Creator");
+
+            var linux_path = Path.Combine(rsfFolder, "RSF-Creator");
+            var win_path = Path.Combine(rsfFolder, "RSF-Creator.exe");
 
             try
             {
                 if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 {
-                    Process.Start(new ProcessStartInfo(win_path) { UseShellExecute = true });
+                    string zoneIdentifierPath = $"{win_path}:Zone.Identifier";
+                    if (File.Exists(zoneIdentifierPath))
+                    {
+                        File.Delete(zoneIdentifierPath);
+                    }
+
+                    Process.Start(new ProcessStartInfo(win_path)
+                    {
+                        UseShellExecute = true,
+                        WorkingDirectory = rsfFolder
+                    });
                 }
                 else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
                 {
+                    try
+                    {
+                        Process.Start(new ProcessStartInfo("chmod", $"+x \"{linux_path}\"") { UseShellExecute = false }).WaitForExit();
+                    }
+                    catch { }
+
                     var psi = new ProcessStartInfo(linux_path)
                     {
-                        UseShellExecute = false
+                        UseShellExecute = false,
+                        WorkingDirectory = rsfFolder
                     };
                     Process.Start(psi);
                 }
             }
-            catch
+            catch (Exception ex)
             {
+                System.Diagnostics.Debug.WriteLine($"Failed start RSFCREATOR: {ex.Message}");
             }
         }
 
         private async Task CheckUpdateAsync()
         {
-            await RunUpdateCheckLogicAsync();
+            await RunUpdateCheckLogicAsync(this);
         }
 
-        public async void OnCheckUpdateAsyncClick(object? sender, RoutedEventArgs e)
+        private async Task RunUpdateCheckLogicAsync(Window ownerWindow)
         {
-            await RunUpdateCheckLogicAsync();
-        }
-
-        private async Task RunUpdateCheckLogicAsync()
-        {
-            string currentVersion = "7.1.1";
+            string currentVersion = "8.0.0";
             var client = new GitHubClient(new ProductHeaderValue("CIAToolsR"));
 
             try
@@ -182,14 +214,48 @@ namespace CIAToolsR.Views
 
                 if (latestRelease != null)
                 {
-                    string latestVersion = latestRelease.TagName.Replace("v", "").Trim();
+                    string latestVersion = latestRelease.TagName?.Replace("v", "").Trim() ?? "0.0.0";
                     var current = new Version(currentVersion);
                     var latest = new Version(latestVersion);
 
                     if (latest > current)
                     {
-                        string downloadUrl = latestRelease.HtmlUrl;
-                        OpenBrowser(downloadUrl);
+                        var dialog = new Window
+                        {
+                            Width = 320,
+                            Height = 180,
+                            Title = "CIATools Updater",
+                            WindowStartupLocation = WindowStartupLocation.CenterOwner
+                        };
+
+                        var textBlock = new TextBlock
+                        {
+                            Text = $"New update available: {latestRelease.TagName} !",
+                            HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center,
+                            Margin = new Thickness(0, 30, 0, 20)
+                        };
+
+                        var button = new Button
+                        {
+                            Content = "Update",
+                            HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center,
+                            Width = 100
+                        };
+
+                        button.Click += (_, _) =>
+                        {
+                            string downloadUrl = latestRelease.HtmlUrl;
+                            OpenBrowser(downloadUrl);
+                            dialog.Close();
+                        };
+
+                        var layout = new StackPanel();
+                        layout.Children.Add(textBlock);
+                        layout.Children.Add(button);
+
+                        dialog.Content = layout;
+
+                        await dialog.ShowDialog(ownerWindow);
                     }
                 }
             }
@@ -211,20 +277,36 @@ namespace CIAToolsR.Views
             }
         }
 
-        public void OnOpenGitHub(object? sender, PointerPressedEventArgs e)
+        public void OnOpenGitHubClick(object? sender, RoutedEventArgs e)
+        {
+            OpenGitHub();
+        }
+
+        public void OnOpenGitHubPointerPressed(object? sender, PointerPressedEventArgs e)
+        {
+            OpenGitHub();
+        }
+
+        private void OpenGitHub()
         {
             var url = "https://github.com/saysaa/CIATools";
 
             try
             {
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                {
-                    Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
-                }
-                else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-                {
-                    Process.Start("xdg-open", url);
-                }
+                OpenBrowser(url);
+            }
+            catch
+            {
+            }
+        }
+
+        public void OnOpenDiscord(object? sender, RoutedEventArgs e)
+        {
+            var url = "https://discord.gg/px7MGB2vhX";
+
+            try
+            {
+                OpenBrowser(url);
             }
             catch
             {

@@ -65,6 +65,7 @@ namespace CIAToolsR.ViewModels
                 string userPath = Path.Combine(rootFolder, "USER_FILES");
                 if (Directory.Exists(userPath)) Directory.Delete(userPath, true);
                 Directory.CreateDirectory(userPath);
+                File.Create(Path.Combine(userPath, "AUTHOR.txt")).Close();
                 File.Create(Path.Combine(userPath, "FILE_PATH")).Close();
 
                 Debug_output = "Clean: USER_FILES - Status: Done";
