@@ -221,7 +221,7 @@ namespace CIAToolsR.Views
 
         private async Task RunUpdateCheckLogicAsync(Window ownerWindow)
         {
-            string currentVersion = "8.0.0";
+            string currentVersion = "8.0.1";
             var client = new GitHubClient(new ProductHeaderValue("CIAToolsR"));
 
             try
