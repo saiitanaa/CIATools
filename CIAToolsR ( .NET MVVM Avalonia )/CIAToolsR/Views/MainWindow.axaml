@@ -7,7 +7,7 @@
         x:Class="CIAToolsR.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Icon="/Assets/icon.ico"
-        Title="{Binding Current_os, StringFormat='CIAToolsR - {0}.V8.0.0'}"
+        Title="{Binding Current_os, StringFormat='CIAToolsR - {0}.V8.0.1'}"
         DragDrop.AllowDrop="True">
 
     <Window.Resources>
@@ -112,6 +112,7 @@
                     </MenuItem.Header>
                     <MenuItem Header="_Clean USER_FILES" Click="OnClearMenuClick"/>
                     <MenuItem Header="_Restore AUTHOR.txt" Click="OnRestoreAuthor"/>
+                    <MenuItem Header="_Restore FILE_PATH" Click="OnRestoreFILEPATH"/>
                     <CheckBox Content=" - Console" IsChecked="{Binding Console}"/>
                     <CheckBox Content=" - Auto Close Script" IsChecked="{Binding AutoCloseScript}"/>
                 </MenuItem>

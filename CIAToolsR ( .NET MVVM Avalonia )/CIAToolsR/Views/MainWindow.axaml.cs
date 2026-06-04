@@ -10,6 +10,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Runtime.InteropServices.ObjectiveC;
 using System.Threading.Tasks;
 
 namespace CIAToolsR.Views
@@ -136,6 +137,21 @@ namespace CIAToolsR.Views
             await File.WriteAllTextAsync(creatorPath, creatorName.Trim());
         }
 
+        public void OnRestoreFILEPATH(object? sender, RoutedEventArgs e)
+        {
+            string rootPath = FindRootPath();
+            string userFilesPath = Path.Combine(rootPath, "USER_FILES");
+            string filePath = Path.Combine(userFilesPath, "FILE_PATH");
+            try
+            {
+                Directory.CreateDirectory(userFilesPath);
+                File.Create(filePath).Close();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Failed! : {ex.Message}");
+            }
+        }
         public void OnRestoreAuthor(object? sender, RoutedEventArgs e)
         {
             string rootPath = FindRootPath();
