@@ -5,6 +5,8 @@
 ### About
 `CIAToolsR` is a complete rewrite of the original tool, designed to be more stable, faster, and above all, **cross-platform**. We have migrated to an **Avalonia UI** architecture for a fluid experience on both Windows and Linux, while automating the entire compilation chain to save you from dealing with manual script handling.
 
+### RSF-Creator for CIATools 
+-> https://github.com/saysaa/CIATools/tree/rsf-creator
 ---
 
 ### OLD vs Renewed: What’s changed?
