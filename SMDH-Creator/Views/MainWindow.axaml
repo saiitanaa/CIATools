@@ -1,0 +1,185 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:SMDH_Creator.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        x:Class="SMDH_Creator.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Width="750"
+        Height="400"
+        MinWidth="750"
+        MinHeight="400"
+        MaxWidth="750"
+        MaxHeight="400"
+        Icon="/Assets/avalonia-logo.ico"
+        Title="SMDH Creator">
+
+    <Design.DataContext>
+        <vm:MainWindowViewModel/>
+    </Design.DataContext>
+
+    <Grid Margin="16"
+          RowDefinitions="Auto,*,Auto"
+          ColumnDefinitions="*,220"
+          RowSpacing="12"
+          ColumnSpacing="16">
+
+        <TextBlock Grid.Row="0"
+                   Grid.Column="0"
+                   Grid.ColumnSpan="2"
+                   Text="SMDH Creator"
+                   FontSize="24"
+                   FontWeight="Bold"/>
+
+        <Border Grid.Row="1"
+                Grid.Column="0"
+                Padding="12"
+                CornerRadius="8"
+                BorderThickness="1"
+                BorderBrush="#404040">
+
+            <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto"
+                  ColumnDefinitions="130,*"
+                  RowSpacing="10"
+                  ColumnSpacing="10">
+
+                <TextBlock Grid.Row="0"
+                           Grid.Column="0"
+                           Text="Title:"
+                           VerticalAlignment="Center"/>
+
+                <TextBox Grid.Row="0"
+                         Grid.Column="1"
+                         Text="{Binding TitleText}"
+                         PlaceholderText="Short name"/>
+
+                <TextBlock Grid.Row="1"
+                           Grid.Column="0"
+                           Text="Description:"
+                           VerticalAlignment="Top"
+                           Margin="0,6,0,0"/>
+
+                <TextBox Grid.Row="1"
+                         Grid.Column="1"
+                         Text="{Binding DescriptionText}"
+                         PlaceholderText="Description"
+                         AcceptsReturn="True"
+                         Height="80"
+                         TextWrapping="Wrap"/>
+
+                <TextBlock Grid.Row="2"
+                           Grid.Column="0"
+                           Text="Publisher:"
+                           VerticalAlignment="Center"/>
+
+                <TextBox Grid.Row="2"
+                         Grid.Column="1"
+                         Text="{Binding PublisherText}"
+                         PlaceholderText="Author"/>
+
+                <TextBlock Grid.Row="3"
+                           Grid.Column="0"
+                           Text="Langue:"
+                           VerticalAlignment="Center"/>
+
+                <ComboBox Grid.Row="3"
+                          Grid.Column="1"
+                          SelectedIndex="{Binding SelectedTitleIndex}">
+                    <ComboBoxItem Content="Japanese"/>
+                    <ComboBoxItem Content="English"/>
+                    <ComboBoxItem Content="French"/>
+                    <ComboBoxItem Content="German"/>
+                    <ComboBoxItem Content="Italian"/>
+                    <ComboBoxItem Content="Spanish"/>
+                    <ComboBoxItem Content="Chinese Simplified"/>
+                    <ComboBoxItem Content="Korean"/>
+                    <ComboBoxItem Content="Dutch"/>
+                    <ComboBoxItem Content="Portuguese"/>
+                    <ComboBoxItem Content="Russian"/>
+                    <ComboBoxItem Content="Chinese Traditional"/>
+                </ComboBox>
+
+                <TextBlock Grid.Row="4"
+                           Grid.Column="0"
+                           Text="Status:"
+                           VerticalAlignment="Center"/>
+
+                <TextBlock Grid.Row="4"
+                           Grid.Column="1"
+                           Text="{Binding StatusText}"
+                           VerticalAlignment="Center"/>
+
+            </Grid>
+        </Border>
+
+        <Border Grid.Row="1"
+                Grid.Column="1"
+                Padding="12"
+                CornerRadius="8"
+                BorderThickness="1"
+                BorderBrush="#404040">
+
+            <StackPanel Spacing="12">
+
+                <TextBlock Text="Icon Preview"
+                           FontSize="16"
+                           FontWeight="SemiBold"
+                           HorizontalAlignment="Center"/>
+
+                <StackPanel Spacing="6" HorizontalAlignment="Center">
+                    <TextBlock Text="Big Icon 48x48" HorizontalAlignment="Center"/>
+
+                    <Border Width="96"
+                            Height="96"
+                            BorderBrush="#606060"
+                            BorderThickness="1"
+                            HorizontalAlignment="Center">
+                        <Image Source="{Binding BigIconPreview}"
+                               Stretch="Uniform"/>
+                    </Border>
+                </StackPanel>
+
+                <StackPanel Spacing="6" HorizontalAlignment="Center">
+                    <TextBlock Text="Small Icon 24x24" HorizontalAlignment="Center"/>
+
+                    <Border Width="72"
+                            Height="72"
+                            BorderBrush="#606060"
+                            BorderThickness="1"
+                            HorizontalAlignment="Center">
+                        <Image Source="{Binding SmallIconPreview}"
+                               Stretch="Uniform"/>
+                    </Border>
+                </StackPanel>
+
+            </StackPanel>
+        </Border>
+
+        <StackPanel Grid.Row="2"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="2"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Right"
+                    Spacing="8">
+
+            <Button Content="New"
+                    Width="90"
+                    Command="{Binding NewCommand}"/>
+
+            <Button Content="Open SMDH"
+                    Width="110"
+                    Command="{Binding OpenSmdhCommand}"/>
+
+            <Button Content="Load Icon"
+                    Width="110"
+                    Command="{Binding LoadIconCommand}"/>
+
+            <Button Content="Save SMDH"
+                    Width="110"
+                    Command="{Binding SaveSmdhCommand}"/>
+
+        </StackPanel>
+
+    </Grid>
+</Window>
