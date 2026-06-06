@@ -10,11 +10,7 @@
 
 ## How to use ?
 
-**Windows**
-   - Locate `SMDH-Creator.exe` and open it.
-  
-**Linux**
-   - Open a terminal and run these commands: `cd ~/SMDH-Creator.linux-x64` and `chmod +x SMDH-Creator` and `./SMDH-Creator`.
+Open CIAToolsR and goto Toolbox and click : Start SMDH-Creator
 
 ---
 
