@@ -21,3 +21,5 @@ Open CIAToolsR and goto Toolbox and click : Start SMDH-Creator
 **For Linux** : `dotnet publish -c Release -r linux-x64 --self-contained true -p:PublishSingleFile=true`
 
 ---
+
+Original project : https://github.com/GEMISIS/SMDH-Creator
