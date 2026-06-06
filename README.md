@@ -1,10 +1,8 @@
-# CIATools | RSF-Creator
+# CIATools | SMDH-Creator
 
-## RSF-Creator for CIATools
+## SMDH-Creator for CIATools
 
-**RSF-Creator** is a tool designed to run on CIATools that allows you to **create .rsf configuration** files very quickly and easily.
-
-By default, it grants **full permissions** to homebrew on the console to ensure there are no issues with your projects.
+**RSF-Creator** is a tool designed to run on CIATools that allows you to **create .smdh configuration** files very quickly and easily.
 
 **CIATools repository**: https://github.com/saysaa/CIATools
 
@@ -13,10 +11,10 @@ By default, it grants **full permissions** to homebrew on the console to ensure 
 ## How to use ?
 
 **Windows**
-   - Locate `RSF-Creator.exe` and open it.
+   - Locate `SMDH-Creator.exe` and open it.
   
 **Linux**
-   - Open a terminal and run these commands: `cd ~/RSF-Creator.linux-x64` and `chmod +x RSF-Creator` and `./RSF-Creator`.
+   - Open a terminal and run these commands: `cd ~/SMDH-Creator.linux-x64` and `chmod +x SMDH-Creator` and `./SMDH-Creator`.
 
 ---
 
