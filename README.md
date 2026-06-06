@@ -12,11 +12,7 @@ By default, it grants **full permissions** to homebrew on the console to ensure 
 
 ## How to use ?
 
-**Windows**
-   - Locate `RSF-Creator.exe` and open it.
-  
-**Linux**
-   - Open a terminal and run these commands: `cd ~/RSF-Creator.linux-x64` and `chmod +x RSF-Creator` and `./RSF-Creator`.
+Open CIAToolsR and goto Toolbox and click : Start RSF-Creator
 
 ---
 
