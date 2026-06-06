@@ -8,6 +8,10 @@
 ### RSF-Creator for CIATools 
 
 https://github.com/saysaa/CIATools/tree/rsf-creator
+
+### SMDH-Creator for CIATools 
+
+https://github.com/saysaa/CIATools/tree/smdh-creator
 ---
 
 ### OLD vs Renewed: What’s changed?
