@@ -1,7 +1,4 @@
-﻿using Avalonia.Controls;
-using Avalonia.Interactivity;
-using Avalonia.Platform.Storage;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System;
 using System.Collections.Generic;
@@ -26,9 +23,26 @@ namespace CIAToolsR.ViewModels
         [ObservableProperty]
         private string _current_os = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "Win" : "Linux";
 
-        public string rootFolder = AppDomain.CurrentDomain.BaseDirectory.Contains("bin")
-            ? Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"..\..\..\.."))
-            : AppDomain.CurrentDomain.BaseDirectory;
+        private static string FindRootPath()
+        {
+            string? dir = AppDomain.CurrentDomain.BaseDirectory;
+
+            while (dir != null)
+            {
+                if (File.Exists(Path.Combine(dir, "root_path")) ||
+                    Directory.Exists(Path.Combine(dir, "PYSCRIPT")) ||
+                    Directory.Exists(Path.Combine(dir, "USER_FILES")))
+                {
+                    return dir;
+                }
+
+                dir = Directory.GetParent(dir)?.FullName;
+            }
+
+            return AppDomain.CurrentDomain.BaseDirectory;
+        }
+
+        public string rootFolder = FindRootPath();
 
         public void ImportFiles(List<string> FilePath)
         {
@@ -39,8 +53,7 @@ namespace CIAToolsR.ViewModels
             }
 
             string userPath = Path.Combine(rootFolder, "USER_FILES");
-            if (!Directory.Exists(userPath))
-                Directory.CreateDirectory(userPath);
+            Directory.CreateDirectory(userPath);
 
             foreach (string file in FilePath)
             {
@@ -65,19 +78,11 @@ namespace CIAToolsR.ViewModels
                 string userPath = Path.Combine(rootFolder, "USER_FILES");
                 if (Directory.Exists(userPath)) Directory.Delete(userPath, true);
                 Directory.CreateDirectory(userPath);
-                File.Create(Path.Combine(userPath, "AUTHOR.txt")).Close();
-                File.Create(Path.Combine(userPath, "FILE_PATH")).Close();
+                File.WriteAllText(Path.Combine(userPath, "AUTHOR.txt"), "");
+                File.WriteAllText(Path.Combine(userPath, "FILE_PATH"), "");
 
                 Debug_output = "Clean: USER_FILES - Status: Done";
-
-                if (Current_os == "Win")
-                {
-                    Process.Start(new ProcessStartInfo { FileName = "explorer.exe", Arguments = userPath, UseShellExecute = true });
-                }
-                else
-                {
-                    Process.Start(new ProcessStartInfo { FileName = "xdg-open", Arguments = $"\"{userPath}\"", UseShellExecute = true });
-                }
+                OpenFolder(userPath);
             }
             catch (Exception ex)
             {
@@ -89,9 +94,25 @@ namespace CIAToolsR.ViewModels
         public void Build()
         {
             string execute_py = Path.Combine(rootFolder, "PYSCRIPT");
+            string import_py = Path.Combine(execute_py, "import.py");
+            string userPath = Path.Combine(rootFolder, "USER_FILES");
 
             try
             {
+                Directory.CreateDirectory(userPath);
+
+                if (!Directory.Exists(execute_py))
+                {
+                    Debug_output = $"Build Error: PYSCRIPT folder not found: {execute_py}";
+                    return;
+                }
+
+                if (!File.Exists(import_py))
+                {
+                    Debug_output = $"Build Error: import.py not found: {import_py}";
+                    return;
+                }
+
                 if (Current_os == "Win")
                 {
                     Debug_output = AutoCloseScript ? "Auto Close Script: Enabled" : "Auto Close Script: Disabled";
@@ -101,28 +122,54 @@ namespace CIAToolsR.ViewModels
                 else
                 {
                     Debug_output = "Build started (Linux)";
-                    Process.Start(new ProcessStartInfo
+
+                    var psi = new ProcessStartInfo
                     {
-                        FileName = "python3",
-                        Arguments = "import.py",
+                        FileName = "/usr/bin/env",
                         WorkingDirectory = execute_py,
                         UseShellExecute = false
-                    });
+                    };
+
+                    psi.ArgumentList.Add("python3");
+                    psi.ArgumentList.Add("import.py");
+
+                    Process.Start(psi);
                 }
 
-                string userPath = Path.Combine(rootFolder, "USER_FILES");
-                if (Current_os == "Win")
-                {
-                    Process.Start(new ProcessStartInfo { FileName = "explorer.exe", Arguments = userPath, UseShellExecute = true });
-                }
-                else
-                {
-                    Process.Start(new ProcessStartInfo { FileName = "xdg-open", Arguments = $"\"{userPath}\"", UseShellExecute = true });
-                }
+                OpenFolder(userPath);
             }
             catch (Exception ex)
             {
                 Debug_output = $"Build Error: {ex.Message}";
+            }
+        }
+
+        private void OpenFolder(string path)
+        {
+            try
+            {
+                if (Current_os == "Win")
+                {
+                    Process.Start(new ProcessStartInfo
+                    {
+                        FileName = "explorer.exe",
+                        Arguments = $"\"{path}\"",
+                        UseShellExecute = true
+                    });
+                }
+                else
+                {
+                    Process.Start(new ProcessStartInfo
+                    {
+                        FileName = "xdg-open",
+                        Arguments = $"\"{path}\"",
+                        UseShellExecute = true
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug_output = $"Open folder error: {ex.Message}";
             }
         }
     }

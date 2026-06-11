@@ -7,7 +7,7 @@
         x:Class="CIAToolsR.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Icon="/Assets/icon.ico"
-        Title="{Binding Current_os, StringFormat='CIAToolsR - {0}.V8.0.1'}"
+        Title="{Binding Current_os, StringFormat='CIAToolsR - {0}.V8.2.1'}"
         DragDrop.AllowDrop="True">
 
     <Window.Resources>
@@ -59,7 +59,7 @@
             <Setter Property="Template">
                 <ControlTemplate>
                     <Grid>
-                        <Border Background="#C40EA5"
+                        <Border Background="#C40CA5"
                                 CornerRadius="7"
                                 BoxShadow="0 0 20 0 #9D00FF"/>
                         
@@ -92,7 +92,7 @@
     </Design.DataContext>
 
     <Grid>
-        <Image Source="/Assets/background.png" Stretch="UniformToFill" Opacity="0.5"/>
+        <Image Source="/Assets/background.jpeg" Stretch="UniformToFill" Opacity="0.5"/>
         <Canvas>
 
             <TextBlock Text="CIATools" 
@@ -124,6 +124,7 @@
                         <materialIcons:MaterialIcon Kind="TuneVariant" IconSize="50" />
                     </MenuItem.Header>
                     <MenuItem Header="_Start RSF-Creator" Click="OnRSFCREATOR"/>
+                    <MenuItem Header="_Start SMDH-Creator" Click="OnSMDHCREATOR"/>
 					<MenuItem Header="_Set Author name" Click="OnSetAuthorName"/>
                 </MenuItem>
             </Menu>

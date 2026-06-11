@@ -11,11 +11,11 @@ echo "Searching files in: $WORK_DIR"
 # 1) DETECT ELF OR 3DSX
 # ============================
 
-ELF_FILE="$(ls *.elf 2>/dev/null | head -n 1 || true)"
-THREEDSX_FILE="$(ls *.3dsx 2>/dev/null | head -n 1 || true)"
+ELF_FILE="$(find . -maxdepth 1 -type f -iname "*.elf" | head -n 1 | sed 's|^\./||')"
+THREEDSX_FILE="$(find . -maxdepth 1 -type f -iname "*.3dsx" | head -n 1 | sed 's|^\./||')"
 
 if [ -z "$ELF_FILE" ] && [ -z "$THREEDSX_FILE" ]; then
-    echo "No .elf or .3dsx file found!"
+    echo "ERROR: No .elf or .3dsx file found!"
     exit 1
 fi
 
@@ -28,13 +28,15 @@ else
     echo "Converting .3dsx to .elf..."
 
     if [ -x "./3dsxtool" ]; then
-        ./3dsxtool "$THREEDSX_FILE" "$HOME_NAME.elf"
+        THREE_DSTOOL="./3dsxtool"
     elif command -v 3dsxtool >/dev/null 2>&1; then
-        3dsxtool "$THREEDSX_FILE" "$HOME_NAME.elf"
+        THREE_DSTOOL="3dsxtool"
     else
         echo "ERROR: 3dsxtool not found!"
         exit 1
     fi
+
+    "$THREE_DSTOOL" "$THREEDSX_FILE" "$HOME_NAME.elf"
 
     if [ ! -f "$HOME_NAME.elf" ]; then
         echo "ERROR: Failed to generate ELF!"
@@ -48,68 +50,8 @@ echo "Using ELF: $ELF_FILE"
 echo "Homebrew name: $HOME_NAME"
 
 # ============================
-# 2) BANNER / ICON / AUDIO
+# 2) CHECK TOOLS
 # ============================
-
-BANNER_FILE="$(find . -maxdepth 1 -type f -iname "*.png" ! -iname "icon*.png" | head -n 1 | sed 's|^\./||')"
-ICON_FILE="$(find . -maxdepth 1 -type f -iname "icon*.png" | head -n 1 | sed 's|^\./||')"
-AUDIO_FILE="$(find . -maxdepth 1 -type f -iname "*.wav" | head -n 1 | sed 's|^\./||')"
-
-if [ -z "$BANNER_FILE" ]; then
-    echo "No banner PNG found!"
-    exit 1
-fi
-
-if [ -z "$ICON_FILE" ]; then
-    echo "No icon PNG found!"
-    exit 1
-fi
-
-if [ -z "$AUDIO_FILE" ]; then
-    echo "No WAV audio found!"
-    exit 1
-fi
-
-echo "Banner: $BANNER_FILE"
-echo "Icon: $ICON_FILE"
-echo "Audio: $AUDIO_FILE"
-
-# ============================
-# 3) ROMFS
-# ============================
-
-if [ ! -d "romfs" ]; then
-    mkdir romfs
-fi
-
-# ============================
-# 4) CREATOR / AUTHOR
-# ============================
-
-CREATOR="NameOfTheCreator"
-
-if [ -f "AUTHOR.txt" ]; then
-    CREATOR="$(head -n 1 AUTHOR.txt)"
-fi
-
-if [ -z "$CREATOR" ]; then
-    CREATOR="PleaseDefineCreatorName"
-fi
-
-echo "Creator: $CREATOR"
-
-# ============================
-# 5) CHECK TOOLS
-# ============================
-
-if [ -x "./bannertool" ]; then
-    BANNERTOOL="./bannertool"
-elif command -v bannertool >/dev/null 2>&1; then
-    BANNERTOOL="bannertool"
-else
-    echo "ERROR: bannertool not found!"
-    exit 1
-fi
 
 if [ -x "./makerom" ]; then
     MAKEROM="./makerom"
@@ -125,51 +67,124 @@ if [ ! -f "homebrew.rsf" ]; then
     exit 1
 fi
 
+# bannertool est seulement obligatoire si on doit générer banner.bnr ou icon.icn.
+if [ -x "./bannertool" ]; then
+    BANNERTOOL="./bannertool"
+elif command -v bannertool >/dev/null 2>&1; then
+    BANNERTOOL="bannertool"
+else
+    BANNERTOOL=""
+fi
+
 # ============================
-# 6) BUILD
+# 3) ICON DYNAMIQUE
 # ============================
 
-echo "Building $HOME_NAME..."
+if [ -f "icon.icn" ]; then
+    ICON_OUT="icon.icn"
+    echo "Using existing icon: $ICON_OUT"
+else
+    ICON_PNG="$(find . -maxdepth 1 -type f -iname "icon*.png" | head -n 1 | sed 's|^\./||')"
 
-"$BANNERTOOL" makebanner \
-    -i "$BANNER_FILE" \
-    -a "$AUDIO_FILE" \
-    -o banner.bnr
+    if [ -z "$ICON_PNG" ]; then
+        echo "ERROR: No icon.icn or icon*.png found!"
+        exit 1
+    fi
 
-"$BANNERTOOL" makesmdh \
-    -s "$HOME_NAME" \
-    -l "$HOME_NAME" \
-    -p "$CREATOR" \
-    -i "$ICON_FILE" \
-    -o icon.icn
+    if [ -z "$BANNERTOOL" ]; then
+        echo "ERROR: bannertool not found! Needed to generate icon.icn from $ICON_PNG"
+        exit 1
+    fi
+
+    CREATOR="NameOfTheCreator"
+
+    if [ -f "AUTHOR.txt" ]; then
+        CREATOR="$(head -n 1 AUTHOR.txt)"
+    fi
+
+    if [ -z "$CREATOR" ]; then
+        CREATOR="PleaseDefineCreatorName"
+    fi
+
+    echo "Generating icon.icn from: $ICON_PNG"
+    echo "Creator: $CREATOR"
+
+    "$BANNERTOOL" makesmdh \
+        -s "$HOME_NAME" \
+        -l "$HOME_NAME" \
+        -p "$CREATOR" \
+        -i "$ICON_PNG" \
+        -o icon.icn
+
+    ICON_OUT="icon.icn"
+fi
+
+# ============================
+# 4) BANNER DYNAMIQUE
+# ============================
+# Mode intelligent :
+# - Si banner.bin existe, on l'utilise directement. Utile pour une bannière 3D déjà prête.
+# - Sinon, si banner.bnr existe, on l'utilise directement.
+# - Sinon, on génère banner.bnr avec bannertool depuis une image PNG + un WAV.
+
+if [ -f "banner.bin" ]; then
+    BANNER_OUT="banner.bin"
+    echo "Using 3D/prebuilt banner: $BANNER_OUT"
+elif [ -f "banner.bnr" ]; then
+    BANNER_OUT="banner.bnr"
+    echo "Using existing banner: $BANNER_OUT"
+else
+    BANNER_PNG="$(find . -maxdepth 1 -type f -iname "*.png" ! -iname "icon*.png" | head -n 1 | sed 's|^\./||')"
+    AUDIO_FILE="$(find . -maxdepth 1 -type f -iname "*.wav" | head -n 1 | sed 's|^\./||')"
+
+    if [ -z "$BANNER_PNG" ]; then
+        echo "ERROR: No banner.bin, banner.bnr, or banner PNG found!"
+        exit 1
+    fi
+
+    if [ -z "$AUDIO_FILE" ]; then
+        echo "ERROR: No WAV audio found! Needed to generate banner.bnr."
+        exit 1
+    fi
+
+    if [ -z "$BANNERTOOL" ]; then
+        echo "ERROR: bannertool not found! Needed to generate banner.bnr."
+        exit 1
+    fi
+
+    echo "Generating 2D banner.bnr from:"
+    echo "Banner image: $BANNER_PNG"
+    echo "Audio: $AUDIO_FILE"
+
+    "$BANNERTOOL" makebanner \
+        -i "$BANNER_PNG" \
+        -a "$AUDIO_FILE" \
+        -o banner.bnr
+
+    BANNER_OUT="banner.bnr"
+fi
+
+# ============================
+# 5) ROMFS
+# ============================
+
+if [ ! -d "romfs" ]; then
+    mkdir romfs
+fi
+
+# ============================
+# 6) BUILD CIA
+# ============================
+
+echo "Building CIA: $HOME_NAME.cia"
 
 "$MAKEROM" -f cia \
     -o "$HOME_NAME.cia" \
-    -DAPP_ENCRYPTED=false \
     -rsf homebrew.rsf \
     -target t \
     -exefslogo \
     -elf "$ELF_FILE" \
-    -icon icon.icn \
-    -banner banner.bnr
+    -banner "$BANNER_OUT" \
+    -icon "$ICON_OUT"
 
-"$MAKEROM" -f cci \
-    -o "$HOME_NAME.3ds" \
-    -DAPP_ENCRYPTED=true \
-    -rsf homebrew.rsf \
-    -target t \
-    -exefslogo \
-    -elf "$ELF_FILE" \
-    -icon icon.icn \
-    -banner banner.bnr
-
-echo "Files ready."
-
-# ============================
-# 7) CLEANUP optionnel
-# ============================
-
-# DELETE_SCRIPT="../PYSCRIPT/delete.py"
-# if [ -f "$DELETE_SCRIPT" ]; then
-#     python3 "$DELETE_SCRIPT"
-# fi
+echo "CIA ready: $HOME_NAME.cia"

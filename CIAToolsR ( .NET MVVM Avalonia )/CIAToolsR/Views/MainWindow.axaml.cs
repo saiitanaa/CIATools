@@ -214,6 +214,52 @@ namespace CIAToolsR.Views
             }
         }
 
+        public void OnSMDHCREATOR(object sender, RoutedEventArgs e)
+        {
+            var rootPath = FindRootPath();
+            var smdhFolder = Path.Combine(rootPath, "SMDH-Creator");
+
+            var linux_path = Path.Combine(smdhFolder, "SMDH-Creator");
+            var win_path = Path.Combine(smdhFolder, "SMDH-Creator.exe");
+
+            try
+            {
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                {
+                    string zoneIdentifierPath = $"{win_path}:Zone.Identifier";
+                    if (File.Exists(zoneIdentifierPath))
+                    {
+                        File.Delete(zoneIdentifierPath);
+                    }
+
+                    Process.Start(new ProcessStartInfo(win_path)
+                    {
+                        UseShellExecute = true,
+                        WorkingDirectory = smdhFolder
+                    });
+                }
+                else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                {
+                    try
+                    {
+                        Process.Start(new ProcessStartInfo("chmod", $"+x \"{linux_path}\"") { UseShellExecute = false }).WaitForExit();
+                    }
+                    catch { }
+
+                    var psi = new ProcessStartInfo(linux_path)
+                    {
+                        UseShellExecute = false,
+                        WorkingDirectory = smdhFolder
+                    };
+                    Process.Start(psi);
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Failed start SMDHCREATOR: {ex.Message}");
+            }
+        }
+
         private async Task CheckUpdateAsync()
         {
             await RunUpdateCheckLogicAsync(this);
@@ -221,7 +267,7 @@ namespace CIAToolsR.Views
 
         private async Task RunUpdateCheckLogicAsync(Window ownerWindow)
         {
-            string currentVersion = "8.0.1";
+            string currentVersion = "8.1.1";
             var client = new GitHubClient(new ProductHeaderValue("CIAToolsR"));
 
             try

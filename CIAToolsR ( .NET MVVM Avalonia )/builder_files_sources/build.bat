@@ -17,23 +17,27 @@ set "THREEDSX_FILE="
 
 REM -- Try to find ELF first
 for %%f in ("%WORK_DIR%*.elf") do (
-    set "ELF_FILE=%%~nxf"
-    set "HOME_NAME=%%~nf"
+    if not defined ELF_FILE (
+        set "ELF_FILE=%%~nxf"
+        set "HOME_NAME=%%~nf"
+    )
 )
 
 REM -- If no ELF, try 3DSX
 if not defined ELF_FILE (
     for %%f in ("%WORK_DIR%*.3dsx") do (
-        set "THREEDSX_FILE=%%~nxf"
-        set "HOME_NAME=%%~nf"
+        if not defined THREEDSX_FILE (
+            set "THREEDSX_FILE=%%~nxf"
+            set "HOME_NAME=%%~nf"
+        )
     )
 )
 
 REM -- Error if nothing found
 if not defined ELF_FILE if not defined THREEDSX_FILE (
-    echo No .elf or .3dsx file found!
+    echo ERROR: No .elf or .3dsx file found!
     pause
-    exit /b
+    exit /b 1
 )
 
 REM ============================
@@ -44,18 +48,18 @@ if not defined ELF_FILE (
     echo Found 3DSX: %THREEDSX_FILE%
     echo Converting .3dsx to .elf...
 
-    if not exist "%WORK_DIR%3dsxtool.exe" (
-        echo ERROR: 3dsxtool.exe not found!
-        pause
-        exit /b
+    if exist "%WORK_DIR%3dsxtool.exe" (
+        set "THREEDSTOOL=%WORK_DIR%3dsxtool.exe"
+    ) else (
+        set "THREEDSTOOL=3dsxtool.exe"
     )
 
-    3dsxtool.exe "%WORK_DIR%%THREEDSX_FILE%" "%HOME_NAME%.elf"
+    "%THREEDSTOOL%" "%WORK_DIR%%THREEDSX_FILE%" "%WORK_DIR%%HOME_NAME%.elf"
 
-    if not exist "%HOME_NAME%.elf" (
+    if not exist "%WORK_DIR%%HOME_NAME%.elf" (
         echo ERROR: Failed to generate ELF!
         pause
-        exit /b
+        exit /b 1
     )
 
     set "ELF_FILE=%HOME_NAME%.elf"
@@ -65,43 +69,128 @@ echo Using ELF: %ELF_FILE%
 echo Homebrew name: %HOME_NAME%
 
 REM ============================
-REM 3) BANNER / ICON / AUDIO
+REM 3) CHECK TOOLS
 REM ============================
 
-set "BANNER_FILE="
-for %%f in ("%WORK_DIR%*.png") do (
-    if /i "%%~nf" neq "icon" (
-        set "BANNER_FILE=%%~nxf"
+if exist "%WORK_DIR%makerom.exe" (
+    set "MAKEROM=%WORK_DIR%makerom.exe"
+) else if exist "%WORK_DIR%makerom" (
+    set "MAKEROM=%WORK_DIR%makerom"
+) else (
+    set "MAKEROM=makerom.exe"
+)
+
+if not exist "%WORK_DIR%homebrew.rsf" (
+    echo ERROR: homebrew.rsf not found!
+    pause
+    exit /b 1
+)
+
+REM bannertool est seulement obligatoire si on doit générer banner.bnr ou icon.icn.
+if exist "%WORK_DIR%bannertool.exe" (
+    set "BANNERTOOL=%WORK_DIR%bannertool.exe"
+) else (
+    set "BANNERTOOL=bannertool.exe"
+)
+
+REM ============================
+REM 4) ICON DYNAMIQUE
+REM ============================
+
+if exist "%WORK_DIR%icon.icn" (
+    set "ICON_OUT=icon.icn"
+    echo Using existing icon: icon.icn
+) else (
+    set "ICON_PNG="
+    for %%f in ("%WORK_DIR%icon*.png") do (
+        if not defined ICON_PNG set "ICON_PNG=%%~nxf"
     )
-)
-if not defined BANNER_FILE (
-    echo No banner PNG found!
-    pause
-    exit /b
-)
 
-set "ICON_FILE="
-for %%f in ("%WORK_DIR%icon*.png") do (
-    set "ICON_FILE=%%~nxf"
-)
-if not defined ICON_FILE (
-    echo No icon PNG found!
-    pause
-    exit /b
-)
+    if not defined ICON_PNG (
+        echo ERROR: No icon.icn or icon*.png found!
+        pause
+        exit /b 1
+    )
 
-set "AUDIO_FILE="
-for %%f in ("%WORK_DIR%*.wav") do (
-    set "AUDIO_FILE=%%~nxf"
-)
-if not defined AUDIO_FILE (
-    echo No WAV audio found!
-    pause
-    exit /b
+    set "CREATOR=NameOfTheCreator"
+    if exist "%WORK_DIR%AUTHOR.txt" (
+        set /p CREATOR=<"%WORK_DIR%AUTHOR.txt"
+    )
+    if "!CREATOR!"=="" (
+        set "CREATOR=PleaseDefineCreatorName"
+    )
+
+    echo Generating icon.icn from: !ICON_PNG!
+    echo Creator: !CREATOR!
+
+    "%BANNERTOOL%" makesmdh -s "%HOME_NAME%" -l "%HOME_NAME%" -p "!CREATOR!" -i "%WORK_DIR%!ICON_PNG!" -o "%WORK_DIR%icon.icn"
+
+    if not exist "%WORK_DIR%icon.icn" (
+        echo ERROR: Failed to generate icon.icn!
+        pause
+        exit /b 1
+    )
+
+    set "ICON_OUT=icon.icn"
 )
 
 REM ============================
-REM 4) ROMFS
+REM 5) BANNER DYNAMIQUE
+REM ============================
+REM Mode intelligent :
+REM - Si banner.bin existe, on l'utilise directement. Utile pour une banniere 3D deja prete.
+REM - Sinon, si banner.bnr existe, on l'utilise directement.
+REM - Sinon, on genere banner.bnr avec bannertool depuis une image PNG + un WAV.
+
+if exist "%WORK_DIR%banner.bin" (
+    set "BANNER_OUT=banner.bin"
+    echo Using 3D/prebuilt banner: banner.bin
+) else if exist "%WORK_DIR%banner.bnr" (
+    set "BANNER_OUT=banner.bnr"
+    echo Using existing banner: banner.bnr
+) else (
+    set "BANNER_PNG="
+    for %%f in ("%WORK_DIR%*.png") do (
+        set "PNG_NAME=%%~nf"
+        if /i not "!PNG_NAME:~0,4!"=="icon" (
+            if not defined BANNER_PNG set "BANNER_PNG=%%~nxf"
+        )
+    )
+
+    set "AUDIO_FILE="
+    for %%f in ("%WORK_DIR%*.wav") do (
+        if not defined AUDIO_FILE set "AUDIO_FILE=%%~nxf"
+    )
+
+    if not defined BANNER_PNG (
+        echo ERROR: No banner.bin, banner.bnr, or banner PNG found!
+        pause
+        exit /b 1
+    )
+
+    if not defined AUDIO_FILE (
+        echo ERROR: No WAV audio found! Needed to generate banner.bnr.
+        pause
+        exit /b 1
+    )
+
+    echo Generating 2D banner.bnr from:
+    echo Banner image: !BANNER_PNG!
+    echo Audio: !AUDIO_FILE!
+
+    "%BANNERTOOL%" makebanner -i "%WORK_DIR%!BANNER_PNG!" -a "%WORK_DIR%!AUDIO_FILE!" -o "%WORK_DIR%banner.bnr"
+
+    if not exist "%WORK_DIR%banner.bnr" (
+        echo ERROR: Failed to generate banner.bnr!
+        pause
+        exit /b 1
+    )
+
+    set "BANNER_OUT=banner.bnr"
+)
+
+REM ============================
+REM 6) ROMFS
 REM ============================
 
 if not exist "%WORK_DIR%romfs" (
@@ -109,33 +198,18 @@ if not exist "%WORK_DIR%romfs" (
 )
 
 REM ============================
-REM 5) BUILD
+REM 7) BUILD CIA
 REM ============================
 
-echo Building %HOME_NAME%...
+echo Building CIA: %HOME_NAME%.cia
 
-set "CREATOR=NameOfTheCreator"
+"%MAKEROM%" -f cia -o "%WORK_DIR%%HOME_NAME%.cia" -rsf "%WORK_DIR%homebrew.rsf" -target t -exefslogo -elf "%WORK_DIR%%ELF_FILE%" -banner "%WORK_DIR%%BANNER_OUT%" -icon "%WORK_DIR%%ICON_OUT%"
 
-if exist "AUTHOR.txt" (
-    set /p CREATOR=<"AUTHOR.txt"
+if errorlevel 1 (
+    echo ERROR: makerom failed!
+    pause
+    exit /b 1
 )
 
-if "%CREATOR%"=="" (
-    set "CREATOR=PleaseDefineCreatorName"
-)
-
-bannertool.exe makebanner -i "%WORK_DIR%%BANNER_FILE%" -a "%WORK_DIR%%AUDIO_FILE%" -o banner.bnr
-bannertool.exe makesmdh -s "%HOME_NAME%" -l "%HOME_NAME%" -p "%CREATOR%" -i "%WORK_DIR%%ICON_FILE%" -o icon.icn
-
-makerom -f cia -o "%HOME_NAME%.cia" -DAPP_ENCRYPTED=false -rsf homebrew.rsf -target t -exefslogo -elf "%ELF_FILE%" -icon icon.icn -banner banner.bnr
-makerom -f cci -o "%HOME_NAME%.3ds" -DAPP_ENCRYPTED=true -rsf homebrew.rsf -target t -exefslogo -elf "%ELF_FILE%" -icon icon.icn -banner banner.bnr
-
-echo Files ready.
-
-REM -- 6) CLEANUP (Supprime cette partie ou commente-la)
-REM set "DELETE_SCRIPT=%WORK_DIR%..\PYSCRIPT\delete.py"
-REM if exist "%DELETE_SCRIPT%" (
-REM     python "%DELETE_SCRIPT%"
-REM )
-
+echo CIA ready: %HOME_NAME%.cia
 pause
