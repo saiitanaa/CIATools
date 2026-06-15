@@ -3,11 +3,11 @@
         xmlns:vm="using:CIAToolsR.ViewModels"
         xmlns:themes="clr-namespace:Material.Styles.Themes;assembly=Material.Styles"
         xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia" 
-        MinHeight="370" MinWidth="440" MaxHeight="400" MaxWidth="600"
+        MinHeight="400" MinWidth="600" MaxHeight="400" MaxWidth="600"
         x:Class="CIAToolsR.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Icon="/Assets/icon.ico"
-        Title="{Binding Current_os, StringFormat='CIAToolsR - {0}.V8.2.1'}"
+        Title="{Binding Current_os, StringFormat='CIAToolsR - {0}.V8.2.2'}"
         DragDrop.AllowDrop="True">
 
     <Window.Resources>

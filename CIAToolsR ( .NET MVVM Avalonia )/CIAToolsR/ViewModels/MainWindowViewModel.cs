@@ -15,7 +15,7 @@ namespace CIAToolsR.ViewModels
         private string _debug_output = "";
 
         [ObservableProperty]
-        private bool _Console = false;
+        private bool _Console = true;
 
         [ObservableProperty]
         private bool _AutoCloseScript = true;

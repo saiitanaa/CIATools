@@ -196,9 +196,24 @@ namespace CIAToolsR.Views
                 {
                     try
                     {
-                        Process.Start(new ProcessStartInfo("chmod", $"+x \"{linux_path}\"") { UseShellExecute = false }).WaitForExit();
+                        var chmodProcess = Process.Start(new ProcessStartInfo("chmod", $"+x \"{linux_path}\"")
+                        {
+                            UseShellExecute = false
+                        });
+
+                        if (chmodProcess == null)
+                        {
+                            Debug.WriteLine("Failed to start chmod.");
+                        }
+                        else
+                        {
+                            chmodProcess.WaitForExit();
+                        }
                     }
-                    catch { }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine($"chmod failed: {ex.Message}");
+                    }
 
                     var psi = new ProcessStartInfo(linux_path)
                     {
@@ -242,9 +257,24 @@ namespace CIAToolsR.Views
                 {
                     try
                     {
-                        Process.Start(new ProcessStartInfo("chmod", $"+x \"{linux_path}\"") { UseShellExecute = false }).WaitForExit();
+                        var chmodProcess = Process.Start(new ProcessStartInfo("chmod", $"+x \"{linux_path}\"")
+                        {
+                            UseShellExecute = false
+                        });
+
+                        if (chmodProcess == null)
+                        {
+                            Debug.WriteLine("Failed to start chmod.");
+                        }
+                        else
+                        {
+                            chmodProcess.WaitForExit();
+                        }
                     }
-                    catch { }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine($"chmod failed: {ex.Message}");
+                    }
 
                     var psi = new ProcessStartInfo(linux_path)
                     {
