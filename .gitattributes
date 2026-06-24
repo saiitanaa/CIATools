@@ -1,0 +1,5 @@
+*.rs linguist-language=Rust
+*.rs linguist-detectable
+*.rs -linguist-vendored
+*.rs -linguist-generated
+*.rs -linguist-documentation
