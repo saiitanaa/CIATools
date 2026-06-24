@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System;
 using System.Collections.Generic;
@@ -30,7 +30,7 @@ namespace CIAToolsR.ViewModels
             while (dir != null)
             {
                 if (File.Exists(Path.Combine(dir, "root_path")) ||
-                    Directory.Exists(Path.Combine(dir, "PYSCRIPT")) ||
+                    Directory.Exists(Path.Combine(dir, "RSSCRIPT")) ||
                     Directory.Exists(Path.Combine(dir, "USER_FILES")))
                 {
                     return dir;
@@ -44,9 +44,9 @@ namespace CIAToolsR.ViewModels
 
         public string rootFolder = FindRootPath();
 
-        public void ImportFiles(List<string> FilePath)
+        public void ImportFiles(List<string> filePath)
         {
-            if (FilePath == null || !FilePath.Any())
+            if (filePath == null || !filePath.Any())
             {
                 Debug_output = "Import aborted: no file selected.";
                 return;
@@ -55,12 +55,12 @@ namespace CIAToolsR.ViewModels
             string userPath = Path.Combine(rootFolder, "USER_FILES");
             Directory.CreateDirectory(userPath);
 
-            foreach (string file in FilePath)
+            foreach (string file in filePath)
             {
                 try
                 {
-                    string ImportFile = Path.Combine(userPath, Path.GetFileName(file));
-                    File.Copy(file, ImportFile, true);
+                    string importFile = Path.Combine(userPath, Path.GetFileName(file));
+                    File.Copy(file, importFile, true);
                     Debug_output = "Import successful";
                 }
                 catch (Exception ex)
@@ -76,8 +76,14 @@ namespace CIAToolsR.ViewModels
             try
             {
                 string userPath = Path.Combine(rootFolder, "USER_FILES");
-                if (Directory.Exists(userPath)) Directory.Delete(userPath, true);
+
+                if (Directory.Exists(userPath))
+                {
+                    Directory.Delete(userPath, true);
+                }
+
                 Directory.CreateDirectory(userPath);
+
                 File.WriteAllText(Path.Combine(userPath, "AUTHOR.txt"), "");
                 File.WriteAllText(Path.Combine(userPath, "FILE_PATH"), "");
 
@@ -93,47 +99,43 @@ namespace CIAToolsR.ViewModels
         [RelayCommand]
         public void Build()
         {
-            string execute_py = Path.Combine(rootFolder, "PYSCRIPT");
-            string import_py = Path.Combine(execute_py, "import.py");
+            string rustScriptPath = Path.Combine(rootFolder, "RSSCRIPT");
             string userPath = Path.Combine(rootFolder, "USER_FILES");
+
+            string importExecutable = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+                ? Path.Combine(rustScriptPath, "import.exe")
+                : Path.Combine(rustScriptPath, "import");
 
             try
             {
                 Directory.CreateDirectory(userPath);
 
-                if (!Directory.Exists(execute_py))
+                if (!Directory.Exists(rustScriptPath))
                 {
-                    Debug_output = $"Build Error: PYSCRIPT folder not found: {execute_py}";
+                    Debug_output = $"Build Error: RSSCRIPT folder not found: {rustScriptPath}";
                     return;
                 }
 
-                if (!File.Exists(import_py))
+                if (!File.Exists(importExecutable))
                 {
-                    Debug_output = $"Build Error: import.py not found: {import_py}";
+                    Debug_output = $"Build Error: Rust import executable not found: {importExecutable}";
                     return;
                 }
 
-                if (Current_os == "Win")
+                PrepareRustExecutables(rustScriptPath);
+
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 {
-                    Debug_output = AutoCloseScript ? "Auto Close Script: Enabled" : "Auto Close Script: Disabled";
-                    string flag = AutoCloseScript ? "/c" : "/k";
-                    Process.Start("cmd.exe", $"{flag} cd /d \"{execute_py}\" && py -3 import.py");
+                    StartRustToolWindows(rustScriptPath, importExecutable);
+                }
+                else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                {
+                    StartRustToolLinux(rustScriptPath, importExecutable);
                 }
                 else
                 {
-                    Debug_output = "Build started (Linux)";
-
-                    var psi = new ProcessStartInfo
-                    {
-                        FileName = "/usr/bin/env",
-                        WorkingDirectory = execute_py,
-                        UseShellExecute = false
-                    };
-
-                    psi.ArgumentList.Add("python3");
-                    psi.ArgumentList.Add("import.py");
-
-                    Process.Start(psi);
+                    Debug_output = "Build Error: unsupported OS.";
+                    return;
                 }
 
                 OpenFolder(userPath);
@@ -144,11 +146,241 @@ namespace CIAToolsR.ViewModels
             }
         }
 
+        private void StartRustToolWindows(string rustScriptPath, string importExecutable)
+        {
+            Debug_output = AutoCloseScript
+                ? "Rust build started - Auto close enabled"
+                : "Rust build started - Auto close disabled";
+
+            if (Console)
+            {
+                string flag = AutoCloseScript ? "/c" : "/k";
+
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = "cmd.exe",
+                    Arguments = $"{flag} \"\"{importExecutable}\"\"",
+                    WorkingDirectory = rustScriptPath,
+                    UseShellExecute = true
+                });
+
+                return;
+            }
+
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = importExecutable,
+                WorkingDirectory = rustScriptPath,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            });
+        }
+
+        private void StartRustToolLinux(string rustScriptPath, string importExecutable)
+        {
+            Debug_output = "Rust build started (Linux)";
+
+            if (Console && TryStartLinuxTerminal(rustScriptPath, importExecutable))
+            {
+                return;
+            }
+
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = importExecutable,
+                WorkingDirectory = rustScriptPath,
+                UseShellExecute = false
+            });
+        }
+
+        private void PrepareRustExecutables(string rustScriptPath)
+        {
+            try
+            {
+                string builderPath = Path.Combine(rustScriptPath, "builder_files_sources");
+
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                {
+                    RemoveWindowsZoneIdentifierFromFolder(rustScriptPath);
+                    RemoveWindowsZoneIdentifierFromFolder(builderPath);
+                }
+                else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                {
+                    MakeExecutable(Path.Combine(rustScriptPath, "import"));
+                    MakeExecutable(Path.Combine(rustScriptPath, "compile"));
+                    MakeExecutable(Path.Combine(rustScriptPath, "delete"));
+
+                    MakeExecutable(Path.Combine(builderPath, "build.sh"));
+                    MakeExecutable(Path.Combine(builderPath, "makerom"));
+                    MakeExecutable(Path.Combine(builderPath, "bannertool"));
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"PrepareRustExecutables warning: {ex.Message}");
+            }
+        }
+
+        private static void RemoveWindowsZoneIdentifierFromFolder(string folderPath)
+        {
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                return;
+
+            if (!Directory.Exists(folderPath))
+                return;
+
+            string[] patterns =
+            {
+                "*.exe",
+                "*.bat",
+                "*.cmd"
+            };
+
+            foreach (string pattern in patterns)
+            {
+                foreach (string file in Directory.EnumerateFiles(folderPath, pattern, SearchOption.TopDirectoryOnly))
+                {
+                    RemoveWindowsZoneIdentifier(file);
+                }
+            }
+        }
+
+        private static void RemoveWindowsZoneIdentifier(string filePath)
+        {
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                return;
+
+            if (!File.Exists(filePath))
+                return;
+
+            try
+            {
+                File.Delete($"{filePath}:Zone.Identifier");
+            }
+            catch (FileNotFoundException)
+            {
+            }
+            catch (DirectoryNotFoundException)
+            {
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Zone.Identifier remove failed for {filePath}: {ex.Message}");
+            }
+        }
+
+        private static void MakeExecutable(string path)
+        {
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                return;
+
+            if (!File.Exists(path))
+                return;
+
+            try
+            {
+                var chmodInfo = new ProcessStartInfo
+                {
+                    FileName = "chmod",
+                    UseShellExecute = false
+                };
+
+                chmodInfo.ArgumentList.Add("+x");
+                chmodInfo.ArgumentList.Add(path);
+
+                using Process? chmodProcess = Process.Start(chmodInfo);
+                chmodProcess?.WaitForExit();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"chmod failed for {path}: {ex.Message}");
+            }
+        }
+
+        private bool TryStartLinuxTerminal(string rustScriptPath, string importExecutable)
+        {
+            string command = $"cd {QuoteForBash(rustScriptPath)} && {QuoteForBash(importExecutable)}";
+
+            if (!AutoCloseScript)
+            {
+                command += "; echo; read -r -p 'Press Enter to close...'";
+            }
+
+            string[] terminals =
+            {
+                "gnome-terminal",
+                "konsole",
+                "xfce4-terminal",
+                "mate-terminal",
+                "xterm"
+            };
+
+            foreach (string terminal in terminals)
+            {
+                try
+                {
+                    var psi = new ProcessStartInfo
+                    {
+                        FileName = terminal,
+                        UseShellExecute = false
+                    };
+
+                    if (terminal == "gnome-terminal")
+                    {
+                        psi.ArgumentList.Add("--");
+                        psi.ArgumentList.Add("bash");
+                        psi.ArgumentList.Add("-lc");
+                        psi.ArgumentList.Add(command);
+                    }
+                    else if (terminal == "konsole")
+                    {
+                        psi.ArgumentList.Add("-e");
+                        psi.ArgumentList.Add("bash");
+                        psi.ArgumentList.Add("-lc");
+                        psi.ArgumentList.Add(command);
+                    }
+                    else if (terminal == "xfce4-terminal")
+                    {
+                        psi.ArgumentList.Add("--command");
+                        psi.ArgumentList.Add($"bash -lc {QuoteForBash(command)}");
+                    }
+                    else if (terminal == "mate-terminal")
+                    {
+                        psi.ArgumentList.Add("--");
+                        psi.ArgumentList.Add("bash");
+                        psi.ArgumentList.Add("-lc");
+                        psi.ArgumentList.Add(command);
+                    }
+                    else if (terminal == "xterm")
+                    {
+                        psi.ArgumentList.Add("-e");
+                        psi.ArgumentList.Add("bash");
+                        psi.ArgumentList.Add("-lc");
+                        psi.ArgumentList.Add(command);
+                    }
+
+                    Process.Start(psi);
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"Terminal start failed ({terminal}): {ex.Message}");
+                }
+            }
+
+            return false;
+        }
+
+        private static string QuoteForBash(string value)
+        {
+            return "'" + value.Replace("'", "'\"'\"'") + "'";
+        }
+
         private void OpenFolder(string path)
         {
             try
             {
-                if (Current_os == "Win")
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 {
                     Process.Start(new ProcessStartInfo
                     {
@@ -157,7 +389,7 @@ namespace CIAToolsR.ViewModels
                         UseShellExecute = true
                     });
                 }
-                else
+                else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
                 {
                     Process.Start(new ProcessStartInfo
                     {

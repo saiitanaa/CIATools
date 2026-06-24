@@ -7,92 +7,99 @@
         x:Class="CIAToolsR.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Icon="/Assets/icon.ico"
-        Title="{Binding Current_os, StringFormat='CIAToolsR - {0}.V8.2.2'}"
-        DragDrop.AllowDrop="True">
+        Title="{Binding Current_os, StringFormat='CIAToolsR - {0}.V9.0.0'}"
+        DragDrop.AllowDrop="True"
 
+        Background="Transparent"
+        TransparencyLevelHint="Transparent"
+        TransparencyBackgroundFallback="#FF1E1E1E">
+
+    
     <Window.Resources>
         <FontFamily x:Key="Montserrat.Extrabold">avares://CIAToolsR/Assets/Fonts/Montserrat-ExtraBold.ttf</FontFamily>
     </Window.Resources>
     
-    <Window.Styles>
-        <themes:MaterialTheme BaseTheme="Dark" PrimaryColor="Orange" SecondaryColor="Purple" />
-        <materialIcons:MaterialIconStyles />
+<Window.Styles>
+    <themes:MaterialTheme BaseTheme="Dark" PrimaryColor="Orange" SecondaryColor="Purple" />
+    <materialIcons:MaterialIconStyles />
 
-        <Style Selector="Button.neon-blue">
-            <Setter Property="Foreground" Value="White"/>
-            <Setter Property="FontSize" Value="22"/>
-            <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="Template">
-                <ControlTemplate>
-                    <Grid>
-                        <Border Background="#1291C7"
-                                CornerRadius="7"
-                                BoxShadow="0 0 20 0 #008CFF"/>
-                        
-                        <Border Name="HoverGlow"
-                                CornerRadius="7"
-                                BoxShadow="0 0 5 0 #008CFF, 0 0 25 0 #008CFF, 0 0 50 0 #008CFF, 0 0 100 0 #008CFF"
-                                Opacity="0">
-                            <Border.Transitions>
-                                <Transitions>
-                                    <DoubleTransition Property="Opacity" Duration="0:0:0.5"/>
-                                </Transitions>
-                            </Border.Transitions>
-                        </Border>
+    <Style Selector="Button.neon-blue">
+        <Setter Property="Foreground" Value="White"/>
+        <Setter Property="FontSize" Value="22"/>
+        <Setter Property="FontWeight" Value="Bold"/>
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Grid>
+                    <Border Background="#ff9e00"
+                            CornerRadius="7"
+                            BoxShadow="0 0 15 0 #ff9e00"/> <Border Name="HoverGlow"
+                            Background="Transparent"
+                            CornerRadius="7"
+                            BoxShadow="0 0 12 0 #ff9e00, 0 0 25 -3 #ff9e00, 0 0 50 -8 #ff9e00"
+                            Opacity="0">
+                        <Border.Transitions>
+                            <Transitions>
+                                <DoubleTransition Property="Opacity" Duration="0:0:0.5"/>
+                            </Transitions>
+                        </Border.Transitions>
+                    </Border>
 
-                        <ContentPresenter Content="{TemplateBinding Content}"
-                                          HorizontalAlignment="Center"
-                                          VerticalAlignment="Center"/>
-                    </Grid>
-                </ControlTemplate>
-            </Setter>
-        </Style>
+                    <ContentPresenter Content="{TemplateBinding Content}"
+                                      HorizontalAlignment="Center"
+                                      VerticalAlignment="Center"/>
+                </Grid>
+            </ControlTemplate>
+        </Setter>
+    </Style>
 
-        <Style Selector="Button.neon-blue:pointerover /template/ Border#HoverGlow">
-            <Setter Property="Opacity" Value="1"/>
-        </Style>
+    <Style Selector="Button.neon-blue:pointerover /template/ Border#HoverGlow">
+        <Setter Property="Opacity" Value="1"/>
+    </Style>
 
-        <Style Selector="Button.neon-purple">
-            <Setter Property="Foreground" Value="White"/>
-            <Setter Property="FontSize" Value="20"/>
-            <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="Template">
-                <ControlTemplate>
-                    <Grid>
-                        <Border Background="#C40CA5"
-                                CornerRadius="7"
-                                BoxShadow="0 0 20 0 #9D00FF"/>
-                        
-                        <Border Name="HoverGlow"
-                                CornerRadius="7"
-                                BoxShadow="0 0 5 0 #9D00FF, 0 0 25 0 #9D00FF, 0 0 50 0 #9D00FF, 0 0 100 0 #9D00FF"
-                                Opacity="0">
-                            <Border.Transitions>
-                                <Transitions>
-                                    <DoubleTransition Property="Opacity" Duration="0:0:0.5"/>
-                                </Transitions>
-                            </Border.Transitions>
-                        </Border>
+    <Style Selector="Button.neon-purple">
+        <Setter Property="Foreground" Value="White"/>
+        <Setter Property="FontSize" Value="20"/>
+        <Setter Property="FontWeight" Value="Bold"/>
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Grid>
+                    <Border Background="#240046"
+                            CornerRadius="7"
+                            BoxShadow="0 0 15 0 #240046"/>
+                    
+                    <Border Name="HoverGlow"
+                            Background="Transparent"
+                            CornerRadius="7"
+                            BoxShadow="0 0 12 0 #9D00FF, 0 0 25 -3 #9D00FF, 0 0 50 -8 #9D00FF"
+                            Opacity="0">
+                        <Border.Transitions>
+                            <Transitions>
+                                <DoubleTransition Property="Opacity" Duration="0:0:0.5"/>
+                            </Transitions>
+                        </Border.Transitions>
+                    </Border>
 
-                        <ContentPresenter Content="{TemplateBinding Content}"
-                                          HorizontalAlignment="Center"
-                                          VerticalAlignment="Center"/>
-                    </Grid>
-                </ControlTemplate>
-            </Setter>
-        </Style>
+                    <ContentPresenter Content="{TemplateBinding Content}"
+                                      HorizontalAlignment="Center"
+                                      VerticalAlignment="Center"/>
+                </Grid>
+            </ControlTemplate>
+        </Setter>
+    </Style>
 
-        <Style Selector="Button.neon-purple:pointerover /template/ Border#HoverGlow">
-            <Setter Property="Opacity" Value="1"/>
-        </Style>
-    </Window.Styles>
+    <Style Selector="Button.neon-purple:pointerover /template/ Border#HoverGlow">
+        <Setter Property="Opacity" Value="1"/>
+    </Style>
+</Window.Styles>
     
     <Design.DataContext>
         <vm:MainWindowViewModel/>
     </Design.DataContext>
 
-    <Grid>
-        <Image Source="/Assets/background.jpeg" Stretch="UniformToFill" Opacity="0.5"/>
+    <Grid Background="#CC000000">
+        <Image Source="/Assets/background.png"
+               Stretch="UniformToFill"
+               Opacity="0.5"/>
         <Canvas>
 
             <TextBlock Text="CIATools" 
