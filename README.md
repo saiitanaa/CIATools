@@ -5,11 +5,11 @@
 ### About
 `CIAToolsR` is a complete rewrite of the original tool, designed to be more stable, faster, and above all, **cross-platform**. We have migrated to an **Avalonia UI** architecture for a fluid experience on both Windows and Linux, while automating the entire compilation chain to save you from dealing with manual script handling.
 
-### RSF-Creator for CIATools | Included in CIATools (v7.0.0 and later)
+### RSF-Creator for CIATools | Included in CIATools (v7.0.0 - v8.2.3)
 
 https://github.com/saysaa/CIATools/tree/rsf-creator
 ---
-### SMDH-Creator for CIATools | Included in CIATools (v8.1.1 and later)
+### SMDH-Creator for CIATools | Included in CIATools (v8.1.1 - v8.2.3)
 
 https://github.com/saysaa/CIATools/tree/smdh-creator
 ---
