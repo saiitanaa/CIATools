@@ -53,9 +53,14 @@ CIAToolsXP is a **derivative version**, compatible with Windows XP, Vista, 7, 8,
 
 ### Compile
 
-**For Windows** : `dotnet publish -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true`
+**Windows x64** : `dotnet publish -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true`
+**Windows ARM64** : `dotnet publish -c Release -r win-arm64 --self-contained true -p:PublishSingleFile=true`
 
-**For Linux** : `dotnet publish -c Release -r linux-x64 --self-contained true -p:PublishSingleFile=true`
+**Linux x64** : `dotnet publish -c Release -r linux-x64 --self-contained true -p:PublishSingleFile=true`
+**Linux ARM64** : `dotnet publish -c Release -r linux-arm64 --self-contained true -p:PublishSingleFile=true`
+
+**macOS x64** : `dotnet publish -c Release -r osx-x64 --self-contained true -p:PublishSingleFile=true`
+**macOS Apple Silicon** : `dotnet publish -c Release -r osx-arm64 --self-contained true -p:PublishSingleFile=true`
 
 ---
 
