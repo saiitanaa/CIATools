@@ -24,9 +24,11 @@ https://github.com/saysaa/CIATools/tree/smdh-creator
 
 ### Compatibility
 
-CIATools **V5 or earlier** is compatible only with Windows Vista and later (64-bit)
+CIATools **V5 or earlier** is compatible only with Windows Vista and later (64-bits)
 
-CIATools **V6 or later** is compatible with Windows Vista and later (64-bit) and Linux (64-bit)
+CIATools **V6 or later** is compatible with Windows Vista and later (64-bits) and Linux (64-bits)
+
+CIATools **V10 or later** is compatible with Windows, Linux, macOS 64-Bits
 
 CIAToolsXP is a **derivative version**, compatible with Windows XP, Vista, 7, 8, 8.1, 10, and 11 (32-bit). [Release](https://github.com/saysaa/CIATools/releases/tag/CIAToolsXP)
 
