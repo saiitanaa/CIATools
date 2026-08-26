@@ -1,0 +1,13 @@
+# macOS
+.DS_Store
+
+# IDE
+.idea/
+.vs/
+
+# Python
+__pycache__/
+*.py[cod]
+
+# Rust build directory
+target/
