@@ -18,14 +18,16 @@ use ratatui::{
     widgets::{Block, Borders, Paragraph, Widget},
 };
 
-const MIN_WIDTH: u16 = 120;
-const MIN_HEIGHT: u16 = 32;
+use crate::import::import_files;
+
+//const MIN_WIDTH: u16 = 120;
+//const MIN_HEIGHT: u16 = 32;
 
 fn main() -> io::Result<()> {
     print!("\x1b]0;CIATools v12.0.0\x07");
         execute!(
         io::stdout(),
-        SetSize(MIN_WIDTH, MIN_HEIGHT)
+        //SetSize(MIN_WIDTH, MIN_HEIGHT)
     )?;
     ratatui::run(|terminal| App::default().run(terminal))
 }
@@ -34,6 +36,7 @@ fn main() -> io::Result<()> {
 pub struct App {
     exit: bool,
     output: Vec<String>,
+    main: Vec<String>,
 }
 
 impl App {
@@ -83,6 +86,14 @@ impl App {
             .chain(self.output.iter().map(|s| Line::from(s.as_str())))
             .collect();
 
+        let main_lines: Vec<Line> = std::iter::once(Line::from("\n"))
+            .chain(
+                self.main
+                    .iter()
+                    .map(|s| Line::from(s.as_str()))
+            )
+            .collect();
+
         frame.render_widget(
             Paragraph::new(output_lines)
                 .style(Color::White)
@@ -115,7 +126,7 @@ impl App {
                         self.output.push("Start SMDH-Creator...".to_string());
                     }
                     KeyCode::Char('4') => {
-                        self.output.push("Set HB Author".to_string());
+                        self.main.push("Enter author -> ".to_string());
                     }
                     KeyCode::Char('C') | KeyCode::Char('c') => {
                         self.output.push("Compile HB...".to_string());
@@ -138,15 +149,20 @@ impl Widget for &App {
             .map(|h| h.to_string_lossy().into_owned())
             .unwrap_or_else(|_| "unknown".to_string());
 
-        Paragraph::new(vec![
-            Line::from(format!("HELLO !!!, {hostname} 👋")),
-        ])
-        .centered()
-        .block(
-            Block::bordered()
-                .title(" >_ CIATools -- Saiitanaa ".bold())
-                .border_set(border::THICK),
-        )
-        .render(area, buf);
+        let main_lines: Vec<Line> = std::iter::once(Line::from(""))
+            .chain(std::iter::once(Line::from(format!(
+                "HELLO !!!, {hostname} 👋"
+            ))))
+            .chain(self.main.iter().map(|s| Line::from(s.as_str())))
+            .collect();
+
+        Paragraph::new(main_lines)
+            .centered()
+            .block(
+                Block::bordered()
+                    .title(" CIATools -- Saiitanaa ".bold())
+                    .border_set(border::THICK),
+            )
+            .render(area, buf);
     }
 }
