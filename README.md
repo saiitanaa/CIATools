@@ -1,6 +1,6 @@
 <img width="1000" height="200" alt="BannerCIATools" src="https://github.com/user-attachments/assets/1c882709-0a5d-464e-b4dc-7455125c3a10" />
 
-## The CIA Tooling for Nintendo 3DS development
+## <img width="32" height="32" alt="Icon-iOS-Default-83 5@1x" src="https://github.com/user-attachments/assets/1da812d6-2f60-40f1-bf3b-eb6d31496e8e" /> The CIA Tooling for Nintendo 3DS development
 
 **`CIATools`** is **all-in-one tool** for compiling your **projects** into `.cia` format with ease.
 
