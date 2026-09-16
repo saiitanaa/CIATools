@@ -3,11 +3,9 @@ mod utils;
 mod delete;
 mod compile;
 
-use std::io;
+use std::{io, fs, path::PathBuf};
 use crossterm::{
     event::{self, Event, KeyCode, KeyEventKind},
-    execute,
-    terminal::SetSize,
 };
 use ratatui::{
     DefaultTerminal, Frame, buffer::Buffer,
@@ -18,30 +16,32 @@ use ratatui::{
     widgets::{Block, Borders, Paragraph, Widget},
 };
 
-use crate::import::import_files;
-
-//const MIN_WIDTH: u16 = 120;
-//const MIN_HEIGHT: u16 = 32;
-
 fn main() -> io::Result<()> {
     print!("\x1b]0;CIATools v12.0.0\x07");
-        execute!(
-        io::stdout(),
-        //SetSize(MIN_WIDTH, MIN_HEIGHT)
-    )?;
-    ratatui::run(|terminal| App::default().run(terminal))
+    set_directories()?;
+    let author = load_author()?;
+    ratatui::run(|terminal| App::default().run(terminal)) //Good size : 120x32
 }
 
 #[derive(Debug, Default)]
 pub struct App {
     exit: bool,
     output: Vec<String>,
-    main: Vec<String>,
     author: String,
     author_input: String,
     editing_author: bool,
 }
 
+    fn set_directories() -> io::Result<PathBuf> {
+        let bin_path = std::env::current_exe()?
+            .parent()
+            .ok_or_else(|| io::Error::other("Get binary error!"))?
+            .to_path_buf();
+        let user_files = bin_path.join("DATA").join("USER_FILES");
+        fs::create_dir_all(&user_files)?;
+        Ok(user_files)
+    }
+    
 impl App {
     pub fn run(&mut self, terminal: &mut DefaultTerminal) -> io::Result<()> {
         while !self.exit {
@@ -68,11 +68,13 @@ impl App {
         frame.render_widget(
             Paragraph::new(vec![
                 Line::from("1 : Select HB Files"),
-                Line::from("2 : Create RSF-Files"),
-                Line::from("3 : Create SMDH-Files"),
-                Line::from("4 : Set author"),
+                Line::from("2 : Create RSF"),
+                Line::from("3 : Create SMDH"),
+                Line::from("4 : Set Author"),
+                Line::from("\n"),
                 Line::from("C : Compile"),
                 Line::from("0 : Clean USER_FILES"),
+                Line::from("\n"),
                 Line::from("Q : Quit"),
             ])
             .block(
@@ -87,14 +89,6 @@ impl App {
 
         let output_lines: Vec<Line> = std::iter::once(Line::from(">_ "))
             .chain(self.output.iter().map(|s| Line::from(s.as_str())))
-            .collect();
-
-        let main_lines: Vec<Line> = std::iter::once(Line::from("\n"))
-            .chain(
-                self.main
-                    .iter()
-                    .map(|s| Line::from(s.as_str()))
-            )
             .collect();
 
         frame.render_widget(
@@ -112,7 +106,7 @@ impl App {
     }
 
 
-    fn handle_events(&mut self, terminal: &mut DefaultTerminal) -> io::Result<()> {
+    fn handle_events(&mut self, _terminal: &mut DefaultTerminal) -> io::Result<()> {
         if let Event::Key(key) = event::read()? {
             if key.kind == KeyEventKind::Press {
 
@@ -121,9 +115,9 @@ impl App {
                     match key.code {
                         KeyCode::Enter => {
                             self.author = self.author_input.clone();
+                            save_author(&self.author)?;
                             self.author_input.clear();
                             self.editing_author = false;
-
                             self.output
                                 .push(format!("Author set to: {}", self.author));
                         }
@@ -186,6 +180,30 @@ impl App {
 
         Ok(())
         }
+    }
+
+    fn user_files_path() -> io::Result<PathBuf> {
+        let bin_path = std::env::current_exe()?
+            .parent()
+            .ok_or_else(|| io::Error::other("Binary path error !?"))?
+            .to_path_buf();
+        let user_files = bin_path.join("DATA").join("USER_FILES");
+        fs::create_dir_all(&user_files)?;
+        Ok(user_files)
+    }
+
+    fn load_author() -> io::Result<String> {
+        let path = user_files_path()?.join("author.txt");
+        if path.exists() {
+            return Ok(fs::read_to_string(path)?.trim().to_string());
+        }
+        Ok(String::new())
+    }
+
+    fn save_author(author: &str) -> io::Result<()> {
+        let path = user_files_path()?.join("author.txt");
+        fs::write(path, author)?;
+        Ok(())
     }
 
 impl Widget for &App {

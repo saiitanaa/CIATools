@@ -33,13 +33,13 @@ RSF File Creator, SMDH File Creator, Edit Author, 2D-3D banner support, No depen
 
 ## Downloads
 
-You have Windows 10 - 11 ? Download here ➡️
+You have **Windows** ? ➡️
 [<kbd>X64</kbd>](https://github.com/saiitanaa/CIATools/releases)
 
-You have macOS ? Download here ➡️
+You have **macOS** ? ➡️
 [<kbd>ARM64</kbd>](https://github.com/saiitanaa/CIATools/releases) - [<kbd>X64</kbd>](https://github.com/saiitanaa/CIATools/releases)
 
-You have Linux ? Download here ➡️
+You have **Linux** ? ➡️
 [<kbd>ARM64</kbd>](https://github.com/saiitanaa/CIATools/releases) - [<kbd>X64</kbd>](https://github.com/saiitanaa/CIATools/releases)
 
 ## Compiling
