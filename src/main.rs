@@ -37,6 +37,9 @@ pub struct App {
     exit: bool,
     output: Vec<String>,
     main: Vec<String>,
+    author: String,
+    author_input: String,
+    editing_author: bool,
 }
 
 impl App {
@@ -108,40 +111,82 @@ impl App {
         );
     }
 
-    fn handle_events(&mut self, terminal: &mut DefaultTerminal) -> io::Result<()> {
 
+    fn handle_events(&mut self, terminal: &mut DefaultTerminal) -> io::Result<()> {
         if let Event::Key(key) = event::read()? {
             if key.kind == KeyEventKind::Press {
+
+                // Author input mode
+                if self.editing_author {
+                    match key.code {
+                        KeyCode::Enter => {
+                            self.author = self.author_input.clone();
+                            self.author_input.clear();
+                            self.editing_author = false;
+
+                            self.output
+                                .push(format!("Author set to: {}", self.author));
+                        }
+
+                        KeyCode::Backspace => {
+                            self.author_input.pop();
+                        }
+
+                        KeyCode::Char(c) => {
+                            self.author_input.push(c);
+                        }
+
+                        KeyCode::Esc => {
+                            self.author_input.clear();
+                            self.editing_author = false;
+                        }
+
+                        _ => {}
+                    }
+
+                    return Ok(());
+                }
+
+                // Key mode
                 match key.code {
                     KeyCode::Char('q') | KeyCode::Char('Q') => {
                         self.exit = true;
                     }
+
                     KeyCode::Char('1') => {
                         self.output.push("Import HB Files...".to_string());
                     }
+
                     KeyCode::Char('2') => {
                         self.output.push("Start RSF-Creator...".to_string());
                     }
+
                     KeyCode::Char('3') => {
                         self.output.push("Start SMDH-Creator...".to_string());
                     }
+
                     KeyCode::Char('4') => {
-                        self.main.push("Enter author -> ".to_string());
+                        self.output.push("Set HB Author".to_string());
+                        self.author_input.clear();
+                        self.editing_author = true;
                     }
+
                     KeyCode::Char('C') | KeyCode::Char('c') => {
                         self.output.push("Compile HB...".to_string());
                     }
+
                     KeyCode::Char('0') => {
                         self.output.push("Clean USER_FILES...".to_string());
                     }
+
                     _ => {}
                 }
             }
         }
 
         Ok(())
+        }
     }
-}
 
 impl Widget for &App {
     fn render(self, area: Rect, buf: &mut Buffer) {
@@ -149,14 +194,26 @@ impl Widget for &App {
             .map(|h| h.to_string_lossy().into_owned())
             .unwrap_or_else(|_| "unknown".to_string());
 
-        let main_lines: Vec<Line> = std::iter::once(Line::from(""))
-            .chain(std::iter::once(Line::from(format!(
-                "HELLO !!!, {hostname} 👋"
-            ))))
-            .chain(self.main.iter().map(|s| Line::from(s.as_str())))
-            .collect();
+        let mut lines = vec![
+            Line::from(""),
+            Line::from(format!("HELLO !!! {hostname} 👋")),
+        ];
 
-        Paragraph::new(main_lines)
+        if self.editing_author {
+            lines.push(Line::from(""));
+            lines.push(Line::from(format!(
+                "Enter author -> {}",
+                self.author_input
+            )));
+        } else if !self.author.is_empty() {
+            lines.push(Line::from(""));
+            lines.push(Line::from(format!(
+                "Author: {}",
+                self.author
+            )));
+        }
+
+        Paragraph::new(lines)
             .centered()
             .block(
                 Block::bordered()
