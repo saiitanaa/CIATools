@@ -1,10 +1,10 @@
 mod import;
-mod utils;
 mod delete;
+mod utils;
 mod compile;
 mod picker;
 
-use std::{io, fs, path::PathBuf};
+use std::{io, fs, path::PathBuf, path::Path};
 use crossterm::{
     event::{self, Event, KeyCode, KeyEventKind},
 };
@@ -199,8 +199,17 @@ impl App {
 
                     KeyCode::Char('0') => {
                         self.output.push("Clean USER_FILES...".to_string());
-                    }
 
+                        match user_files_path() {
+                            Ok(path) => {
+                                match crate::delete::clean_user_files(path) {
+                                    Ok(()) => self.output.push("[+] USER_FILES cleaned.".to_string()),
+                                    Err(error) => self.output.push(format!("[!] {error}")),
+                                }
+                            }
+                            Err(error) => self.output.push(format!("[!] {error}")),
+                        }
+                    }
                     _ => {}
                 }
             }
