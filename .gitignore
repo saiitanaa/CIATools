@@ -11,3 +11,4 @@ __pycache__/
 
 # Rust build directory
 target/
+Arch/
