@@ -2,6 +2,7 @@ mod import;
 mod utils;
 mod delete;
 mod compile;
+mod picker;
 
 use std::{io, fs, path::PathBuf};
 use crossterm::{
@@ -16,12 +17,20 @@ use ratatui::{
     widgets::{Block, Borders, Paragraph, Widget},
 };
 
+use crate::import::import_files;
+
 fn main() -> io::Result<()> {
     print!("\x1b]0;CIATools v12.0.0\x07");
     set_directories()?;
     let author = load_author()?;
-    ratatui::run(|terminal| App::default().run(terminal)) //Good size : 120x32
-}
+    ratatui::run(|terminal| {
+        App {
+            author,
+            ..App::default()
+        }
+        .run(terminal)
+    })
+} //Good size : 120x32
 
 #[derive(Debug, Default)]
 pub struct App {
@@ -67,7 +76,7 @@ impl App {
 
         frame.render_widget(
             Paragraph::new(vec![
-                Line::from("1 : Select HB Files"),
+                Line::from("1 : Import HB Files"),
                 Line::from("2 : Create RSF"),
                 Line::from("3 : Create SMDH"),
                 Line::from("4 : Set Author"),
@@ -106,7 +115,7 @@ impl App {
     }
 
 
-    fn handle_events(&mut self, _terminal: &mut DefaultTerminal) -> io::Result<()> {
+    fn handle_events(&mut self, terminal: &mut DefaultTerminal) -> io::Result<()> {
         if let Event::Key(key) = event::read()? {
             if key.kind == KeyEventKind::Press {
 
@@ -149,6 +158,25 @@ impl App {
 
                     KeyCode::Char('1') => {
                         self.output.push("Import HB Files...".to_string());
+
+                        ratatui::restore();
+
+                        let result = user_files_path()
+                            .and_then(import_files);
+
+                        *terminal = ratatui::init();
+
+                        match result {
+                            Ok(files) => {
+                                for file in files {
+                                    self.output.push(format!("[+] {file}"));
+                                }
+                            }
+
+                            Err(error) => {
+                                self.output.push(format!("[!] {error}"));
+                            }
+                        }
                     }
 
                     KeyCode::Char('2') => {
