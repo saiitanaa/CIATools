@@ -34,16 +34,14 @@ RSF File Creator, SMDH File Creator, Edit Author, 2D-3D banner support, No depen
 ## Downloads
 
 You have Windows 10 - 11 ? Download here ↙️
-
 [<kbd>X64</kbd>](https://github.com/saiitanaa/CIATools/releases)
 
 You have macOS ? Download here ↙️
-
 [<kbd>ARM64</kbd>](https://github.com/saiitanaa/CIATools/releases) - [<kbd>X64</kbd>](https://github.com/saiitanaa/CIATools/releases)
 
 You have Linux ? Download here ↙️
-
 [<kbd>ARM64</kbd>](https://github.com/saiitanaa/CIATools/releases) - [<kbd>X64</kbd>](https://github.com/saiitanaa/CIATools/releases)
+
 ## Compiling
 
 Dependencies of **CIAToolsN** (everything else in the `cargo tree` is just their transitive sub-dependencies):
