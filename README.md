@@ -7,7 +7,7 @@
 ### Included :
 RSF File Creator, SMDH File Creator, Edit Author, 2D-3D banner support, No dependencies required, 
 
-#### What's Changed ?
+### What's Changed ?
 
 **Switching to the CLI interface**. Faster for low-end PC and Better compatibility
 
@@ -19,7 +19,7 @@ RSF File Creator, SMDH File Creator, Edit Author, 2D-3D banner support, No depen
 
 ## Usage
 
-
+**Coming soon...**
 
 ### History
 
