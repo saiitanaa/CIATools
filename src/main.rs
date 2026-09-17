@@ -4,8 +4,9 @@ mod utils;
 mod compile;
 mod picker;
 mod rsfcreator;
+mod smdhcreator;
 
-use std::{io, fs, path::PathBuf, path::Path};
+use std::{io, fs, path::PathBuf};
 use crossterm::{
     event::{self, Event, KeyCode, KeyEventKind},
 };
@@ -22,7 +23,7 @@ use crate::import::import_files;
 use crate::rsfcreator::rsf_config;
 
 fn main() -> io::Result<()> {
-    print!("\x1b]0;CIATools v12.0.0\x07");
+    print!("\x1b]0;CIATools v26.0.0\x07");
     set_directories()?;
     let author = load_author()?;
     ratatui::run(|terminal| {
@@ -45,6 +46,11 @@ pub struct App {
     rsf_field: usize,
     rsf_input: String,
     rsf_config: rsf_config,
+    smdh_edit: bool,
+    smdh_field: usize,
+    smdh_language: usize,
+    smdh_input: String,
+    smdh_file: smdhcreator::SmdhFile,
 }
 
     fn set_directories() -> io::Result<PathBuf> {
@@ -157,6 +163,7 @@ impl App {
                     return Ok(());
                 }
 
+                // RSF input mode
                 if self.rsf_edit {
                     match key.code {
                         KeyCode::Char(c) => {
@@ -182,7 +189,7 @@ impl App {
                             self.rsf_input.clear();
                             self.rsf_field += 1;
 
-                            if self.rsf_field > 4 {
+                            if self.rsf_field > 6 {
                                 self.rsf_edit = false;
 
                                 let content = self.rsf_config.generate();
@@ -197,6 +204,81 @@ impl App {
                         KeyCode::Esc => {
                             self.rsf_edit = false;
                             self.rsf_input.clear();
+                        }
+
+                        _ => {}
+                    }
+
+                    return Ok(());
+                }
+
+                // SMDH input mode
+                if self.smdh_edit {
+                    match key.code {
+                        KeyCode::Esc => {
+                            self.smdh_edit = false;
+                            self.smdh_input.clear();
+                        }
+
+                        KeyCode::Backspace => {
+                            self.smdh_input.pop();
+                        }
+
+                        KeyCode::Enter => {
+                            match self.smdh_field {
+                                0 => {
+                                    self.smdh_file.set_short_description(
+                                        self.smdh_language,
+                                        &self.smdh_input,
+                                    );
+
+                                    self.smdh_input.clear();
+                                    self.smdh_field = 1;
+                                }
+
+                                1 => {
+                                    self.smdh_file.set_long_description(
+                                        self.smdh_language,
+                                        &self.smdh_input,
+                                    );
+
+                                    self.smdh_input.clear();
+                                    self.smdh_field = 2;
+                                }
+
+                                2 => {
+                                    self.smdh_file.set_publisher(
+                                        self.smdh_language,
+                                        &self.smdh_input,
+                                    );
+
+                                    self.smdh_input.clear();
+
+                                    match self.smdh_file.save_to_user_files("icon.smdh") {
+                                        Ok(path) => {
+                                            self.output.push(format!(
+                                                "[+] SMDH created: {}",
+                                                path.display()
+                                            ));
+                                        }
+
+                                        Err(error) => {
+                                            self.output.push(format!(
+                                                "[!] SMDH error: {}",
+                                                error
+                                            ));
+                                        }
+                                    }
+
+                                    self.smdh_edit = false;
+                                }
+
+                                _ => {}
+                            }
+                        }
+
+                        KeyCode::Char(c) => {
+                            self.smdh_input.push(c);
                         }
 
                         _ => {}
@@ -242,7 +324,11 @@ impl App {
                     }
 
                     KeyCode::Char('3') => {
-                        self.output.push("Start SMDH-Creator...".to_string());
+                        self.smdh_edit = true;
+                        self.smdh_field = 0;
+                        self.smdh_language = 1;
+                        self.smdh_input.clear();
+                        self.smdh_file = smdhcreator::SmdhFile::new();
                     }
 
                     KeyCode::Char('4') => {
@@ -347,6 +433,35 @@ impl Widget for &App {
                     .fg(Color::DarkGray),
             );
         }
+
+            if self.smdh_edit {
+                lines.push(Line::from(""));
+
+                let (prompt, example) = match self.smdh_field {
+                    0 => ("Title:", "(Ex: The best Homebrew)"),
+                    1 => ("Description:", "(Ex: An awesome 3DS application)"),
+                    2 => ("Publisher:", "(Ex: Saiitanaa)"),
+                    _ => ("", ""),
+                };
+
+                lines.push(
+                    Line::from(format!("{} {}", prompt, self.smdh_input))
+                        .fg(Color::White),
+                );
+
+                lines.push(
+                    Line::from(example)
+                        .fg(Color::DarkGray),
+                );
+
+                lines.push(
+                    Line::from(format!(
+                        "Language: {}",
+                        smdhcreator::SMDH_LANGUAGES[self.smdh_language]
+                    ))
+                    .fg(Color::White),
+                );
+            }
 
         Paragraph::new(lines)
             .centered()
