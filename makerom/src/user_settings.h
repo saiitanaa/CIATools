@@ -309,3 +309,4 @@ typedef struct
 void init_UserSettings(user_settings *set);
 void free_UserSettings(user_settings *set);
 int ParseArgs(int argc, char *argv[], user_settings *usr_settings);
+void SetDefaults(user_settings *set);

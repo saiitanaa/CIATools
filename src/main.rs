@@ -5,8 +5,9 @@ mod picker;
 mod rsfcreator;
 mod smdhcreator;
 mod make;
+mod makerom;
 
-use std::{fs, io, path::PathBuf};
+use std::{fs, io, path::PathBuf, result};
 
 use crossterm::{
     event::{self, Event, KeyCode, KeyEventKind},
@@ -33,6 +34,11 @@ fn main() -> io::Result<()> {
 
     let author = load_author()?;
 
+    let result = makerom::build_cia(
+        "/path/to/input.ncch",
+        "/path/to/output.cia"
+    );
+    println!("result cia : {result}");
     ratatui::run(|terminal| {
         App {
             author,

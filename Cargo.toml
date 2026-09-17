@@ -11,3 +11,6 @@ hostname = "0.4.2"
 ratatui = "0.30.2"
 rfd = "0.14"
 image = "0.25"
+
+[build-dependencies]
+cc = "1"
