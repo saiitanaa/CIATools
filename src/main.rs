@@ -1,10 +1,10 @@
 mod import;
 mod delete;
 mod utils;
-mod compile;
 mod picker;
 mod rsfcreator;
 mod smdhcreator;
+mod make;
 
 use std::{fs, io, path::PathBuf};
 
@@ -108,7 +108,7 @@ impl App {
                 Line::from("3 : Create SMDH"),
                 Line::from("4 : Set Author"),
                 Line::from(""),
-                Line::from("C : Compile"),
+                Line::from(r"C : Make ¯\_(ツ)_/¯"),
                 Line::from("0 : Clean USER_FILES"),
                 Line::from(""),
                 Line::from("Q : Quit"),
