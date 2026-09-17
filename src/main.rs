@@ -3,6 +3,7 @@ mod delete;
 mod utils;
 mod compile;
 mod picker;
+mod rsfcreator;
 
 use std::{io, fs, path::PathBuf, path::Path};
 use crossterm::{
@@ -18,6 +19,7 @@ use ratatui::{
 };
 
 use crate::import::import_files;
+use crate::rsfcreator::rsf_config;
 
 fn main() -> io::Result<()> {
     print!("\x1b]0;CIATools v12.0.0\x07");
@@ -39,6 +41,10 @@ pub struct App {
     author: String,
     author_input: String,
     editing_author: bool,
+    rsf_edit: bool,
+    rsf_field: usize,
+    rsf_input: String,
+    rsf_config: rsf_config,
 }
 
     fn set_directories() -> io::Result<PathBuf> {
@@ -60,6 +66,7 @@ impl App {
 
         Ok(())
     }
+
 
     fn draw(&self, frame: &mut Frame) {
         let outer_layout = Layout::default()
@@ -128,7 +135,7 @@ impl App {
                             self.author_input.clear();
                             self.editing_author = false;
                             self.output
-                                .push(format!("Author set to: {}", self.author));
+                                .push(format!("[+] Author set to: {}", self.author));
                         }
 
                         KeyCode::Backspace => {
@@ -150,6 +157,54 @@ impl App {
                     return Ok(());
                 }
 
+                if self.rsf_edit {
+                    match key.code {
+                        KeyCode::Char(c) => {
+                            self.rsf_input.push(c);
+                        }
+
+                        KeyCode::Backspace => {
+                            self.rsf_input.pop();
+                        }
+
+                        KeyCode::Enter => {
+                            match self.rsf_field {
+                                0 => self.rsf_config.title = self.rsf_input.clone(),
+                                1 => self.rsf_config.companyCode = self.rsf_input.clone(),
+                                2 => self.rsf_config.productCode = self.rsf_input.clone(),
+                                3 => self.rsf_config.romFsPath = self.rsf_input.clone(),
+                                4 => self.rsf_config.uniqueId = self.rsf_input.clone(),
+                                5 => self.rsf_config.saveDataSize = self.rsf_input.clone(),
+                                6 => self.rsf_config.cpuSpeed = self.rsf_input.clone(),
+                                _ => {}
+                            }
+
+                            self.rsf_input.clear();
+                            self.rsf_field += 1;
+
+                            if self.rsf_field > 4 {
+                                self.rsf_edit = false;
+
+                                let content = self.rsf_config.generate();
+                                let path = user_files_path()?.join("config.rsf");
+
+                                fs::write(path, content)?;
+
+                                self.output.push("[+] RSF file created.".to_string());
+                            }
+                        }
+
+                        KeyCode::Esc => {
+                            self.rsf_edit = false;
+                            self.rsf_input.clear();
+                        }
+
+                        _ => {}
+                    }
+
+                    return Ok(());
+                }
+
                 // Key mode
                 match key.code {
                     KeyCode::Char('q') | KeyCode::Char('Q') => {
@@ -157,7 +212,7 @@ impl App {
                     }
 
                     KeyCode::Char('1') => {
-                        self.output.push("Import HB Files...".to_string());
+                        self.output.push("[?] Import FileDialog".to_string());
 
                         ratatui::restore();
 
@@ -180,7 +235,10 @@ impl App {
                     }
 
                     KeyCode::Char('2') => {
-                        self.output.push("Start RSF-Creator...".to_string());
+                        self.rsf_edit = true;
+                        self.rsf_field = 0;
+                        self.rsf_input.clear();
+                        self.rsf_config = rsf_config::default();
                     }
 
                     KeyCode::Char('3') => {
@@ -188,22 +246,19 @@ impl App {
                     }
 
                     KeyCode::Char('4') => {
-                        self.output.push("Set HB Author".to_string());
                         self.author_input.clear();
                         self.editing_author = true;
                     }
 
                     KeyCode::Char('C') | KeyCode::Char('c') => {
-                        self.output.push("Compile HB...".to_string());
+                        self.output.push("[+] Compile HB...".to_string());
                     }
 
                     KeyCode::Char('0') => {
-                        self.output.push("Clean USER_FILES...".to_string());
-
                         match user_files_path() {
                             Ok(path) => {
                                 match crate::delete::clean_user_files(path) {
-                                    Ok(()) => self.output.push("[+] USER_FILES cleaned.".to_string()),
+                                    Ok(()) => self.output.push("[-] USER_FILES cleaned.".to_string()),
                                     Err(error) => self.output.push(format!("[!] {error}")),
                                 }
                             }
@@ -222,7 +277,7 @@ impl App {
     fn user_files_path() -> io::Result<PathBuf> {
         let bin_path = std::env::current_exe()?
             .parent()
-            .ok_or_else(|| io::Error::other("Binary path error !?"))?
+            .ok_or_else(|| io::Error::other("[!] Binary path error !?"))?
             .to_path_buf();
         let user_files = bin_path.join("DATA").join("USER_FILES");
         fs::create_dir_all(&user_files)?;
@@ -263,9 +318,34 @@ impl Widget for &App {
         } else if !self.author.is_empty() {
             lines.push(Line::from(""));
             lines.push(Line::from(format!(
-                "Author: {}",
+                "Author defined: {}",
                 self.author
             )));
+        }
+
+        if self.rsf_edit {
+            lines.push(Line::from(""));
+
+            let (prompt, example) = match self.rsf_field {
+                0 => ("Title:", "(Ex: The best Homebrew)"),
+                1 => ("CompanyCode:", "(Ex: SAAA)"),
+                2 => ("ProductCode:", "(Ex: CTR-P-XXXX)"),
+                3 => ("RomFs Path:", "(Ex: ./romfs)"),
+                4 => ("UniqueId:", "(Ex: 0x0004000000000000)"),
+                5 => ("SaveDataSize:", "(Ex: 0x100000)"),
+                6 => ("CpuSpeed:", "(Ex: 804)"),
+                _ => ("", ""),
+            };
+
+            lines.push(
+                Line::from(format!("{} {}", prompt, self.rsf_input))
+                    .fg(Color::White),
+            );
+
+            lines.push(
+                Line::from(example)
+                    .fg(Color::DarkGray),
+            );
         }
 
         Paragraph::new(lines)
