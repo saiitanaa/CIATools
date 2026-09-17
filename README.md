@@ -15,7 +15,7 @@ RSF File Creator, SMDH File Creator, Edit Author, 2D-3D banner support, No depen
 
 **Full cleaned code**. Cleaned obselete code & functions. Fast and light
 
-**Read Console**. Yes, finally a veritable console for debug !
+**Console**. Yes, finally a veritable console for debug !
 
 ## Usage
 
