@@ -28,10 +28,10 @@ pub const SMDH_LANGUAGES: [&str; 16] = [
     "Portuguese",
     "Russian",
     "Traditional Chinese",
-    "Language 12",
-    "Language 13",
-    "Language 14",
-    "Language 15",
+    "[!] Unused Slot 12",
+    "[!] Unused Slot 13",
+    "[!] Unused Slot 14",
+    "[!] Unused Slot 15",
 ];
 
 #[derive(Clone, Copy, Debug)]

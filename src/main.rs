@@ -51,6 +51,7 @@ pub struct App {
     smdh_language: usize,
     smdh_input: String,
     smdh_file: smdhcreator::SmdhFile,
+    smdh_select_language: bool,
 }
 
     fn set_directories() -> io::Result<PathBuf> {
@@ -214,6 +215,36 @@ impl App {
 
                 // SMDH input mode
                 if self.smdh_edit {
+                    if self.smdh_select_language {
+                        match key.code {
+                            KeyCode::Left => {
+                                if self.smdh_language == 0 {
+                                    self.smdh_language = 15;
+                                } else {
+                                    self.smdh_language -= 1;
+                                }
+                            }
+
+                            KeyCode::Right => {
+                                self.smdh_language = (self.smdh_language + 1) % 16;
+                            }
+
+                            KeyCode::Enter => {
+                                self.smdh_select_language = false;
+                            }
+
+                            KeyCode::Esc => {
+                                self.smdh_edit = false;
+                                self.smdh_select_language = false;
+                                self.smdh_input.clear();
+                            }
+
+                            _ => {}
+                        }
+
+                        return Ok(());
+                    }
+
                     match key.code {
                         KeyCode::Esc => {
                             self.smdh_edit = false;
@@ -338,6 +369,7 @@ impl App {
 
                     KeyCode::Char('3') => {
                         self.smdh_edit = true;
+                        self.smdh_select_language = true;
                         self.smdh_field = 0;
                         self.smdh_language = 1;
                         self.smdh_input.clear();
@@ -467,46 +499,77 @@ impl Widget for &App {
 
         if self.smdh_edit {
             lines.push(Line::from(""));
-            lines.push(
-                Line::from("SMDH-Creator")
-                    .bold()
-                    .fg(Color::LightBlue),
-            );
 
-            lines.push(Line::from(""));
+            if self.smdh_select_language {
+                lines.push(
+                    Line::from("SMDH CREATOR")
+                        .bold()
+                        .fg(Color::LightBlue),
+                );
 
-            let language = smdhcreator::SMDH_LANGUAGES[self.smdh_language];
+                lines.push(Line::from(""));
 
-            lines.push(
-                Line::from(format!("Language: {}", language))
+                lines.push(
+                    Line::from(format!(
+                        "Language: {}",
+                        smdhcreator::SMDH_LANGUAGES[self.smdh_language]
+                    ))
                     .fg(Color::Yellow),
-            );
+                );
 
-            lines.push(Line::from(""));
+                lines.push(Line::from(""));
+                lines.push(
+                    Line::from("<- / -> Change language")
+                        .fg(Color::DarkGray),
+                );
 
-            let (prompt, example) = match self.smdh_field {
-                0 => ("Title:", "(Ex: My Homebrew)"),
-                1 => ("Description:", "(Ex: My awesome 3DS application)"),
-                2 => ("Publisher:", "(Ex: Saiitanaa)"),
-                _ => ("", ""),
-            };
+                lines.push(
+                    Line::from("Enter: Select    Esc: Cancel")
+                        .fg(Color::DarkGray),
+                );
+            } else {
+                let (prompt, example) = match self.smdh_field {
+                    0 => ("Title:", "(Ex: My Homebrew)"),
+                    1 => ("Description:", "(Ex: My awesome 3DS application)"),
+                    2 => ("Publisher:", "(Ex: Saiitanaa)"),
+                    _ => ("", ""),
+                };
 
-            lines.push(
-                Line::from(format!("{} {}", prompt, self.smdh_input))
-                    .fg(Color::White),
-            );
+                lines.push(
+                    Line::from("SMDH CREATOR")
+                        .bold()
+                        .fg(Color::LightBlue),
+                );
 
-            lines.push(
-                Line::from(example)
-                    .fg(Color::DarkGray),
-            );
+                lines.push(Line::from(""));
 
-            lines.push(Line::from(""));
+                lines.push(
+                    Line::from(format!(
+                        "Language: {}",
+                        smdhcreator::SMDH_LANGUAGES[self.smdh_language]
+                    ))
+                    .fg(Color::Yellow),
+                );
 
-            lines.push(
-                Line::from("Enter: Next    Esc: Cancel")
-                    .fg(Color::DarkGray),
-            );
+                lines.push(Line::from(""));
+
+                lines.push(
+                    Line::from(format!("{} {}", prompt, self.smdh_input))
+                        .fg(Color::White),
+                );
+
+                lines.push(
+                    Line::from(example)
+                        .fg(Color::DarkGray),
+                );
+
+                lines.push(Line::from(""));
+
+                lines.push(
+                    Line::from("Enter: Next    Esc: Cancel")
+                        .fg(Color::DarkGray),
+                );
+            }
         }
 
         Paragraph::new(lines)
