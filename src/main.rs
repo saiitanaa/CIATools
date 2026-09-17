@@ -254,7 +254,20 @@ impl App {
 
                                     self.smdh_input.clear();
 
-                                    match self.smdh_file.save_to_user_files("icon.smdh") {
+                                    let title = self
+                                        .smdh_file
+                                        .get_short_description(self.smdh_language);
+
+                                    let filename = format!(
+                                        "{}.smdh",
+                                        if title.is_empty() {
+                                            "icon"
+                                        } else {
+                                            &title
+                                        }
+                                    );
+
+                                    match self.smdh_file.save_to_user_files(&filename) {
                                         Ok(path) => {
                                             self.output.push(format!(
                                                 "[+] SMDH created: {}",
@@ -392,7 +405,7 @@ impl Widget for &App {
 
         let mut lines = vec![
             Line::from(""),
-            Line::from(format!("HELLO !!! {hostname} 👋")),
+            Line::from(format!("Hi ! {hostname} 👋")),
         ];
 
         if self.editing_author {
@@ -401,6 +414,11 @@ impl Widget for &App {
                 "Enter author -> {}",
                 self.author_input
             )));
+
+            lines.push(
+                Line::from("Enter: Next    Esc: Cancel")
+                    .fg(Color::DarkGray),
+            );
         } else if !self.author.is_empty() {
             lines.push(Line::from(""));
             lines.push(Line::from(format!(
@@ -411,6 +429,12 @@ impl Widget for &App {
 
         if self.rsf_edit {
             lines.push(Line::from(""));
+            lines.push(
+                Line::from("RSF-Creator")
+                    .bold()
+                    .fg(Color::LightBlue),
+            );
+            lines.push(Line::from(""));
 
             let (prompt, example) = match self.rsf_field {
                 0 => ("Title:", "(Ex: The best Homebrew)"),
@@ -419,7 +443,7 @@ impl Widget for &App {
                 3 => ("RomFs Path:", "(Ex: ./romfs)"),
                 4 => ("UniqueId:", "(Ex: 0x0004000000000000)"),
                 5 => ("SaveDataSize:", "(Ex: 0x100000)"),
-                6 => ("CpuSpeed:", "(Ex: 804)"),
+                6 => ("CpuSpeed:", "(804Mhz New 3DS, 268MHz Old 3DS)"),
                 _ => ("", ""),
             };
 
@@ -432,36 +456,58 @@ impl Widget for &App {
                 Line::from(example)
                     .fg(Color::DarkGray),
             );
+
+            lines.push(Line::from(""));
+
+            lines.push(
+                Line::from("Enter: Next    Esc: Cancel")
+                    .fg(Color::DarkGray),
+            );
         }
 
-            if self.smdh_edit {
-                lines.push(Line::from(""));
+        if self.smdh_edit {
+            lines.push(Line::from(""));
+            lines.push(
+                Line::from("SMDH-Creator")
+                    .bold()
+                    .fg(Color::LightBlue),
+            );
 
-                let (prompt, example) = match self.smdh_field {
-                    0 => ("Title:", "(Ex: The best Homebrew)"),
-                    1 => ("Description:", "(Ex: An awesome 3DS application)"),
-                    2 => ("Publisher:", "(Ex: Saiitanaa)"),
-                    _ => ("", ""),
-                };
+            lines.push(Line::from(""));
 
-                lines.push(
-                    Line::from(format!("{} {}", prompt, self.smdh_input))
-                        .fg(Color::White),
-                );
+            let language = smdhcreator::SMDH_LANGUAGES[self.smdh_language];
 
-                lines.push(
-                    Line::from(example)
-                        .fg(Color::DarkGray),
-                );
+            lines.push(
+                Line::from(format!("Language: {}", language))
+                    .fg(Color::Yellow),
+            );
 
-                lines.push(
-                    Line::from(format!(
-                        "Language: {}",
-                        smdhcreator::SMDH_LANGUAGES[self.smdh_language]
-                    ))
+            lines.push(Line::from(""));
+
+            let (prompt, example) = match self.smdh_field {
+                0 => ("Title:", "(Ex: My Homebrew)"),
+                1 => ("Description:", "(Ex: My awesome 3DS application)"),
+                2 => ("Publisher:", "(Ex: Saiitanaa)"),
+                _ => ("", ""),
+            };
+
+            lines.push(
+                Line::from(format!("{} {}", prompt, self.smdh_input))
                     .fg(Color::White),
-                );
-            }
+            );
+
+            lines.push(
+                Line::from(example)
+                    .fg(Color::DarkGray),
+            );
+
+            lines.push(Line::from(""));
+
+            lines.push(
+                Line::from("Enter: Next    Esc: Cancel")
+                    .fg(Color::DarkGray),
+            );
+        }
 
         Paragraph::new(lines)
             .centered()
