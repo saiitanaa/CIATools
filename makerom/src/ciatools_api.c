@@ -1,5 +1,6 @@
 #define _CRT_SECURE_NO_WARNINGS
 #define _CRT_NONSTDC_NO_DEPRECATE
+#define _POSIX_C_SOURCE 200809L
 
 #include "lib.h"
 #include "ciatools_api.h"
