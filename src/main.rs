@@ -482,6 +482,14 @@ impl App {
                                 }
                             };
 
+                            let banner = match find_file_with_extension(&user_files, "bin") {
+                                Ok(path) => path,
+                                Err(error) => {
+                                    self.output.push(format!("[!] {error}"));
+                                    return Ok(());
+                                }
+                            };
+
                             let output = elf.with_extension("cia");
 
                             self.output.push(format!(
@@ -493,6 +501,7 @@ impl App {
                                 elf.to_string_lossy().as_ref(),
                                 rsf.to_string_lossy().as_ref(),
                                 icon.to_string_lossy().as_ref(),
+                                &banner.to_string_lossy().as_ref(),
                                 output.to_string_lossy().as_ref(),
                             );
 

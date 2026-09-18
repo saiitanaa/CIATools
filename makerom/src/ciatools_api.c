@@ -2,6 +2,7 @@
 #include "ciatools_api.h"
 #include "cia_build.h"
 #include "user_settings.h"
+#include <_string.h>
 
 int build_NCCH(user_settings *usrset);
 
@@ -9,6 +10,7 @@ int CIAToolsBuildCIA(
     const char *elfPath,
     const char *rsfPath,
     const char *iconPath,
+    const char *bannerPath,
     const char *outputPath
 )
 {
@@ -37,16 +39,15 @@ int CIAToolsBuildCIA(
         goto cleanup;
 
     set->common.rsfPath = strdup(rsfPath);
-
     set->ncch.elfPath = strdup(elfPath);
-
     set->ncch.iconPath = strdup(iconPath);
-
+    set->ncch.bannerPath = strdup(bannerPath);
     set->common.outFileName = strdup(outputPath);
 
     if (!set->common.rsfPath ||
         !set->ncch.elfPath ||
         !set->ncch.iconPath ||
+        !set->ncch.bannerPath ||
         !set->common.outFileName)
     {
         result = -1;
