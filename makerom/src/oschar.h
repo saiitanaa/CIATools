@@ -1,11 +1,20 @@
 #pragma once
-#include <stdio.h>
-#include <string.h>
-#include <inttypes.h>
-#include <sys/stat.h>
-#ifdef _WIN32
-#include <wchar.h>
+
+#define _CRT_SECURE_NO_WARNINGS
+#define _CRT_NONSTDC_NO_DEPRECATE
+
+#if defined(_WIN32) || defined(_MSC_VER)
+#include <windows.h>
+#else
+#include <sys/stat.h>  // Fournit struct stat, stat(), et mkdir()
+#include <sys/types.h> // Types système POSIX
+#include <dirent.h>    // Fournit DIR, struct dirent, opendir(), etc.
+#include <unistd.h>    // Fournit chdir()
 #endif
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 // Nintendo uses UTF16-LE chars for extended ASCII support
 typedef uint16_t utf16char_t;
