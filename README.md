@@ -35,23 +35,23 @@ To do this, **press** `2` for RSF or `3` for SMDH.
 
 #### For RSF File :
 
-<img width="990" height="612" alt="image" src="https://github.com/user-attachments/assets/a06837b4-ae8f-42c2-8ee4-58797e25fd5d" />
+<img width="500" height="312" alt="image" src="https://github.com/user-attachments/assets/a06837b4-ae8f-42c2-8ee4-58797e25fd5d" />
 
 #### For SMDH File: 
 
-<img width="990" height="612" alt="image" src="https://github.com/user-attachments/assets/02f9769c-2772-4f35-9581-8851875d7643" />
+<img width="500" height="312" alt="image" src="https://github.com/user-attachments/assets/02f9769c-2772-4f35-9581-8851875d7643" />
 
 **Perfect! Now let's define an author.** 
 
 To do this, **press** `4`.
 
-<img width="990" height="612" alt="image" src="https://github.com/user-attachments/assets/841ebbab-cc0e-4cad-8e40-a88f41967169" />
+<img width="500" height="312" alt="image" src="https://github.com/user-attachments/assets/841ebbab-cc0e-4cad-8e40-a88f41967169" />
 
 **Now we can compile the homebrew!**
 
 To do this, **press** `C`.
 
-<img width="990" height="612" alt="image" src="https://github.com/user-attachments/assets/1d26c2b3-e04b-4e7a-830f-1153029c6ca7" />
+<img width="500" height="312" alt="image" src="https://github.com/user-attachments/assets/1d26c2b3-e04b-4e7a-830f-1153029c6ca7" />
 
 
 
@@ -70,13 +70,13 @@ To do this, **press** `C`.
 ## Downloads
 
 You have **Windows** ? ➡️
-[<kbd>X64</kbd>](https://github.com/saiitanaa/CIATools/releases)
+[<kbd>X64</kbd>](https://github.com/saiitanaa/CIATools/releases/latest/download/CIAToolsN-Win-x64.exe) - [<kbd>X64</kbd>](https://github.com/saiitanaa/CIATools/releases/latest/download/CIAToolsN-Win-aarch64.exe)
 
 You have **macOS** ? ➡️
-[<kbd>ARM64</kbd>](https://github.com/saiitanaa/CIATools/releases) - [<kbd>X64</kbd>](https://github.com/saiitanaa/CIATools/releases)
+[<kbd>ARM64</kbd>](https://github.com/saiitanaa/CIATools/releases/latest/download/CIAToolsN-OSX-aarch64)
 
 You have **Linux** ? ➡️
-[<kbd>ARM64</kbd>](https://github.com/saiitanaa/CIATools/releases) - [<kbd>X64</kbd>](https://github.com/saiitanaa/CIATools/releases)
+[<kbd>ARM64</kbd>](https://github.com/saiitanaa/CIATools/releases/latest/download/CIAToolsN-Linux-aarch64) - *x64 coming soon...*
 
 ## Compiling
 
