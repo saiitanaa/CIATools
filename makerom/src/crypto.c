@@ -187,7 +187,7 @@ int RsaSignVerify(void *data, u64 len, u8 *sign, u8 *mod, u8 *priv_exp, u32 sig_
 {
 	int rsa_result = 0;
 	mbedtls_rsa_context ctx;
-	u8 hash[HASH_MAX_LEN];
+	u8 hash[32];
 		
 	if(!RsaKeyInit(&ctx, mod, priv_exp, RSA_PUB_EXP, GetRsaType(sig_type)))
 		return -1;
