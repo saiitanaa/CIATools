@@ -5,7 +5,7 @@
 **`CIATools`** is **all-in-one tool** for compiling your **projects** into `.cia` format with ease.
 
 ### Included :
-RSF File Creator, SMDH File Creator, Edit Author, 2D-3D banner support, No dependencies required, 
+RSF File Creator, SMDH File Creator, Edit Author, 2D-3D banner support, No dependencies required, `makeROM` & `bannertool` librairies included
 
 ## Downloads
 
@@ -25,7 +25,7 @@ You have **Linux** ? ➡️
 
 **Passage to full Rust**. Very (very) **simple** for **compile** CIATools 
 
-**Full cleaned code**. Cleaned obselete code & functions. Fast and light
+**Full cleaned code**. Cleaned obsolete code & functions. Fast and light
 
 **Console**. Yes, finally a veritable console for debug !
 
@@ -92,6 +92,12 @@ Dependencies of **CIAToolsN** (everything else in the `cargo tree` is just their
 | **ratatui** | 0.30.2 | TUI framework (terminal UI) — biggest dependency, includes widgets, layout, etc. |
 | **rfd** | 0.14.1 | Native file dialogs ("Rust File Dialogs") |
 
-#### AI Utilisation & Transparancy
+#### AI Utilisation
 
 Artificial intelligence was **used** only for complex compilation **errors**. It was **not** used to generate assets or ready-made code.
+
+### Credit <3
+
+Thanks for makeROM source code : https://github.com/3DSGuy/Project_CTR
+
+Thanks for bannertool source code : https://github.com/diasurgical/bannertool
