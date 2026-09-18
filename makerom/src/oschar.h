@@ -29,11 +29,22 @@ typedef char oschar_t; // UTF8
 #define utf16_CopyStr strcopy_16to16
 #define utf16_CopyConvertOsStr strcopy_16to16
 
-#define _osdirent _wdirent
-#define _OSDIR _WDIR
-#define os_readdir _wreaddir
-#define os_opendir _wopendir
-#define os_closedir _wclosedir
+typedef struct
+{
+	HANDLE handle;
+	struct _osdirent *entry;
+	wchar_t path[MAX_PATH];
+} _OSDIR;
+
+struct _osdirent
+{
+	wchar_t d_name[MAX_PATH];
+};
+
+_OSDIR *os_opendir(const wchar_t *path);
+struct _osdirent *os_readdir(_OSDIR *dir);
+int os_closedir(_OSDIR *dir);
+
 #define os_chdir _wchdir
 
 #define _osstat _stat64
