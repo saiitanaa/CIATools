@@ -21,7 +21,39 @@ RSF File Creator, SMDH File Creator, Edit Author, 2D-3D banner support, No depen
 
 ## Usage
 
-**Coming soon...**
+**Welcome to the interface!** To get started, **import the files** needed to create your **Homebrew** in `.cia` format.
+
+To do this, **press** `1`. 
+
+<img width="720" height="318" alt="image" src="https://github.com/user-attachments/assets/ae2fe529-c421-44e5-892a-5a68662e53e9" />
+
+**You're now in the file explorer!** Select all the **files** needed for **compilation**.
+
+**Don't have** an `.rsf` or `.smdh` **file**? No problem—we'll **create them for you**!
+
+To do this, **press** `2` for RSF or `3` for SMDH.
+
+#### For RSF File :
+
+<img width="990" height="612" alt="image" src="https://github.com/user-attachments/assets/a06837b4-ae8f-42c2-8ee4-58797e25fd5d" />
+
+#### For SMDH File: 
+
+<img width="990" height="612" alt="image" src="https://github.com/user-attachments/assets/02f9769c-2772-4f35-9581-8851875d7643" />
+
+**Perfect! Now let's define an author.** 
+
+To do this, **press** `4`.
+
+<img width="990" height="612" alt="image" src="https://github.com/user-attachments/assets/841ebbab-cc0e-4cad-8e40-a88f41967169" />
+
+**Now we can compile the homebrew!**
+
+To do this, **press** `C`.
+
+<img width="990" height="612" alt="image" src="https://github.com/user-attachments/assets/1d26c2b3-e04b-4e7a-830f-1153029c6ca7" />
+
+
 
 ### History
 
