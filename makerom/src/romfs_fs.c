@@ -1,7 +1,7 @@
 #include "lib.h"
 #include "oschar.h"
 #include <stdio.h>
-#include <sys/syslimits.h>
+#include <limits.h>
 #include "romfs_fs.h"
 
 /* This is the FS interface for ROMFS generation */
