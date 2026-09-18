@@ -1,3 +1,6 @@
+#define _CRT_SECURE_NO_WARNINGS
+#define _CRT_NONSTDC_NO_DEPRECATE
+
 #include "lib.h"
 #include "ciatools_api.h"
 #include "cia_build.h"
@@ -37,6 +40,13 @@ int CIAToolsBuildCIA(
 
     if (result != 0)
         goto cleanup;
+
+    // Sécurisation contre les pointeurs NULL
+    if (!elfPath || !rsfPath || !iconPath || !bannerPath || !outputPath)
+    {
+        result = -1;
+        goto cleanup;
+    }
 
     set->common.rsfPath = strdup(rsfPath);
     set->ncch.elfPath = strdup(elfPath);
