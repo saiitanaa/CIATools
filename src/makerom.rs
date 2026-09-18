@@ -16,21 +16,27 @@ pub fn build_cia(
     elf_path: &str,
     rsf_path: &str,
     icon_path: &str,
-    banner_path: &str,
+    banner_path: Option<&str>,
     output_path: &str,
 ) -> i32 {
     let elf = CString::new(elf_path).expect("[!] Invalid ELF path");
     let rsf = CString::new(rsf_path).expect("[!] Invalid RSF path");
     let icon = CString::new(icon_path).expect("[!] Invalid icon path");
-    let banner = CString::new(banner_path).expect("[!] Invalid banner path");
+    let banner = banner_path.map(|path| {
+        CString::new(path).expect("[!] Invalid banner path")
+    });
     let output = CString::new(output_path).expect("[!] Invalid output path");
+
+    let banner_ptr = banner
+        .as_ref()
+        .map_or(std::ptr::null(), |path| path.as_ptr());
 
     unsafe {
         CIAToolsBuildCIA(
             elf.as_ptr(),
             rsf.as_ptr(),
             icon.as_ptr(),
-            banner.as_ptr(),
+            banner_ptr,
             output.as_ptr(),
         )
     }

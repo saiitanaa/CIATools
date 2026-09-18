@@ -42,8 +42,7 @@ int CIAToolsBuildCIA(
     if (result != 0)
         goto cleanup;
 
-    // Sécurisation contre les pointeurs NULL
-    if (!elfPath || !rsfPath || !iconPath || !bannerPath || !outputPath)
+    if (!elfPath || !rsfPath || !iconPath || !outputPath)
     {
         result = -1;
         goto cleanup;
@@ -52,13 +51,12 @@ int CIAToolsBuildCIA(
     set->common.rsfPath = strdup(rsfPath);
     set->ncch.elfPath = strdup(elfPath);
     set->ncch.iconPath = strdup(iconPath);
-    set->ncch.bannerPath = strdup(bannerPath);
+    set->ncch.bannerPath = bannerPath ? strdup(bannerPath) : NULL;
     set->common.outFileName = strdup(outputPath);
 
     if (!set->common.rsfPath ||
         !set->ncch.elfPath ||
         !set->ncch.iconPath ||
-        !set->ncch.bannerPath ||
         !set->common.outFileName)
     {
         result = -1;

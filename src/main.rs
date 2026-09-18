@@ -29,15 +29,30 @@ fn main() -> io::Result<()> {
 
     set_directories()?;
 
+    let bin_path = std::env::current_exe()?
+        .parent()
+        .ok_or_else(|| io::Error::other("Get binary error!"))?
+        .to_path_buf();
+
+    let romfs_path = bin_path.join("romfs");
+
+    fs::create_dir_all(&romfs_path)?;
+
     let author = load_author()?;
 
-    ratatui::run(|terminal| {
+    let result = ratatui::run(|terminal| {
         App {
             author,
             ..App::default()
         }
         .run(terminal)
-    })
+    });
+
+    if romfs_path.exists() {
+        fs::remove_dir_all(&romfs_path)?;
+    }
+
+    result
 } // Good size : 120x32
 
 #[derive(Debug, Default)]
@@ -482,13 +497,9 @@ impl App {
                                 }
                             };
 
-                            let banner = match find_file_with_extension(&user_files, "bin") {
-                                Ok(path) => path,
-                                Err(error) => {
-                                    self.output.push(format!("[!] {error}"));
-                                    return Ok(());
-                                }
-                            };
+                            let banner = find_file_with_extension(&user_files, "bin")
+                                .or_else(|_| find_file_with_extension(&user_files, "bnr"))
+                                .ok();
 
                             let output = elf.with_extension("cia");
 
@@ -501,7 +512,10 @@ impl App {
                                 elf.to_string_lossy().as_ref(),
                                 rsf.to_string_lossy().as_ref(),
                                 icon.to_string_lossy().as_ref(),
-                                &banner.to_string_lossy().as_ref(),
+                                banner
+                                    .as_ref()
+                                    .map(|path| path.to_string_lossy().to_string())
+                                    .as_deref(),
                                 output.to_string_lossy().as_ref(),
                             );
 
