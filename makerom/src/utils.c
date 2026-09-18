@@ -1,5 +1,8 @@
+#define _POSIX_C_SOURCE 200809L
+
 #include "lib.h"
 #include <mbedtls/base64.h>
+#include "utils.h"
 
 #define IO_BLOCKSIZE 5*MB
 
