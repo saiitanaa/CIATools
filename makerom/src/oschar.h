@@ -62,7 +62,7 @@ int os_closedir(_OSDIR *dir);
 #define OS_MODE_WRITE L"wb"
 #define OS_MODE_EDIT L"rb+"
 
-#define OS_PATH_SEPARATOR '\'
+#define OS_PATH_SEPARATOR '\\'
 
 #else
 
