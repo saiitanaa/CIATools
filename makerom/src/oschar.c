@@ -1,364 +1,461 @@
 #include <stdlib.h>
+#include <string.h>
+#include <wchar.h>
 
-#ifndef _WIN32
-#ifndef __CYGWIN__
+#ifdef _WIN32
+
+#include <windows.h>
+#include <sys/stat.h>
+#include <direct.h>
+
+#else
+
+#ifndef CYGWIN
 #define LIBICONV_PLUG
 #endif
+
 #include <iconv.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <dirent.h>
+#include <unistd.h>
+
 #endif
 
 #include "oschar.h"
 
 #ifdef _WIN32
 
-typedef struct
+struct _OSDIR
 {
-	HANDLE handle;
-	WIN32_FIND_DATAW data;
-	struct _osdirent *entry;
-	int first;
-} _OSDIR;
-
-struct _osdirent
-{
-	wchar_t d_name[MAX_PATH];
+HANDLE handle;
+WIN32_FIND_DATAW data;
+struct _osdirent *entry;
+int first;
 };
 
 _OSDIR *os_opendir(const wchar_t *path)
 {
-	_OSDIR *dir = calloc(1, sizeof(_OSDIR));
+_OSDIR *dir;
+wchar_t search_path[MAX_PATH];
 
-	if (!dir)
-		return NULL;
+if (!path)
+	return NULL;
 
-	dir->entry = calloc(1, sizeof(struct _osdirent));
+dir = calloc(1, sizeof(*dir));
 
-	if (!dir->entry)
-	{
-		free(dir);
-		return NULL;
-	}
+if (!dir)
+	return NULL;
 
-	wchar_t search_path[MAX_PATH];
+dir->entry = calloc(1, sizeof(*dir->entry));
 
-	_snwprintf(
-		search_path,
-		MAX_PATH,
-		L"%s\\*",
-		path
-	);
+if (!dir->entry)
+{
+	free(dir);
+	return NULL;
+}
 
-	dir->handle = FindFirstFileW(
-		search_path,
-		&dir->data
-	);
+_snwprintf(
+	search_path,
+	MAX_PATH,
+	L"%ls\\*",
+	path
+);
 
-	if (dir->handle == INVALID_HANDLE_VALUE)
-	{
-		free(dir->entry);
-		free(dir);
-		return NULL;
-	}
+search_path[MAX_PATH - 1] = L'\0';
 
-	dir->first = 1;
+dir->handle = FindFirstFileW(
+	search_path,
+	&dir->data
+);
 
-	return dir;
+if (dir->handle == INVALID_HANDLE_VALUE)
+{
+	free(dir->entry);
+	free(dir);
+	return NULL;
+}
+
+dir->first = 1;
+
+return dir;
+
 }
 
 struct _osdirent *os_readdir(_OSDIR *dir)
 {
-	if (!dir)
-		return NULL;
+if (!dir)
+return NULL;
 
-	if (!dir->first)
+if (!dir->first)
+{
+	if (!FindNextFileW(
+		dir->handle,
+		&dir->data
+	))
 	{
-		if (!FindNextFileW(dir->handle, &dir->data))
-			return NULL;
+		return NULL;
 	}
+}
 
-	dir->first = 0;
+dir->first = 0;
 
-	wcsncpy(
-		dir->entry->d_name,
-		dir->data.cFileName,
-		MAX_PATH - 1
-	);
+wcsncpy(
+	dir->entry->d_name,
+	dir->data.cFileName,
+	MAX_PATH - 1
+);
 
-	dir->entry->d_name[MAX_PATH - 1] = L'\0';
+dir->entry->d_name[MAX_PATH - 1] = L'\0';
 
-	return dir->entry;
+return dir->entry;
+
 }
 
 int os_closedir(_OSDIR *dir)
 {
-	if (!dir)
-		return -1;
+if (!dir)
+return -1;
 
-	if (dir->handle != INVALID_HANDLE_VALUE)
-		FindClose(dir->handle);
+if (dir->handle != INVALID_HANDLE_VALUE)
+	FindClose(dir->handle);
 
-	free(dir->entry);
-	free(dir);
+free(dir->entry);
+free(dir);
 
-	return 0;
+return 0;
+
 }
 
 #endif
 
 int os_fstat(const oschar_t *path)
 {
-	struct _osstat st;
-	return os_stat(path, &st);
+struct _osstat st;
+
+return os_stat(path, &st);
+
 }
 
 uint64_t os_fsize(const oschar_t *path)
 {
-	struct _osstat st;
+struct _osstat st;
 
-	if (os_stat(path, &st) != 0)
-		return 0;
+if (os_stat(path, &st) != 0)
+	return 0;
 
-	return st.st_size;
+return (uint64_t)st.st_size;
+
 }
 
 int os_makedir(const oschar_t *dir)
 {
 #ifdef _WIN32
-	return _wmkdir(dir);
+return _wmkdir(dir);
 #else
-	return mkdir(dir, 0777);
+return mkdir(dir, 0777);
 #endif
 }
 
 uint32_t utf16_strlen(const utf16char_t *str)
 {
-	uint32_t i;
+uint32_t i;
 
-	for (i = 0; str[i] != 0x0; i++);
+if (!str)
+	return 0;
 
-	return i;
+for (i = 0; str[i] != 0; i++)
+	;
+
+return i;
+
 }
 
 void utf16_fputs(const utf16char_t *str, FILE *out)
 {
-	oschar_t *_str = os_CopyConvertUTF16Str(str);
+oschar_t *converted;
 
-	os_fputs(_str, out);
+if (!str || !out)
+	return;
 
-	free(_str);
+converted = os_CopyConvertUTF16Str(str);
+
+if (!converted)
+	return;
+
+os_fputs(converted, out);
+
+free(converted);
+
 }
 
 char *strcopy_8to8(const char *src)
 {
-	uint32_t src_len;
-	char *dst;
+size_t src_len;
+char *dst;
 
-	if (!src)
-		return NULL;
+if (!src)
+	return NULL;
 
-	src_len = strlen(src);
+src_len = strlen(src);
 
-	dst = calloc(src_len + 1, sizeof(char));
+dst = calloc(src_len + 1, sizeof(*dst));
 
-	if (!dst)
-		return NULL;
+if (!dst)
+	return NULL;
 
-	strncpy(dst, src, src_len);
+memcpy(dst, src, src_len);
+dst[src_len] = '\0';
 
-	return dst;
+return dst;
+
 }
 
 utf16char_t *strcopy_8to16(const char *src)
 {
-	uint32_t src_len;
-	uint32_t i;
-	utf16char_t *dst;
+size_t src_len;
+size_t i;
+utf16char_t *dst;
 
-	if (!src)
-		return NULL;
+if (!src)
+	return NULL;
 
-	src_len = strlen(src);
+src_len = strlen(src);
 
-	dst = calloc(src_len + 1, sizeof(utf16char_t));
+dst = calloc(src_len + 1, sizeof(*dst));
 
-	if (!dst)
-		return NULL;
+if (!dst)
+	return NULL;
 
-	for (i = 0; i < src_len; i++)
-		dst[i] = src[i];
+for (i = 0; i < src_len; i++)
+	dst[i] = (utf16char_t)(unsigned char)src[i];
 
-	return dst;
+dst[src_len] = 0;
+
+return dst;
+
 }
 
 utf16char_t *strcopy_16to16(const utf16char_t *src)
 {
-	uint32_t src_len;
-	uint32_t i;
-	utf16char_t *dst;
+size_t src_len;
+size_t i;
+utf16char_t *dst;
 
-	if (!src)
-		return NULL;
+if (!src)
+	return NULL;
 
-	src_len = utf16_strlen(src);
+src_len = utf16_strlen(src);
 
-	dst = calloc(src_len + 1, sizeof(utf16char_t));
+dst = calloc(src_len + 1, sizeof(*dst));
 
-	if (!dst)
-		return NULL;
+if (!dst)
+	return NULL;
 
-	for (i = 0; i < src_len; i++)
-		dst[i] = src[i];
+for (i = 0; i < src_len; i++)
+	dst[i] = src[i];
 
-	return dst;
+dst[src_len] = 0;
+
+return dst;
+
 }
 
 #ifndef _WIN32
 
 utf16char_t *strcopy_UTF8toUTF16(const char *src)
 {
-	uint32_t src_len;
-	uint32_t dst_len;
-	size_t in_bytes;
-	size_t out_bytes;
-	utf16char_t *dst;
-	char *in;
-	char *out;
+size_t src_len;
+size_t dst_len;
+size_t in_bytes;
+size_t out_bytes;
 
-	if (!src)
-		return NULL;
+utf16char_t *dst;
+char *in;
+char *out;
+iconv_t cd;
 
-	src_len = strlen(src);
-	dst_len = src_len + 1;
+if (!src)
+	return NULL;
 
-	dst = calloc(dst_len, sizeof(utf16char_t));
+src_len = strlen(src);
+dst_len = src_len + 1;
 
-	if (!dst)
-		return NULL;
+dst = calloc(dst_len, sizeof(*dst));
 
-	in = (char *)src;
-	out = (char *)dst;
+if (!dst)
+	return NULL;
 
-	in_bytes = src_len * sizeof(char);
-	out_bytes = dst_len * sizeof(utf16char_t);
+in = (char *)src;
+out = (char *)dst;
 
-	iconv_t cd = iconv_open("UTF-16LE", "UTF-8");
+in_bytes = src_len;
+out_bytes = dst_len * sizeof(*dst);
 
-	iconv(cd, &in, &in_bytes, &out, &out_bytes);
+cd = iconv_open("UTF-16LE", "UTF-8");
 
-	iconv_close(cd);
+if (cd == (iconv_t)-1)
+{
+	free(dst);
+	return NULL;
+}
 
-	return dst;
+iconv(cd, &in, &in_bytes, &out, &out_bytes);
+iconv_close(cd);
+
+return dst;
+
 }
 
 char *strcopy_UTF16toUTF8(const utf16char_t *src)
 {
-	uint32_t src_len;
-	uint32_t dst_len;
-	size_t in_bytes;
-	size_t out_bytes;
-	char *dst;
-	char *in;
-	char *out;
+size_t src_len;
+size_t dst_len;
+size_t in_bytes;
+size_t out_bytes;
 
-	if (!src)
-		return NULL;
+char *dst;
+char *in;
+char *out;
+iconv_t cd;
 
-	src_len = utf16_strlen(src);
-	dst_len = src_len * 3;
+if (!src)
+	return NULL;
 
-	dst = calloc(dst_len, sizeof(char));
+src_len = utf16_strlen(src);
+dst_len = src_len * 3 + 1;
 
-	if (!dst)
-		return NULL;
+dst = calloc(dst_len, sizeof(*dst));
 
-	in = (char *)src;
-	out = (char *)dst;
+if (!dst)
+	return NULL;
 
-	in_bytes = src_len * sizeof(uint16_t);
-	out_bytes = dst_len * sizeof(char);
+in = (char *)src;
+out = dst;
 
-	iconv_t cd = iconv_open("UTF-8", "UTF-16LE");
+in_bytes = src_len * sizeof(*src);
+out_bytes = dst_len;
 
-	iconv(cd, &in, &in_bytes, &out, &out_bytes);
+cd = iconv_open("UTF-8", "UTF-16LE");
 
-	iconv_close(cd);
+if (cd == (iconv_t)-1)
+{
+	free(dst);
+	return NULL;
+}
 
-	return dst;
+iconv(cd, &in, &in_bytes, &out, &out_bytes);
+iconv_close(cd);
+
+return dst;
+
 }
 
 #endif
 
 oschar_t *os_AppendToPath(
-	const oschar_t *src,
-	const oschar_t *add
+const oschar_t *src,
+const oschar_t *add
 )
 {
-	uint32_t len;
-	oschar_t *new_path;
+size_t len;
+oschar_t *new_path;
 
-	len = os_strlen(src) + os_strlen(add) + 0x10;
+if (!src || !add)
+	return NULL;
 
-	new_path = calloc(len, sizeof(oschar_t));
+len = os_strlen(src) + os_strlen(add) + 0x10;
+
+new_path = calloc(len, sizeof(*new_path));
+
+if (!new_path)
+	return NULL;
 
 #ifdef _WIN32
-	_snwprintf(
-		new_path,
-		len,
-		L"%s%c%s",
-		src,
-		OS_PATH_SEPARATOR,
-		add
-	);
+
+_snwprintf(
+	new_path,
+	len,
+	L"%ls%c%ls",
+	src,
+	OS_PATH_SEPARATOR,
+	add
+);
+
 #else
-	snprintf(
-		new_path,
-		len,
-		"%s%c%s",
-		src,
-		OS_PATH_SEPARATOR,
-		add
-	);
+
+snprintf(
+	new_path,
+	len,
+	"%s%c%s",
+	src,
+	OS_PATH_SEPARATOR,
+	add
+);
+
 #endif
 
-	return new_path;
+new_path[len - 1] = 0;
+
+return new_path;
+
 }
 
 oschar_t *os_AppendUTF16StrToPath(
-	const oschar_t *src,
-	const utf16char_t *add
+const oschar_t *src,
+const utf16char_t *add
 )
 {
-	uint32_t len;
-	oschar_t *new_path;
-	oschar_t *_add;
+size_t len;
+oschar_t *new_path;
+oschar_t *_add;
 
-	_add = os_CopyConvertUTF16Str(add);
+if (!src || !add)
+	return NULL;
 
-	len = os_strlen(src) + os_strlen(_add) + 0x10;
+_add = os_CopyConvertUTF16Str(add);
 
-	new_path = calloc(len, sizeof(oschar_t));
+if (!_add)
+	return NULL;
+
+len = os_strlen(src) + os_strlen(_add) + 0x10;
+
+new_path = calloc(len, sizeof(*new_path));
+
+if (!new_path)
+{
+	free(_add);
+	return NULL;
+}
 
 #ifdef _WIN32
-	_snwprintf(
-		new_path,
-		len,
-		L"%s%c%s",
-		src,
-		OS_PATH_SEPARATOR,
-		_add
-	);
+
+_snwprintf(
+	new_path,
+	len,
+	L"%ls%c%ls",
+	src,
+	OS_PATH_SEPARATOR,
+	_add
+);
+
 #else
-	snprintf(
-		new_path,
-		len,
-		"%s%c%s",
-		src,
-		OS_PATH_SEPARATOR,
-		_add
-	);
+
+snprintf(
+	new_path,
+	len,
+	"%s%c%s",
+	src,
+	OS_PATH_SEPARATOR,
+	_add
+);
+
 #endif
 
-	free(_add);
+new_path[len - 1] = 0;
 
-	return new_path;
+free(_add);
+
+return new_path;
+
 }
