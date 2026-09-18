@@ -3,8 +3,12 @@
 #include "cia_build.h"
 #include "user_settings.h"
 
+int build_NCCH(user_settings *usrset);
+
 int CIAToolsBuildCIA(
-    const char *inputPath,
+    const char *elfPath,
+    const char *rsfPath,
+    const char *iconPath,
     const char *outputPath
 )
 {
@@ -14,7 +18,17 @@ int CIAToolsBuildCIA(
         return -1;
 
     init_UserSettings(set);
+
+    set->common.contentPath = calloc(CIA_MAX_CONTENT, sizeof(char *));
+
+    if (!set->common.contentPath)
+    {
+        free_UserSettings(set);
+        return -1;
+    }
+
     InitKeys(&set->common.keys);
+
     SetDefaults(set);
 
     int result = SetKeys(&set->common.keys);
@@ -22,37 +36,43 @@ int CIAToolsBuildCIA(
     if (result != 0)
         goto cleanup;
 
-    set->common.workingFileType = infile_ncch;
-    set->common.workingFile.size = GetFileSize64((char *)inputPath);
+    set->common.rsfPath = strdup(rsfPath);
 
-    if (set->common.workingFile.size == 0) {
-        result = -1;
-        goto cleanup;
-    }
+    set->ncch.elfPath = strdup(elfPath);
 
-    set->common.workingFile.buffer = ImportFile(
-        (char *)inputPath,
-        set->common.workingFile.size
-    );
-
-    if (!set->common.workingFile.buffer) {
-        result = -1;
-        goto cleanup;
-    }
+    set->ncch.iconPath = strdup(iconPath);
 
     set->common.outFileName = strdup(outputPath);
 
-    if (!set->common.outFileName) {
+    if (!set->common.rsfPath ||
+        !set->ncch.elfPath ||
+        !set->ncch.iconPath ||
+        !set->common.outFileName)
+    {
         result = -1;
         goto cleanup;
     }
 
     set->common.outFileName_mallocd = true;
+
     set->common.outFormat = CIA;
+
+    set->common.workingFileType = infile_ncch;
+
+    result = GetRsfSettings(set);
+
+    if (result != 0)
+        goto cleanup;
+
+    result = build_NCCH(set);
+
+    if (result != 0)
+        goto cleanup;
 
     result = build_CIA(set);
 
 cleanup:
     free_UserSettings(set);
+
     return result;
 }

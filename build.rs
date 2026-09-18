@@ -20,13 +20,15 @@ fn main() {
         }
     }
 
-build.compile("makerom_core");
+    build.compile("makerom_core");
 
-let out_dir = std::env::var("OUT_DIR").unwrap();
-println!("cargo:rustc-link-arg={out_dir}/libmakerom_core.a");
-let manifest_dir = std::env::var("CARGO_MANIFEST_DIR").unwrap();
+    let out_dir = std::env::var("OUT_DIR").unwrap();
+    println!("cargo:rustc-link-arg={out_dir}/libmakerom_core.a");
+    let manifest_dir = std::env::var("CARGO_MANIFEST_DIR").unwrap();
 
-println!(
-    "cargo:rustc-link-arg={manifest_dir}/makerom/deps/libmbedtls/bin/libmbedtls.a"
-);
+    println!("cargo:rustc-link-arg={manifest_dir}/makerom/deps/libmbedtls/bin/libmbedtls.a");
+    println!("cargo:rerun-if-changed=makerom/src");
+    println!("cargo:rerun-if-changed=makerom/deps/libmbedtls");
+    println!("cargo:rustc-link-arg={manifest_dir}/makerom/deps/libblz/bin/libblz.a");
+    println!("cargo:rustc-link-arg={manifest_dir}/makerom/deps/libyaml/bin/libyaml.a");
 }

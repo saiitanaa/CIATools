@@ -3,15 +3,30 @@ use std::os::raw::c_char;
 
 unsafe extern "C" {
     fn CIAToolsBuildCIA(
-        input_path: *const c_char,
+        elf_path: *const c_char,
+        rsf_path: *const c_char,
+        icon_path: *const c_char,
         output_path: *const c_char,
     ) -> i32;
 }
 
-pub fn build_cia(input_path: &str, output_path: &str) -> i32 {
-    let input = CString::new(input_path).expect("[!] Invalid inputPath");
-    let output = CString::new(output_path).expect("[!] Invalid outputPath");
+pub fn build_cia(
+    elf_path: &str,
+    rsf_path: &str,
+    icon_path: &str,
+    output_path: &str,
+) -> i32 {
+    let elf = CString::new(elf_path).expect("[!] Invalid ELF path");
+    let rsf = CString::new(rsf_path).expect("[!] Invalid RSF path");
+    let icon = CString::new(icon_path).expect("[!] Invalid icon path");
+    let output = CString::new(output_path).expect("[!] Invalid output path");
+
     unsafe {
-        CIAToolsBuildCIA(input.as_ptr(), output.as_ptr())
+        CIAToolsBuildCIA(
+            elf.as_ptr(),
+            rsf.as_ptr(),
+            icon.as_ptr(),
+            output.as_ptr(),
+        )
     }
 }

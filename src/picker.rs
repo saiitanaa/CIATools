@@ -15,9 +15,7 @@ pub fn pick_files() -> io::Result<Option<Vec<PathBuf>>> {
         return output
     "#;
 
-    let output = Command::new("osascript")
-        .args(["-e", script])
-        .output()?;
+    let output = Command::new("osascript").args(["-e", script]).output()?;
 
     if !output.status.success() {
         return Ok(None);

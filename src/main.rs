@@ -1,21 +1,18 @@
-mod import;
 mod delete;
-mod utils;
+mod import;
+mod make;
+mod makerom;
 mod picker;
 mod rsfcreator;
 mod smdhcreator;
-mod make;
-mod makerom;
+mod utils;
 
-use std::{fs, io, path::PathBuf, result};
+use std::{fs, io, path::PathBuf};
 
-use crossterm::{
-    event::{self, Event, KeyCode, KeyEventKind},
-};
+use crossterm::event::{self, Event, KeyCode, KeyEventKind};
 
 use ratatui::{
-    DefaultTerminal,
-    Frame,
+    DefaultTerminal, Frame,
     buffer::Buffer,
     layout::{Constraint, Direction, Layout, Rect},
     style::{Color, Stylize},
@@ -34,11 +31,6 @@ fn main() -> io::Result<()> {
 
     let author = load_author()?;
 
-    let result = makerom::build_cia(
-        "/path/to/input.ncch",
-        "/path/to/output.cia"
-    );
-    println!("result cia : {result}");
     ratatui::run(|terminal| {
         App {
             author,
@@ -82,6 +74,27 @@ fn set_directories() -> io::Result<PathBuf> {
     fs::create_dir_all(&user_files)?;
 
     Ok(user_files)
+}
+
+fn find_file_with_extension(
+    directory: &PathBuf,
+    extension: &str,
+) -> io::Result<PathBuf> {
+    for entry in fs::read_dir(directory)? {
+        let path = entry?.path();
+
+        if path.extension()
+            .and_then(|ext| ext.to_str())
+            .is_some_and(|ext| ext.eq_ignore_ascii_case(extension))
+        {
+            return Ok(path);
+        }
+    }
+
+    Err(io::Error::new(
+        io::ErrorKind::NotFound,
+        format!("No .{extension} file found"),
+    ))
 }
 
 impl App {
@@ -134,15 +147,13 @@ impl App {
             .collect();
 
         frame.render_widget(
-            Paragraph::new(output_lines)
-                .style(Color::White)
-                .block(
-                    Block::bordered()
-                        .bold()
-                        .fg(Color::Magenta)
-                        .title(" OUTPUT ".bold())
-                        .border_set(border::THICK),
-                ),
+            Paragraph::new(output_lines).style(Color::White).block(
+                Block::bordered()
+                    .bold()
+                    .fg(Color::Magenta)
+                    .title(" OUTPUT ".bold())
+                    .border_set(border::THICK),
+            ),
             outer_layout[1],
         );
     }
@@ -153,7 +164,6 @@ impl App {
                 return Ok(());
             }
 
-            // Author input mode
             if self.editing_author {
                 match key.code {
                     KeyCode::Enter => {
@@ -187,7 +197,6 @@ impl App {
                 return Ok(());
             }
 
-            // RSF input mode
             if self.rsf_edit {
                 match key.code {
                     KeyCode::Char(c) => {
@@ -221,8 +230,7 @@ impl App {
 
                             fs::write(path, content)?;
 
-                            self.output
-                                .push("[+] RSF file created.".to_string());
+                            self.output.push("[+] RSF file created.".to_string());
                         }
                     }
 
@@ -237,9 +245,7 @@ impl App {
                 return Ok(());
             }
 
-            // SMDH input mode
             if self.smdh_edit {
-                // Language selection
                 if self.smdh_select_language {
                     match key.code {
                         KeyCode::Left => {
@@ -270,7 +276,6 @@ impl App {
                     return Ok(());
                 }
 
-                // Icon selection
                 if self.smdh_select_icon {
                     match key.code {
                         KeyCode::Enter => {
@@ -292,9 +297,7 @@ impl App {
 
                                                 let title = self
                                                     .smdh_file
-                                                    .get_short_description(
-                                                        self.smdh_language,
-                                                    );
+                                                    .get_short_description(self.smdh_language);
 
                                                 let filename = format!(
                                                     "{}.smdh",
@@ -305,10 +308,7 @@ impl App {
                                                     }
                                                 );
 
-                                                match self
-                                                    .smdh_file
-                                                    .save_to_user_files(&filename)
-                                                {
+                                                match self.smdh_file.save_to_user_files(&filename) {
                                                     Ok(path) => {
                                                         self.output.push(format!(
                                                             "[+] SMDH created: {}",
@@ -329,25 +329,20 @@ impl App {
                                             }
 
                                             Err(error) => {
-                                                self.output.push(format!(
-                                                    "[!] Icon error: {}",
-                                                    error
-                                                ));
+                                                self.output
+                                                    .push(format!("[!] Icon error: {}", error));
                                             }
                                         }
                                     }
                                 }
 
                                 Ok(None) => {
-                                    self.output
-                                        .push("[!] No icon selected.".to_string());
+                                    self.output.push("[!] No icon selected.".to_string());
                                 }
 
                                 Err(error) => {
-                                    self.output.push(format!(
-                                        "[!] Icon picker error: {}",
-                                        error
-                                    ));
+                                    self.output
+                                        .push(format!("[!] Icon picker error: {}", error));
                                 }
                             }
                         }
@@ -363,7 +358,6 @@ impl App {
                     return Ok(());
                 }
 
-                // SMDH text fields
                 match key.code {
                     KeyCode::Esc => {
                         self.smdh_edit = false;
@@ -374,41 +368,33 @@ impl App {
                         self.smdh_input.pop();
                     }
 
-                    KeyCode::Enter => {
-                        match self.smdh_field {
-                            0 => {
-                                self.smdh_file.set_short_description(
-                                    self.smdh_language,
-                                    &self.smdh_input,
-                                );
+                    KeyCode::Enter => match self.smdh_field {
+                        0 => {
+                            self.smdh_file
+                                .set_short_description(self.smdh_language, &self.smdh_input);
 
-                                self.smdh_input.clear();
-                                self.smdh_field = 1;
-                            }
-
-                            1 => {
-                                self.smdh_file.set_long_description(
-                                    self.smdh_language,
-                                    &self.smdh_input,
-                                );
-
-                                self.smdh_input.clear();
-                                self.smdh_field = 2;
-                            }
-
-                            2 => {
-                                self.smdh_file.set_publisher(
-                                    self.smdh_language,
-                                    &self.smdh_input,
-                                );
-
-                                self.smdh_input.clear();
-                                self.smdh_select_icon = true;
-                            }
-
-                            _ => {}
+                            self.smdh_input.clear();
+                            self.smdh_field = 1;
                         }
-                    }
+
+                        1 => {
+                            self.smdh_file
+                                .set_long_description(self.smdh_language, &self.smdh_input);
+
+                            self.smdh_input.clear();
+                            self.smdh_field = 2;
+                        }
+
+                        2 => {
+                            self.smdh_file
+                                .set_publisher(self.smdh_language, &self.smdh_input);
+
+                            self.smdh_input.clear();
+                            self.smdh_select_icon = true;
+                        }
+
+                        _ => {}
+                    },
 
                     KeyCode::Char(c) => {
                         self.smdh_input.push(c);
@@ -420,20 +406,17 @@ impl App {
                 return Ok(());
             }
 
-            // Key mode
             match key.code {
                 KeyCode::Char('q') | KeyCode::Char('Q') => {
                     self.exit = true;
                 }
 
                 KeyCode::Char('1') => {
-                    self.output
-                        .push("[?] Import FileDialog".to_string());
+                    self.output.push("[?] Import FileDialog".to_string());
 
                     ratatui::restore();
 
-                    let result = user_files_path()
-                        .and_then(import_files);
+                    let result = user_files_path().and_then(import_files);
 
                     *terminal = ratatui::init();
 
@@ -473,31 +456,79 @@ impl App {
                 }
 
                 KeyCode::Char('C') | KeyCode::Char('c') => {
-                    self.output.push("[+] Compile HB...".to_string());
-                }
-
-                KeyCode::Char('0') => {
                     match user_files_path() {
-                        Ok(path) => {
-                            match crate::delete::clean_user_files(path) {
-                                Ok(()) => {
-                                    self.output
-                                        .push("[-] USER_FILES cleaned.".to_string());
-                                }
-
+                        Ok(user_files) => {
+                            let elf = match find_file_with_extension(&user_files, "elf") {
+                                Ok(path) => path,
                                 Err(error) => {
-                                    self.output
-                                        .push(format!("[!] {error}"));
+                                    self.output.push(format!("[!] {error}"));
+                                    return Ok(());
                                 }
+                            };
+
+                            let rsf = match find_file_with_extension(&user_files, "rsf") {
+                                Ok(path) => path,
+                                Err(error) => {
+                                    self.output.push(format!("[!] {error}"));
+                                    return Ok(());
+                                }
+                            };
+
+                            let icon = match find_file_with_extension(&user_files, "icn") {
+                                Ok(path) => path,
+                                Err(error) => {
+                                    self.output.push(format!("[!] {error}"));
+                                    return Ok(());
+                                }
+                            };
+
+                            let output = elf.with_extension("cia");
+
+                            self.output.push(format!(
+                                "[+] Building CIA: {}",
+                                elf.display()
+                            ));
+
+                            let result = crate::makerom::build_cia(
+                                elf.to_string_lossy().as_ref(),
+                                rsf.to_string_lossy().as_ref(),
+                                icon.to_string_lossy().as_ref(),
+                                output.to_string_lossy().as_ref(),
+                            );
+
+                            if result == 0 {
+                                self.output.push(format!(
+                                    "[+] CIA created: {}",
+                                    output.display()
+                                ));
+                            } else {
+                                self.output.push(format!(
+                                    "[!] makerom failed with code: {result}"
+                                ));
                             }
                         }
 
                         Err(error) => {
-                            self.output
-                                .push(format!("[!] {error}"));
+                            self.output.push(format!("[!] {error}"));
                         }
                     }
                 }
+
+                KeyCode::Char('0') => match user_files_path() {
+                    Ok(path) => match crate::delete::clean_user_files(path) {
+                        Ok(()) => {
+                            self.output.push("[-] USER_FILES cleaned.".to_string());
+                        }
+
+                        Err(error) => {
+                            self.output.push(format!("[!] {error}"));
+                        }
+                    },
+
+                    Err(error) => {
+                        self.output.push(format!("[!] {error}"));
+                    }
+                },
 
                 _ => {}
             }
@@ -559,10 +590,7 @@ impl Widget for &App {
                 .fg(Color::White),
             );
 
-            lines.push(
-                Line::from("Enter: Next    Esc: Cancel")
-                    .fg(Color::DarkGray),
-            );
+            lines.push(Line::from("Enter: Next    Esc: Cancel").fg(Color::DarkGray));
         } else if !self.author.is_empty() {
             lines.push(Line::from(""));
             lines.push(
@@ -576,13 +604,7 @@ impl Widget for &App {
 
         if self.rsf_edit {
             lines.push(Line::from(""));
-
-            lines.push(
-                Line::from("RSF-Creator")
-                    .bold()
-                    .fg(Color::LightBlue),
-            );
-
+            lines.push(Line::from("RSF-Creator").bold().fg(Color::LightBlue));
             lines.push(Line::from(""));
 
             let (prompt, example) = match self.rsf_field {
@@ -597,37 +619,20 @@ impl Widget for &App {
             };
 
             lines.push(
-                Line::from(format!(
-                    "{} {}",
-                    prompt,
-                    self.rsf_input
-                ))
-                .fg(Color::White),
+                Line::from(format!("{} {}", prompt, self.rsf_input))
+                    .fg(Color::White),
             );
 
-            lines.push(
-                Line::from(example)
-                    .fg(Color::DarkGray),
-            );
-
+            lines.push(Line::from(example).fg(Color::DarkGray));
             lines.push(Line::from(""));
-
-            lines.push(
-                Line::from("Enter: Next    Esc: Cancel")
-                    .fg(Color::DarkGray),
-            );
+            lines.push(Line::from("Enter: Next    Esc: Cancel").fg(Color::DarkGray));
         }
 
         if self.smdh_edit {
             lines.push(Line::from(""));
 
             if self.smdh_select_language {
-                lines.push(
-                    Line::from("SMDH CREATOR")
-                        .bold()
-                        .fg(Color::LightBlue),
-                );
-
+                lines.push(Line::from("SMDH CREATOR").bold().fg(Color::LightBlue));
                 lines.push(Line::from(""));
 
                 lines.push(
@@ -639,73 +644,30 @@ impl Widget for &App {
                 );
 
                 lines.push(Line::from(""));
-
-                lines.push(
-                    Line::from("<- / -> Change language")
-                        .fg(Color::DarkGray),
-                );
-
-                lines.push(
-                    Line::from("Enter: Select    Esc: Cancel")
-                        .fg(Color::DarkGray),
-                );
+                lines.push(Line::from("<- / -> Change language").fg(Color::DarkGray));
+                lines.push(Line::from("Enter: Select    Esc: Cancel").fg(Color::DarkGray));
             } else if self.smdh_select_icon {
-                lines.push(
-                    Line::from("SMDH CREATOR")
-                        .bold()
-                        .fg(Color::LightBlue),
-                );
-
+                lines.push(Line::from("SMDH CREATOR").bold().fg(Color::LightBlue));
                 lines.push(Line::from(""));
-
-                lines.push(
-                    Line::from("Icon")
-                        .bold()
-                        .fg(Color::Yellow),
-                );
-
+                lines.push(Line::from("Icon").bold().fg(Color::Yellow));
                 lines.push(Line::from(""));
-
                 lines.push(
-                    Line::from(
-                        "Select an image for the SMDH icon."
-                    )
-                    .fg(Color::White),
+                    Line::from("Select an image for the SMDH icon.")
+                        .fg(Color::White),
                 );
-
-                lines.push(
-                    Line::from("PNG / JPG / WebP")
-                        .fg(Color::DarkGray),
-                );
-
+                lines.push(Line::from("PNG / JPG / WebP").fg(Color::DarkGray));
                 lines.push(Line::from(""));
-
-                lines.push(
-                    Line::from("Enter: Select icon")
-                        .fg(Color::DarkGray),
-                );
-
-                lines.push(
-                    Line::from("Esc: Cancel")
-                        .fg(Color::DarkGray),
-                );
+                lines.push(Line::from("Enter: Select icon").fg(Color::DarkGray));
+                lines.push(Line::from("Esc: Cancel").fg(Color::DarkGray));
             } else {
                 let (prompt, example) = match self.smdh_field {
                     0 => ("Title:", "(Ex: My Homebrew)"),
-                    1 => (
-                        "Description:",
-                        "(Ex: My awesome 3DS application)",
-                    ),
+                    1 => ("Description:", "(Ex: My awesome 3DS application)"),
                     2 => ("Publisher:", "(Ex: Saiitanaa)"),
                     _ => ("", ""),
                 };
 
-                lines.push(
-                    Line::from("SMDH CREATOR")
-                        .bold()
-                        .fg(Color::LightBlue),
-                );
-
+                lines.push(Line::from("SMDH CREATOR").bold().fg(Color::LightBlue));
                 lines.push(Line::from(""));
 
                 lines.push(
@@ -717,27 +679,13 @@ impl Widget for &App {
                 );
 
                 lines.push(Line::from(""));
-
                 lines.push(
-                    Line::from(format!(
-                        "{} {}",
-                        prompt,
-                        self.smdh_input
-                    ))
-                    .fg(Color::White),
+                    Line::from(format!("{} {}", prompt, self.smdh_input))
+                        .fg(Color::White),
                 );
-
-                lines.push(
-                    Line::from(example)
-                        .fg(Color::DarkGray),
-                );
-
+                lines.push(Line::from(example).fg(Color::DarkGray));
                 lines.push(Line::from(""));
-
-                lines.push(
-                    Line::from("Enter: Next    Esc: Cancel")
-                        .fg(Color::DarkGray),
-                );
+                lines.push(Line::from("Enter: Next    Esc: Cancel").fg(Color::DarkGray));
             }
         }
 
