@@ -1,4 +1,7 @@
 #include "lib.h"
+#include "oschar.h"
+#include <stdio.h>
+#include <sys/syslimits.h>
 #include "romfs_fs.h"
 
 /* This is the FS interface for ROMFS generation */
@@ -45,6 +48,9 @@ int OpenRootDir(const char *path, romfs_dir *dir)
 {
 	// Create native FS path
 	dir->path = os_CopyConvertCharStr(path);
+	/*printf("[ROMFS DEBUG] RootPath = \"");
+	os_fputs(dir->path, stdout);
+	printf("\"\n");*/
 	// Copy romfs name (empty string)
 	dir->name = utf16_CopyStr(ROMFS_EMPTY_PATH);
 	dir->namesize = 0;
@@ -59,6 +65,17 @@ int PopulateDir(romfs_dir *dir)
 
 	if (InitDir(dir))
 		return MEM_ERROR;
+
+	/*#include <unistd.h>
+	#include <limits.h>
+
+	char cwd[PATH_MAX];
+	if (getcwd(cwd, sizeof(cwd))) {
+		printf("[ROMFS DEBUG] CWD = \"%s\"\n", cwd);
+	}
+	printf("[ROMFS DEBUG] Path = \"");
+	os_fputs(dir->path, stdout);
+	printf("\"\n");*/
 
 	// Open Directory
 	if((dp = os_opendir(dir->path)) == NULL)

@@ -29,17 +29,10 @@ fn main() -> io::Result<()> {
 
     set_directories()?;
 
-    let bin_path = std::env::current_exe()?
-        .parent()
-        .ok_or_else(|| io::Error::other("Get binary error!"))?
-        .to_path_buf();
-
-    let romfs_path = bin_path.join("romfs");
-
+    let romfs_path = std::env::current_dir()?.join("romfs");
     fs::create_dir_all(&romfs_path)?;
 
     let author = load_author()?;
-
     let result = ratatui::run(|terminal| {
         App {
             author,
