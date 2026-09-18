@@ -17,6 +17,8 @@ RSF File Creator, SMDH File Creator, Edit Author, 2D-3D banner support, No depen
 
 **Console**. Yes, finally a veritable console for debug !
 
+**100% Native**. The makeROM and Bannertool libraries are included in the same executable file 
+
 ## Usage
 
 **Coming soon...**
