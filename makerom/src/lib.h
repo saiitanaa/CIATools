@@ -18,6 +18,9 @@
     #include <direct.h>
     #include <windows.h>
 
+    #define strcasecmp _stricmp
+    #define strncasecmp _strnicmp
+
 #else
 
     #include <strings.h>

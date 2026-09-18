@@ -2,7 +2,7 @@
 #include "ciatools_api.h"
 #include "cia_build.h"
 #include "user_settings.h"
-#include <_string.h>
+#include <string.h>
 
 int build_NCCH(user_settings *usrset);
 
