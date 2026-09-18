@@ -7,7 +7,7 @@ mod rsfcreator;
 mod smdhcreator;
 mod utils;
 
-use std::{fs, io, path::PathBuf};
+use std::{fs, io, path::PathBuf, process::Command};
 
 use crossterm::event::{self, Event, KeyCode, KeyEventKind};
 
@@ -137,6 +137,7 @@ impl App {
                 Line::from(""),
                 Line::from(r"C : Make ¯\_(ツ)_/¯"),
                 Line::from("0 : Clean USER_FILES"),
+                Line::from("9 : Open USER_FILES"),
                 Line::from(""),
                 Line::from("Q : Quit"),
             ])
@@ -546,6 +547,30 @@ impl App {
                     }
                 },
 
+                KeyCode::Char('9') => {
+                    match user_files_path() {
+                        Ok(path) => {
+                            #[cfg(target_os = "macos")]
+                            let result = Command::new("open").arg(&path).spawn();
+                            #[cfg(target_os = "linux")]
+                            let result = Command::new("xdg-open").arg(&path).spawn();
+                            #[cfg(target_os = "windows")]
+                            let result = Command::new("explorer").arg(&path).spawn();
+                            
+                            match result {
+                                Ok(_) => {
+                                    self.output.push("[+] Open USER_FILES".to_string());
+                                }
+                                Err(error) => {
+                                    self.output.push(format!("[!] Failed to open USER_FILES: {error}"));
+                                }
+                            }
+                        }
+                        Err(error) => {
+                            self.output.push(format!("[!] Failed to open USER_FILES: {error}"));
+                        }
+                    }
+                }
                 _ => {}
             }
         }
