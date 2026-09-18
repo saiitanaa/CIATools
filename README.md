@@ -7,6 +7,18 @@
 ### Included :
 RSF File Creator, SMDH File Creator, Edit Author, 2D-3D banner support, No dependencies required, 
 
+## Downloads
+
+You have **Windows** ? ➡️
+[<kbd>X64</kbd>](https://github.com/saiitanaa/CIATools/releases/latest/download/CIAToolsN-Win-x64.exe) - [<kbd>X64</kbd>](https://github.com/saiitanaa/CIATools/releases/latest/download/CIAToolsN-Win-aarch64.exe)
+
+You have **macOS** ? ➡️
+[<kbd>ARM64</kbd>](https://github.com/saiitanaa/CIATools/releases/latest/download/CIAToolsN-OSX-aarch64)
+
+You have **Linux** ? ➡️
+[<kbd>ARM64</kbd>](https://github.com/saiitanaa/CIATools/releases/latest/download/CIAToolsN-Linux-aarch64) - *x64 coming soon...*
+
+
 ### What's Changed ?
 
 **Switching to the CLI interface**. Faster for low-end PC and Better compatibility
@@ -66,17 +78,6 @@ To do this, **press** `C`.
 [Original Branch](https://github.com/saiitanaa/CIATools/tree/ciatoolsr)
 
 **Actual | `CIAToolsN`** -- Written in Rust (Windows, Linux, macOS). Very Fast, CLI, Stable, Simple, Best compatibility (v12.0.0 and later...)
-
-## Downloads
-
-You have **Windows** ? ➡️
-[<kbd>X64</kbd>](https://github.com/saiitanaa/CIATools/releases/latest/download/CIAToolsN-Win-x64.exe) - [<kbd>X64</kbd>](https://github.com/saiitanaa/CIATools/releases/latest/download/CIAToolsN-Win-aarch64.exe)
-
-You have **macOS** ? ➡️
-[<kbd>ARM64</kbd>](https://github.com/saiitanaa/CIATools/releases/latest/download/CIAToolsN-OSX-aarch64)
-
-You have **Linux** ? ➡️
-[<kbd>ARM64</kbd>](https://github.com/saiitanaa/CIATools/releases/latest/download/CIAToolsN-Linux-aarch64) - *x64 coming soon...*
 
 ## Compiling
 
