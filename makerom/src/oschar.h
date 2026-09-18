@@ -95,7 +95,7 @@ typedef char oschar_t;
 #define OS_MODE_WRITE "wb"
 #define OS_MODE_EDIT "rb+"
 
-#define OS_PATH_SEPARATOR '/'
+#define OS_PATH_SEPARATOR '\\'
 
 #endif
 
