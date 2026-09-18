@@ -1,8 +1,9 @@
 use std::ffi::CString;
 use std::os::raw::c_char;
 
+#[link(name = "makerom_core", kind = "static")]
 unsafe extern "C" {
-    fn CIAToolsBuildCIA(
+    pub fn CIAToolsBuildCIA(
         elf_path: *const c_char,
         rsf_path: *const c_char,
         icon_path: *const c_char,

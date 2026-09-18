@@ -1,4 +1,20 @@
 use std::fs;
+use std::path::Path;
+
+fn collect_c_files(dir: &Path, build: &mut cc::Build) {
+    if let Ok(entries) = fs::read_dir(dir) {
+        for entry in entries.flatten() {
+            let path = entry.path();
+            if path.is_dir() {
+                collect_c_files(&path, build);
+            } else if path.extension().and_then(|s| s.to_str()) == Some("c") {
+                if path.file_name().and_then(|s| s.to_str()) != Some("makerom.c") {
+                    build.file(path);
+                }
+            }
+        }
+    }
+}
 
 fn main() {
     let mut build = cc::Build::new();
@@ -10,25 +26,18 @@ fn main() {
         .include("makerom/deps/libmbedtls/include")
         .include("makerom/deps/libblz/include");
 
-    for entry in fs::read_dir("makerom/src").unwrap() {
-        let path = entry.unwrap().path();
-
-        if path.extension().and_then(|x| x.to_str()) == Some("c")
-            && path.file_name().and_then(|x| x.to_str()) != Some("makerom.c")
-        {
-            build.file(path);
-        }
+    if cfg!(target_env = "msvc") {
+        build.flag("/wd4996").flag("/wd4244").flag("/wd4245");
     }
 
+    collect_c_files(Path::new("makerom/src"), &mut build);
+    collect_c_files(Path::new("makerom/deps/libblz/src"), &mut build);
+    collect_c_files(Path::new("makerom/deps/libyaml/src"), &mut build);
+    collect_c_files(Path::new("makerom/deps/libmbedtls/src"), &mut build);
+
     build.compile("makerom_core");
-
-    let out_dir = std::env::var("OUT_DIR").unwrap();
-    println!("cargo:rustc-link-arg={out_dir}/libmakerom_core.a");
-    let manifest_dir = std::env::var("CARGO_MANIFEST_DIR").unwrap();
-
-    println!("cargo:rustc-link-arg={manifest_dir}/makerom/deps/libmbedtls/bin/libmbedtls.a");
+    println!("cargo:rustc-link-lib=static=makerom_core");
     println!("cargo:rerun-if-changed=makerom/src");
-    println!("cargo:rerun-if-changed=makerom/deps/libmbedtls");
-    println!("cargo:rustc-link-arg={manifest_dir}/makerom/deps/libblz/bin/libblz.a");
-    println!("cargo:rustc-link-arg={manifest_dir}/makerom/deps/libyaml/bin/libyaml.a");
+    println!("cargo:rerun-if-changed=makerom/deps");
+    println!("cargo:rustc-link-search=native=/opt/homebrew/lib");
 }
