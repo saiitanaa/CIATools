@@ -14,3 +14,7 @@ target/
 
 # Other
 Arch/
+
+# C
+makerom/**/*.o
+makerom/**/*.a

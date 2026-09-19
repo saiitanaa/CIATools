@@ -2,106 +2,13 @@
 makerom/** linguist-vendored
 
 #except
-makerom/ciatools_api.c linguist-vendored=false
-makerom/ciatools_api.h linguist-vendored=false
-makerom/deps/libblz/bin/libblz.a
-makerom/deps/libblz/src/blz.o
-makerom/deps/libmbedtls/bin/libmbedtls.a
-makerom/deps/libmbedtls/src/aes.o
-makerom/deps/libmbedtls/src/aesni.o
-makerom/deps/libmbedtls/src/arc4.o
-makerom/deps/libmbedtls/src/aria.o
-makerom/deps/libmbedtls/src/asn1parse.o
-makerom/deps/libmbedtls/src/asn1write.o
-makerom/deps/libmbedtls/src/base64.o
-makerom/deps/libmbedtls/src/bignum.o
-makerom/deps/libmbedtls/src/blowfish.o
-makerom/deps/libmbedtls/src/camellia.o
-makerom/deps/libmbedtls/src/ccm.o
-makerom/deps/libmbedtls/src/certs.o
-makerom/deps/libmbedtls/src/chacha20.o
-makerom/deps/libmbedtls/src/chachapoly.o
-makerom/deps/libmbedtls/src/cipher_wrap.o
-makerom/deps/libmbedtls/src/cipher.o
-makerom/deps/libmbedtls/src/cmac.o
-makerom/deps/libmbedtls/src/ctr_drbg.o
-makerom/deps/libmbedtls/src/debug.o
-makerom/deps/libmbedtls/src/des.o
-makerom/deps/libmbedtls/src/dhm.o
-makerom/deps/libmbedtls/src/ecdh.o
-makerom/deps/libmbedtls/src/ecdsa.o
-makerom/deps/libmbedtls/src/ecjpake.o
-makerom/deps/libmbedtls/src/ecp_curves.o
-makerom/deps/libmbedtls/src/ecp.o
-makerom/deps/libmbedtls/src/entropy_poll.o
-makerom/deps/libmbedtls/src/entropy.o
-makerom/deps/libmbedtls/src/error.o
-makerom/deps/libmbedtls/src/gcm.o
-makerom/deps/libmbedtls/src/havege.o
-makerom/deps/libmbedtls/src/hkdf.o
-makerom/deps/libmbedtls/src/hmac_drbg.o
-makerom/deps/libmbedtls/src/md_wrap.o
-makerom/deps/libmbedtls/src/md.o
-makerom/deps/libmbedtls/src/md2.o
-makerom/deps/libmbedtls/src/md4.o
-makerom/deps/libmbedtls/src/md5.o
-makerom/deps/libmbedtls/src/memory_buffer_alloc.o
-makerom/deps/libmbedtls/src/net_sockets.o
-makerom/deps/libmbedtls/src/nist_kw.o
-makerom/deps/libmbedtls/src/oid.o
-makerom/deps/libmbedtls/src/padlock.o
-makerom/deps/libmbedtls/src/pem.o
-makerom/deps/libmbedtls/src/pk_wrap.o
-makerom/deps/libmbedtls/src/pk.o
-makerom/deps/libmbedtls/src/pkcs11.o
-makerom/deps/libmbedtls/src/pkcs12.o
-makerom/deps/libmbedtls/src/pkcs5.o
-makerom/deps/libmbedtls/src/pkparse.o
-makerom/deps/libmbedtls/src/pkwrite.o
-makerom/deps/libmbedtls/src/platform_util.o
-makerom/deps/libmbedtls/src/platform.o
-makerom/deps/libmbedtls/src/poly1305.o
-makerom/deps/libmbedtls/src/ripemd160.o
-makerom/deps/libmbedtls/src/rsa_internal.o
-makerom/deps/libmbedtls/src/rsa.o
-makerom/deps/libmbedtls/src/sha1.o
-makerom/deps/libmbedtls/src/sha256.o
-makerom/deps/libmbedtls/src/sha512.o
-makerom/deps/libmbedtls/src/ssl_cache.o
-makerom/deps/libmbedtls/src/ssl_ciphersuites.o
-makerom/deps/libmbedtls/src/ssl_cli.o
-makerom/deps/libmbedtls/src/ssl_cookie.o
-makerom/deps/libmbedtls/src/ssl_srv.o
-makerom/deps/libmbedtls/src/ssl_ticket.o
-makerom/deps/libmbedtls/src/ssl_tls.o
-makerom/deps/libmbedtls/src/threading.o
-makerom/deps/libmbedtls/src/timing.o
-makerom/deps/libmbedtls/src/version_features.o
-makerom/deps/libmbedtls/src/version.o
-makerom/deps/libmbedtls/src/x509_create.o
-makerom/deps/libmbedtls/src/x509_crl.o
-makerom/deps/libmbedtls/src/x509_crt.o
-makerom/deps/libmbedtls/src/x509_csr.o
-makerom/deps/libmbedtls/src/x509.o
-makerom/deps/libmbedtls/src/x509write_crt.o
-makerom/deps/libmbedtls/src/x509write_csr.o
-makerom/deps/libmbedtls/src/xtea.o
-makerom/deps/libyaml/bin/libyaml.a
-makerom/deps/libyaml/src/api.c
-makerom/deps/libyaml/src/api.o
-makerom/deps/libyaml/src/dumper.o
-makerom/deps/libyaml/src/emitter.o
-makerom/deps/libyaml/src/loader.o
-makerom/deps/libyaml/src/parser.o
-makerom/deps/libyaml/src/reader.o
-makerom/deps/libyaml/src/scanner.o
-makerom/deps/libyaml/src/writer.o
-makerom/src/ciatools_api.c
-makerom/src/ciatools_api.h
-makerom/src/crypto.c
-makerom/src/lib.h
-makerom/src/oschar.c
-makerom/src/oschar.h
-makerom/src/romfs_fs.c
-makerom/src/user_settings.h
-makerom/src/utils.c
+makerom/src/ciatools_api.c linguist-vendored=false
+makerom/src/ciatools_api.h linguist-vendored=false
+makerom/src/crypto.c linguist-vendored=false
+makerom/src/lib.h linguist-vendored=false
+makerom/src/oschar.c linguist-vendored=false
+makerom/src/oschar.h linguist-vendored=false
+makerom/src/romfs_fs.c linguist-vendored=false
+makerom/src/user_settings.h linguist-vendored=false
+makerom/src/utils.c linguist-vendored=false
+makerom/deps/libyaml/src/api.c linguist-vendored=false
