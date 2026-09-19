@@ -16,8 +16,7 @@ You have **macOS** ? ➡️
 [<kbd>ARM64</kbd>](https://github.com/saiitanaa/CIATools/releases/latest/download/CIAToolsN-OSX-aarch64)
 
 You have **Linux** ? ➡️
-[<kbd>ARM64</kbd>](https://github.com/saiitanaa/CIATools/releases/latest/download/CIAToolsN-Linux-aarch64) - *x64 coming soon...*
-
+[<kbd>ARM64</kbd>](https://github.com/saiitanaa/CIATools/releases/latest/download/CIAToolsN-Linux-aarch64) - [<kbd>x64</kbd>](https://github.com/saiitanaa/CIATools/releases/download/v26.0.0/CIAToolsN-Linux-x64)
 
 ### What's Changed ?
 
