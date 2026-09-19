@@ -139,6 +139,7 @@ impl App {
                 Line::from("0 : Clean USER_FILES"),
                 Line::from("9 : Open USER_FILES"),
                 Line::from(""),
+                Line::from("G : GitHub"),
                 Line::from("Q : Quit"),
             ])
             .block(
@@ -418,6 +419,17 @@ impl App {
             match key.code {
                 KeyCode::Char('q') | KeyCode::Char('Q') => {
                     self.exit = true;
+                }
+
+                KeyCode::Char('g') | KeyCode::Char('G') => {
+                    self.output.push("[+] Open GitHub".to_string());
+                    #[cfg(target_os = "macos")]
+                    let _ = Command::new("open").args(["https://github.com/saiitanaa/CIATools"]).spawn();
+                    #[cfg(target_os = "linux")]
+                    let _ = Command::new("xdg-open").args(["https://github.com/saiitanaa/CIATools"]).spawn();
+                    #[cfg(target_os = "windows")]
+                    let _ = Command::new("explorer").args(["https://github.com/saiitanaa/CIATools"]).spawn();
+
                 }
 
                 KeyCode::Char('1') => {
