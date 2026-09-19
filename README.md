@@ -9,14 +9,14 @@ RSF File Creator, SMDH File Creator, Edit Author, 2D-3D banner support, No depen
 
 ## Downloads
 
-You have **Windows** ? ➡️
-[<kbd>X64</kbd>](https://github.com/saiitanaa/CIATools/releases/latest/download/CIAToolsN-Win-x64.exe) - [<kbd>ARM64</kbd>](https://github.com/saiitanaa/CIATools/releases/latest/download/CIAToolsN-Win-aarch64.exe)
-
-You have **macOS** ? ➡️
-[<kbd>ARM64</kbd>](https://github.com/saiitanaa/CIATools/releases/latest/download/CIAToolsN-OSX-aarch64)
-
-You have **Linux** ? ➡️
-[<kbd>ARM64</kbd>](https://github.com/saiitanaa/CIATools/releases/latest/download/CIAToolsN-Linux-aarch64) - [<kbd>x64</kbd>](https://github.com/saiitanaa/CIATools/releases/download/v26.0.0/CIAToolsN-Linux-x64)
+| Platform | Architecture | Download |
+|---|---|---|
+| macOS | Aarch64 | [Download](https://github.com/saiitanaa/CIATools/releases/latest/download/CIAToolsN-OSX-aarch64) |
+| macOS | x64 | [Compile Required](#compiling) |
+| Linux | x64 | [Download](https://github.com/saiitanaa/CIATools/releases/download/v26.0.0/CIAToolsN-Linux-x64) |
+| Linux | Aarch64 | [Download](https://github.com/saiitanaa/CIATools/releases/latest/download/CIAToolsN-Linux-aarch64) |
+| Windows | x64 | [Download](https://github.com/saiitanaa/CIATools/releases/latest/download/CIAToolsN-Win-x64.exe) |
+| Windows | Aarch64 | [Download](https://github.com/saiitanaa/CIATools/releases/latest/download/CIAToolsN-Win-aarch64.exe) |
 
 ### What's Changed ?
 
