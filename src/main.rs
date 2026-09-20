@@ -24,7 +24,7 @@ use crate::import::import_files;
 use crate::rsfcreator::rsf_config;
 const VERSION: &str = "v26.0.1";
 fn main() -> io::Result<()> {
-    print!("\x1b]0;CIATools {VERSION}\x07");
+    print!("\x1b]0;CIATools {}\x07", VERSION);
 
     set_directories()?;
 
@@ -32,13 +32,15 @@ fn main() -> io::Result<()> {
     fs::create_dir_all(&romfs_path)?;
 
     let author = load_author()?;
-    let result = ratatui::run(|terminal| {
-        App {
-            author,
-            ..App::default()
-        }
-        .run(terminal)
-    });
+
+    let mut app = App {
+        author,
+        ..App::default()
+    };
+
+    app.update();
+
+    let result = ratatui::run(|terminal| app.run(terminal));
 
     if romfs_path.exists() {
         fs::remove_dir_all(&romfs_path)?;
@@ -46,6 +48,7 @@ fn main() -> io::Result<()> {
 
     result
 } // Good size : 120x32
+
 
 #[derive(Debug, Default)]
 pub struct App {
@@ -113,6 +116,37 @@ impl App {
 
         Ok(())
     }
+
+fn update(&mut self) {
+    use serde::Deserialize;
+    #[derive(Deserialize)]
+    struct Release {
+        tag_name: String,
+    }
+    self.output.push("[?] Check updates...".to_string());
+    // GitHub API Call
+    match reqwest::blocking::Client::new()
+        .get("https://api.github.com/repos/saiitanaa/CIATools/releases/latest")
+        .header("User-Agent", "CIATools")
+        .send()
+        {
+            Ok(response) => match response.json::<Release>() {
+                Ok(release) => {
+                    self.output.push(format!("[!] Latest release: {}", release.tag_name));
+                    if release.tag_name != VERSION {
+                        self.output.push("[+] New update !".to_string());
+                    } else {
+                        self.output.push("[+] Up to date ;3".to_string());
+                    }
+                } Err(_error) => {
+                    self.output.push(format!("[!] Failed to parse!"));
+                }
+            },
+            Err(_error) => {
+                self.output.push(format!("[!] Check update failed!"));
+            }
+        }
+}
 
     fn draw(&self, frame: &mut Frame) {
         let outer_layout = Layout::default()
@@ -435,34 +469,8 @@ impl App {
                 }
 
                 KeyCode::Char('y') | KeyCode::Char('Y') => {
-                    use serde::Deserialize;
-                    #[derive(Deserialize)]
-                    struct Release {
-                        tag_name: String,
-                    }
-                    self.output.push("[+] Check updates...".to_string());
-                   // GitHub API Calling
-                   match reqwest::blocking::Client::new()
-                        .get("https://api.github.com/repos/saiitanaa/CIATools/releases/latest")
-                        .header("User-Agent", "CIATools")
-                        .send()
-                        {
-                            Ok(response) => match response.json::<Release>() { // GitHub API Reponse
-                                Ok(release) => {
-                                    self.output.push(format!("[?] Latest release : {}", release.tag_name));
-                                    if release.tag_name != VERSION {
-                                        self.output.push("[!] New Update".to_string());
-                                    } else {
-                                        self.output.push("[+] Up to date ;3".to_string());
-                                    }
-                                } Err(_error) => {
-                                    self.output.push(format!("[!] Failed to parse!"));
-                                }
-                            },
-                            Err(_error) => {
-                                self.output.push(format!("[!] Check update failed!"));
-                            }
-                        }
+                    //Call function updates
+                    self.update();
                 }
 
                 KeyCode::Char('1') => {
