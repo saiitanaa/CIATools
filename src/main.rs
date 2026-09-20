@@ -22,7 +22,7 @@ use ratatui::{
 
 use crate::import::import_files;
 use crate::rsfcreator::rsf_config;
-const VERSION: &str = "v26.0.1";
+const VERSION: &str = "v26.1.0";
 fn main() -> io::Result<()> {
     print!("\x1b]0;CIATools {}\x07", VERSION);
 
@@ -108,14 +108,16 @@ fn find_file_with_extension(
 }
 
 impl App {
-    pub fn run(&mut self, terminal: &mut DefaultTerminal) -> io::Result<()> {
-        while !self.exit {
-            terminal.draw(|frame| self.draw(frame))?;
-            self.handle_events(terminal)?;
-        }
+pub fn run(&mut self, terminal: &mut DefaultTerminal) -> io::Result<()> {
+    terminal.draw(|frame| self.draw(frame))?;
 
-        Ok(())
+    while !self.exit {
+        self.handle_events(terminal)?;
+        terminal.draw(|frame| self.draw(frame))?;
     }
+
+    Ok(())
+}
 
 fn update(&mut self) {
     use serde::Deserialize;
@@ -134,14 +136,14 @@ fn update(&mut self) {
                 Ok(release) => {
                     self.output.push(format!("[!] Latest release: {}", release.tag_name));
                     if release.tag_name != VERSION {
-                        self.output.push("[+] New update !".to_string());
+                        self.output.push("[+] New update ! Press : G".to_string());
                     } else {
                         self.output.push("[+] Up to date ;3".to_string());
                     }
                 } Err(_error) => {
                     self.output.push(format!("[!] Failed to parse!"));
                 }
-            },
+            }
             Err(_error) => {
                 self.output.push(format!("[!] Check update failed!"));
             }
@@ -172,10 +174,10 @@ fn update(&mut self) {
                 Line::from("0 : Clean USER_FILES"),
                 Line::from("9 : Open USER_FILES"),
                 Line::from(""),
-                Line::from("G : GitHub"),
+                Line::from("K : Clear Output"),
                 Line::from("Q : Quit"),
                 Line::from(""),
-                Line::from(""),
+                Line::from("G : GitHub"),
                 Line::from("Y: Check Updates"),
             ])
             .block(
@@ -457,6 +459,10 @@ fn update(&mut self) {
                     self.exit = true;
                 }
 
+                KeyCode::Char('k') | KeyCode::Char('K') => {
+                    self.output.clear();
+                }
+
                 KeyCode::Char('g') | KeyCode::Char('G') => {
                     self.output.push("[+] Open GitHub".to_string());
                     #[cfg(target_os = "macos")]
@@ -536,7 +542,7 @@ fn update(&mut self) {
                                 }
                             };
 
-                            let icon = match find_file_with_extension(&user_files, "icn") {
+                            let icon = match find_file_with_extension(&user_files, "smdh") {
                                 Ok(path) => path,
                                 Err(error) => {
                                     self.output.push(format!("[!] {error}"));
@@ -706,8 +712,8 @@ impl Widget for &App {
                 1 => ("CompanyCode:", "(Ex: SAAA)"),
                 2 => ("ProductCode:", "(Ex: CTR-P-XXXX)"),
                 3 => ("RomFs Path:", "(Ex: ./romfs)"),
-                4 => ("UniqueId:", "(Ex: 0x0004000000000000)"),
-                5 => ("SaveDataSize:", "(Ex: 0x100000)"),
+                4 => ("UniqueId:", "(Ex: 0x7D7BE)"),
+                5 => ("SaveDataSize:", "(Ex: 128KB)"),
                 6 => ("CpuSpeed:", "(804Mhz New 3DS, 268MHz Old 3DS)"),
                 _ => ("", ""),
             };
