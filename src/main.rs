@@ -6,23 +6,27 @@ mod picker;
 mod rsfcreator;
 mod smdhcreator;
 mod utils;
+mod bannertool;
 
 use std::{fs, io, path::PathBuf, process::Command};
+
 use crossterm::event::{self, Event, KeyCode, KeyEventKind};
 
 use ratatui::{
-    DefaultTerminal, Frame,
     buffer::Buffer,
     layout::{Constraint, Direction, Layout, Rect},
     style::{Color, Stylize},
     symbols::border,
     text::Line,
     widgets::{Block, Borders, Paragraph, Widget},
+    DefaultTerminal, Frame,
 };
 
 use crate::import::import_files;
 use crate::rsfcreator::rsf_config;
+
 const VERSION: &str = "v26.1.0";
+
 fn main() -> io::Result<()> {
     print!("\x1b]0;CIATools {}\x07", VERSION);
 
@@ -47,8 +51,7 @@ fn main() -> io::Result<()> {
     }
 
     result
-} // Good size : 120x32
-
+}
 
 #[derive(Debug, Default)]
 pub struct App {
@@ -108,47 +111,60 @@ fn find_file_with_extension(
 }
 
 impl App {
-pub fn run(&mut self, terminal: &mut DefaultTerminal) -> io::Result<()> {
-    terminal.draw(|frame| self.draw(frame))?;
-
-    while !self.exit {
-        self.handle_events(terminal)?;
+    pub fn run(&mut self, terminal: &mut DefaultTerminal) -> io::Result<()> {
         terminal.draw(|frame| self.draw(frame))?;
+
+        while !self.exit {
+            self.handle_events(terminal)?;
+            terminal.draw(|frame| self.draw(frame))?;
+        }
+
+        Ok(())
     }
 
-    Ok(())
-}
+    fn update(&mut self) {
+        use serde::Deserialize;
 
-fn update(&mut self) {
-    use serde::Deserialize;
-    #[derive(Deserialize)]
-    struct Release {
-        tag_name: String,
-    }
-    self.output.push("[?] Check updates...".to_string());
-    // GitHub API Call
-    match reqwest::blocking::Client::new()
-        .get("https://api.github.com/repos/saiitanaa/CIATools/releases/latest")
-        .header("User-Agent", "CIATools")
-        .send()
+        #[derive(Deserialize)]
+        struct Release {
+            tag_name: String,
+        }
+
+        self.output.push("[?] Check updates...".to_string());
+
+        match reqwest::blocking::Client::new()
+            .get("https://api.github.com/repos/saiitanaa/CIATools/releases/latest")
+            .header("User-Agent", "CIATools")
+            .send()
         {
             Ok(response) => match response.json::<Release>() {
                 Ok(release) => {
-                    self.output.push(format!("[!] Latest release: {}", release.tag_name));
+                    self.output.push(format!(
+                        "[!] Latest release: {}",
+                        release.tag_name
+                    ));
+
                     if release.tag_name != VERSION {
-                        self.output.push("[+] New update ! Press : G".to_string());
+                        self.output
+                            .push("[+] New update ! Press : G".to_string());
                     } else {
-                        self.output.push("[+] Up to date ;3".to_string());
+                        self.output
+                            .push("[+] Up to date ;3".to_string());
                     }
-                } Err(_error) => {
-                    self.output.push(format!("[!] Failed to parse!"));
                 }
-            }
-            Err(_error) => {
-                self.output.push(format!("[!] Check update failed!"));
+
+                Err(_) => {
+                    self.output
+                        .push("[!] Failed to parse!".to_string());
+                }
+            },
+
+            Err(_) => {
+                self.output
+                    .push("[!] Check update failed!".to_string());
             }
         }
-}
+    }
 
     fn draw(&self, frame: &mut Frame) {
         let outer_layout = Layout::default()
@@ -167,8 +183,9 @@ fn update(&mut self) {
             Paragraph::new(vec![
                 Line::from("1 : Import HB Files"),
                 Line::from("2 : Create RSF"),
-                Line::from("3 : Create SMDH"),
+                Line::from("3 : Create ICN"),
                 Line::from("4 : Set Author"),
+                Line::from("5 : TitleID Generator"),
                 Line::from(""),
                 Line::from(r"C : Make ¯\_(ツ)_/¯"),
                 Line::from("0 : Clean USER_FILES"),
@@ -178,7 +195,7 @@ fn update(&mut self) {
                 Line::from("Q : Quit"),
                 Line::from(""),
                 Line::from("G : GitHub"),
-                Line::from("Y: Check Updates"),
+                Line::from("Y : Check Updates"),
             ])
             .block(
                 Block::new()
@@ -278,7 +295,8 @@ fn update(&mut self) {
 
                             fs::write(path, content)?;
 
-                            self.output.push("[+] RSF file created.".to_string());
+                            self.output
+                                .push("[+] RSF file created.".to_string());
                         }
                     }
 
@@ -305,7 +323,8 @@ fn update(&mut self) {
                         }
 
                         KeyCode::Right => {
-                            self.smdh_language = (self.smdh_language + 1) % 12;
+                            self.smdh_language =
+                                (self.smdh_language + 1) % 12;
                         }
 
                         KeyCode::Enter => {
@@ -336,61 +355,57 @@ fn update(&mut self) {
                             match result {
                                 Ok(Some(files)) => {
                                     if let Some(path) = files.first() {
-                                        match self.smdh_file.load_icon(path) {
+                                        let title = self
+                                            .smdh_file
+                                            .get_short_description(
+                                                self.smdh_language,
+                                            );
+
+                                        let publisher = self
+                                            .smdh_file
+                                            .get_publisher(
+                                                self.smdh_language,
+                                            );
+
+                                        let output =
+                                            user_files_path()?.join("icon.icn");
+
+                                        match crate::bannertool::make_smdh(
+                                            &title,
+                                            &publisher,
+                                            path,
+                                            &output,
+                                        ) {
                                             Ok(()) => {
                                                 self.output.push(format!(
-                                                    "[+] Icon loaded: {}",
-                                                    path.display()
+                                                    "[+] ICN created: {}",
+                                                    output.display()
                                                 ));
 
-                                                let title = self
-                                                    .smdh_file
-                                                    .get_short_description(self.smdh_language);
-
-                                                let filename = format!(
-                                                    "{}.smdh",
-                                                    if title.is_empty() {
-                                                        "icon"
-                                                    } else {
-                                                        &title
-                                                    }
-                                                );
-
-                                                match self.smdh_file.save_to_user_files(&filename) {
-                                                    Ok(path) => {
-                                                        self.output.push(format!(
-                                                            "[+] SMDH created: {}",
-                                                            path.display()
-                                                        ));
-
-                                                        self.smdh_select_icon = false;
-                                                        self.smdh_edit = false;
-                                                    }
-
-                                                    Err(error) => {
-                                                        self.output.push(format!(
-                                                            "[!] Failed to save SMDH: {}",
-                                                            error
-                                                        ));
-                                                    }
-                                                }
+                                                self.smdh_select_icon = false;
+                                                self.smdh_edit = false;
                                             }
 
                                             Err(error) => {
-                                                self.output
-                                                    .push(format!("[!] Icon error: {}", error));
+                                                self.output.push(format!(
+                                                    "[!] bannertool failed: {}",
+                                                    error
+                                                ));
                                             }
                                         }
                                     }
                                 }
 
                                 Ok(None) => {
-                                    self.output.push("[!] No icon selected.".to_string());
+                                    self.output
+                                        .push("[!] No icon selected.".to_string());
                                 }
 
                                 Err(error) => {
-                                    self.output
-                                        .push(format!("[!] Icon picker error: {}", error));
+                                    self.output.push(format!(
+                                        "[!] Icon picker error: {}",
+                                        error
+                                    ));
                                 }
                             }
                         }
@@ -418,24 +433,30 @@ fn update(&mut self) {
 
                     KeyCode::Enter => match self.smdh_field {
                         0 => {
-                            self.smdh_file
-                                .set_short_description(self.smdh_language, &self.smdh_input);
+                            self.smdh_file.set_short_description(
+                                self.smdh_language,
+                                &self.smdh_input,
+                            );
 
                             self.smdh_input.clear();
                             self.smdh_field = 1;
                         }
 
                         1 => {
-                            self.smdh_file
-                                .set_long_description(self.smdh_language, &self.smdh_input);
+                            self.smdh_file.set_long_description(
+                                self.smdh_language,
+                                &self.smdh_input,
+                            );
 
                             self.smdh_input.clear();
                             self.smdh_field = 2;
                         }
 
                         2 => {
-                            self.smdh_file
-                                .set_publisher(self.smdh_language, &self.smdh_input);
+                            self.smdh_file.set_publisher(
+                                self.smdh_language,
+                                &self.smdh_input,
+                            );
 
                             self.smdh_input.clear();
                             self.smdh_select_icon = true;
@@ -465,26 +486,35 @@ fn update(&mut self) {
 
                 KeyCode::Char('g') | KeyCode::Char('G') => {
                     self.output.push("[+] Open GitHub".to_string());
-                    #[cfg(target_os = "macos")]
-                    let _ = Command::new("open").args(["https://github.com/saiitanaa/CIATools"]).spawn();
-                    #[cfg(target_os = "linux")]
-                    let _ = Command::new("xdg-open").args(["https://github.com/saiitanaa/CIATools"]).spawn();
-                    #[cfg(target_os = "windows")]
-                    let _ = Command::new("explorer").args(["https://github.com/saiitanaa/CIATools"]).spawn();
 
+                    #[cfg(target_os = "macos")]
+                    let _ = Command::new("open")
+                        .args(["https://github.com/saiitanaa/CIATools"])
+                        .spawn();
+
+                    #[cfg(target_os = "linux")]
+                    let _ = Command::new("xdg-open")
+                        .args(["https://github.com/saiitanaa/CIATools"])
+                        .spawn();
+
+                    #[cfg(target_os = "windows")]
+                    let _ = Command::new("explorer")
+                        .args(["https://github.com/saiitanaa/CIATools"])
+                        .spawn();
                 }
 
                 KeyCode::Char('y') | KeyCode::Char('Y') => {
-                    //Call function updates
                     self.update();
                 }
 
                 KeyCode::Char('1') => {
-                    self.output.push("[?] Import FileDialog".to_string());
+                    self.output
+                        .push("[?] Import FileDialog".to_string());
 
                     ratatui::restore();
 
-                    let result = user_files_path().and_then(import_files);
+                    let result =
+                        user_files_path().and_then(import_files);
 
                     *terminal = ratatui::init();
 
@@ -526,33 +556,59 @@ fn update(&mut self) {
                 KeyCode::Char('C') | KeyCode::Char('c') => {
                     match user_files_path() {
                         Ok(user_files) => {
-                            let elf = match find_file_with_extension(&user_files, "elf") {
-                                Ok(path) => path,
-                                Err(error) => {
-                                    self.output.push(format!("[!] {error}"));
-                                    return Ok(());
-                                }
-                            };
+                            let elf =
+                                match find_file_with_extension(
+                                    &user_files,
+                                    "elf",
+                                ) {
+                                    Ok(path) => path,
 
-                            let rsf = match find_file_with_extension(&user_files, "rsf") {
-                                Ok(path) => path,
-                                Err(error) => {
-                                    self.output.push(format!("[!] {error}"));
-                                    return Ok(());
-                                }
-                            };
+                                    Err(error) => {
+                                        self.output
+                                            .push(format!("[!] {error}"));
+                                        return Ok(());
+                                    }
+                                };
 
-                            let icon = match find_file_with_extension(&user_files, "smdh") {
-                                Ok(path) => path,
-                                Err(error) => {
-                                    self.output.push(format!("[!] {error}"));
-                                    return Ok(());
-                                }
-                            };
+                            let rsf =
+                                match find_file_with_extension(
+                                    &user_files,
+                                    "rsf",
+                                ) {
+                                    Ok(path) => path,
 
-                            let banner = find_file_with_extension(&user_files, "bin")
-                                .or_else(|_| find_file_with_extension(&user_files, "bnr"))
-                                .ok();
+                                    Err(error) => {
+                                        self.output
+                                            .push(format!("[!] {error}"));
+                                        return Ok(());
+                                    }
+                                };
+
+                            let icon =
+                                match find_file_with_extension(
+                                    &user_files,
+                                    "icn",
+                                ) {
+                                    Ok(path) => path,
+
+                                    Err(error) => {
+                                        self.output
+                                            .push(format!("[!] {error}"));
+                                        return Ok(());
+                                    }
+                                };
+
+                            let banner = find_file_with_extension(
+                                &user_files,
+                                "bin",
+                            )
+                            .or_else(|_| {
+                                find_file_with_extension(
+                                    &user_files,
+                                    "bnr",
+                                )
+                            })
+                            .ok();
 
                             let output = elf.with_extension("cia");
 
@@ -567,7 +623,9 @@ fn update(&mut self) {
                                 icon.to_string_lossy().as_ref(),
                                 banner
                                     .as_ref()
-                                    .map(|path| path.to_string_lossy().to_string())
+                                    .map(|path| {
+                                        path.to_string_lossy().to_string()
+                                    })
                                     .as_deref(),
                                 output.to_string_lossy().as_ref(),
                             );
@@ -585,21 +643,28 @@ fn update(&mut self) {
                         }
 
                         Err(error) => {
-                            self.output.push(format!("[!] {error}"));
+                            self.output
+                                .push(format!("[!] {error}"));
                         }
                     }
                 }
 
                 KeyCode::Char('0') => match user_files_path() {
-                    Ok(path) => match crate::delete::clean_user_files(path) {
-                        Ok(()) => {
-                            self.output.push("[-] USER_FILES cleaned.".to_string());
-                        }
+                    Ok(path) => {
+                        match crate::delete::clean_user_files(path) {
+                            Ok(()) => {
+                                self.output.push(
+                                    "[-] USER_FILES cleaned.".to_string(),
+                                );
+                            }
 
-                        Err(error) => {
-                            self.output.push(format!("[!] {error}"));
+                            Err(error) => {
+                                self.output.push(format!(
+                                    "[!] {error}"
+                                ));
+                            }
                         }
-                    },
+                    }
 
                     Err(error) => {
                         self.output.push(format!("[!] {error}"));
@@ -610,26 +675,40 @@ fn update(&mut self) {
                     match user_files_path() {
                         Ok(path) => {
                             #[cfg(target_os = "macos")]
-                            let result = Command::new("open").arg(&path).spawn();
+                            let result =
+                                Command::new("open").arg(&path).spawn();
+
                             #[cfg(target_os = "linux")]
-                            let result = Command::new("xdg-open").arg(&path).spawn();
+                            let result =
+                                Command::new("xdg-open").arg(&path).spawn();
+
                             #[cfg(target_os = "windows")]
-                            let result = Command::new("explorer").arg(&path).spawn();
-                            
+                            let result =
+                                Command::new("explorer").arg(&path).spawn();
+
                             match result {
                                 Ok(_) => {
-                                    self.output.push("[+] Open USER_FILES".to_string());
+                                    self.output.push(
+                                        "[+] Open USER_FILES".to_string(),
+                                    );
                                 }
+
                                 Err(error) => {
-                                    self.output.push(format!("[!] Failed to open USER_FILES: {error}"));
+                                    self.output.push(format!(
+                                        "[!] Failed to open USER_FILES: {error}"
+                                    ));
                                 }
                             }
                         }
+
                         Err(error) => {
-                            self.output.push(format!("[!] Failed to open USER_FILES: {error}"));
+                            self.output.push(format!(
+                                "[!] Failed to open USER_FILES: {error}"
+                            ));
                         }
                     }
                 }
+
                 _ => {}
             }
         }
@@ -641,7 +720,9 @@ fn update(&mut self) {
 fn user_files_path() -> io::Result<PathBuf> {
     let bin_path = std::env::current_exe()?
         .parent()
-        .ok_or_else(|| io::Error::other("[!] Binary path error !?"))?
+        .ok_or_else(|| {
+            io::Error::other("[!] Binary path error !?")
+        })?
         .to_path_buf();
 
     let user_files = bin_path.join("DATA").join("USER_FILES");
@@ -670,7 +751,11 @@ fn save_author(author: &str) -> io::Result<()> {
 }
 
 impl Widget for &App {
-    fn render(self, area: Rect, buf: &mut Buffer) {
+    fn render(
+        self,
+        area: Rect,
+        buf: &mut Buffer,
+    ) {
         let hostname = hostname::get()
             .map(|h| h.to_string_lossy().into_owned())
             .unwrap_or_else(|_| "unknown".to_string());
@@ -690,7 +775,10 @@ impl Widget for &App {
                 .fg(Color::White),
             );
 
-            lines.push(Line::from("Enter: Next    Esc: Cancel").fg(Color::DarkGray));
+            lines.push(
+                Line::from("Enter: Next    Esc: Cancel")
+                    .fg(Color::DarkGray),
+            );
         } else if !self.author.is_empty() {
             lines.push(Line::from(""));
             lines.push(
@@ -704,7 +792,11 @@ impl Widget for &App {
 
         if self.rsf_edit {
             lines.push(Line::from(""));
-            lines.push(Line::from("RSF-Creator").bold().fg(Color::LightBlue));
+            lines.push(
+                Line::from("RSF-Creator")
+                    .bold()
+                    .fg(Color::LightBlue),
+            );
             lines.push(Line::from(""));
 
             let (prompt, example) = match self.rsf_field {
@@ -712,80 +804,134 @@ impl Widget for &App {
                 1 => ("CompanyCode:", "(Ex: SAAA)"),
                 2 => ("ProductCode:", "(Ex: CTR-P-XXXX)"),
                 3 => ("RomFs Path:", "(Ex: ./romfs)"),
-                4 => ("UniqueId:", "(Ex: 0x7D7BE)"),
+                4 => ("UniqueId:", "(Ex: 0x7BE00)"),
                 5 => ("SaveDataSize:", "(Ex: 128KB)"),
-                6 => ("CpuSpeed:", "(804Mhz New 3DS, 268MHz Old 3DS)"),
+                6 => ("CpuSpeed:", "(804MHz New 3DS, 268MHz Old 3DS)"),
                 _ => ("", ""),
             };
 
             lines.push(
-                Line::from(format!("{} {}", prompt, self.rsf_input))
-                    .fg(Color::White),
+                Line::from(format!(
+                    "{} {}",
+                    prompt,
+                    self.rsf_input
+                ))
+                .fg(Color::White),
             );
 
             lines.push(Line::from(example).fg(Color::DarkGray));
             lines.push(Line::from(""));
-            lines.push(Line::from("Enter: Next    Esc: Cancel").fg(Color::DarkGray));
+            lines.push(
+                Line::from("Enter: Next    Esc: Cancel")
+                    .fg(Color::DarkGray),
+            );
         }
 
         if self.smdh_edit {
             lines.push(Line::from(""));
 
             if self.smdh_select_language {
-                lines.push(Line::from("SMDH CREATOR").bold().fg(Color::LightBlue));
+                lines.push(
+                    Line::from("SMDH CREATOR")
+                        .bold()
+                        .fg(Color::LightBlue),
+                );
                 lines.push(Line::from(""));
 
                 lines.push(
                     Line::from(format!(
                         "Language: {}",
-                        smdhcreator::SMDH_LANGUAGES[self.smdh_language]
+                        smdhcreator::SMDH_LANGUAGES[
+                            self.smdh_language
+                        ]
                     ))
                     .fg(Color::Yellow),
                 );
 
                 lines.push(Line::from(""));
-                lines.push(Line::from("<- / -> Change language").fg(Color::DarkGray));
-                lines.push(Line::from("Enter: Select    Esc: Cancel").fg(Color::DarkGray));
+                lines.push(
+                    Line::from("<- / -> Change language")
+                        .fg(Color::DarkGray),
+                );
+                lines.push(
+                    Line::from("Enter: Select    Esc: Cancel")
+                        .fg(Color::DarkGray),
+                );
             } else if self.smdh_select_icon {
-                lines.push(Line::from("SMDH CREATOR").bold().fg(Color::LightBlue));
-                lines.push(Line::from(""));
-                lines.push(Line::from("Icon").bold().fg(Color::Yellow));
+                lines.push(
+                    Line::from("SMDH CREATOR")
+                        .bold()
+                        .fg(Color::LightBlue),
+                );
                 lines.push(Line::from(""));
                 lines.push(
-                    Line::from("Select an image for the SMDH icon.")
-                        .fg(Color::White),
+                    Line::from("Icon")
+                        .bold()
+                        .fg(Color::Yellow),
                 );
-                lines.push(Line::from("PNG / JPG / WebP").fg(Color::DarkGray));
                 lines.push(Line::from(""));
-                lines.push(Line::from("Enter: Select icon").fg(Color::DarkGray));
-                lines.push(Line::from("Esc: Cancel").fg(Color::DarkGray));
+                lines.push(
+                    Line::from(
+                        "Select an image for the SMDH icon."
+                    )
+                    .fg(Color::White),
+                );
+                lines.push(
+                    Line::from("PNG / JPG / WebP")
+                        .fg(Color::DarkGray),
+                );
+                lines.push(Line::from(""));
+                lines.push(
+                    Line::from("Enter: Select icon")
+                        .fg(Color::DarkGray),
+                );
+                lines.push(
+                    Line::from("Esc: Cancel")
+                        .fg(Color::DarkGray),
+                );
             } else {
                 let (prompt, example) = match self.smdh_field {
                     0 => ("Title:", "(Ex: My Homebrew)"),
-                    1 => ("Description:", "(Ex: My awesome 3DS application)"),
+                    1 => (
+                        "Description:",
+                        "(Ex: My awesome 3DS application)",
+                    ),
                     2 => ("Publisher:", "(Ex: Saiitanaa)"),
                     _ => ("", ""),
                 };
 
-                lines.push(Line::from("SMDH CREATOR").bold().fg(Color::LightBlue));
+                lines.push(
+                    Line::from("SMDH CREATOR")
+                        .bold()
+                        .fg(Color::LightBlue),
+                );
                 lines.push(Line::from(""));
 
                 lines.push(
                     Line::from(format!(
                         "Language: {}",
-                        smdhcreator::SMDH_LANGUAGES[self.smdh_language]
+                        smdhcreator::SMDH_LANGUAGES[
+                            self.smdh_language
+                        ]
                     ))
                     .fg(Color::Yellow),
                 );
 
                 lines.push(Line::from(""));
                 lines.push(
-                    Line::from(format!("{} {}", prompt, self.smdh_input))
-                        .fg(Color::White),
+                    Line::from(format!(
+                        "{} {}",
+                        prompt,
+                        self.smdh_input
+                    ))
+                    .fg(Color::White),
                 );
                 lines.push(Line::from(example).fg(Color::DarkGray));
                 lines.push(Line::from(""));
-                lines.push(Line::from("Enter: Next    Esc: Cancel").fg(Color::DarkGray));
+                lines.push(
+                    Line::from("Enter: Next    Esc: Cancel")
+                        .fg(Color::DarkGray),
+                );
             }
         }
 

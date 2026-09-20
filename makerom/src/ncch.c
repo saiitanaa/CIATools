@@ -626,32 +626,57 @@ int FinaliseNcch(ncch_settings *set)
 				printf("Done!\n");
 		}			
 
-		// Crypting ExeFs Files
-		if(set->cryptoDetails.exefsSize){
-			if (set->options.verbose)
-				printf("[NCCH] Encrypting ExeFS... ");
+	// Crypting ExeFs Files
+	if(set->cryptoDetails.exefsSize){
+	    if (set->options.verbose)
+	        printf("[NCCH] Encrypting ExeFS... ");
 
-			exefs_hdr *exefsHdr = (exefs_hdr*)exefs;
-			for(int i = 0; i < MAX_EXEFS_SECTIONS; i++){
-				u8 *key = NULL;
-				if(strncmp(exefsHdr->fileHdr[i].name,"icon",8) == 0 || strncmp(exefsHdr->fileHdr[i].name,"banner",8) == 0)
-					key = set->keys->aes.ncchKey0;
-				else
-					key = set->keys->aes.ncchKey1;
-								
-				u32 offset = u8_to_u32(exefsHdr->fileHdr[i].offset,LE) + sizeof(exefs_hdr);
-				u32 size = u8_to_u32(exefsHdr->fileHdr[i].size,LE);
+	    exefs_hdr *exefsHdr = (exefs_hdr*)exefs;
 
-				if(size)
-					CryptNcchRegion((exefs+offset),align(size,set->options.blockSize),offset,set->cryptoDetails.titleId,key,ncch_exefs);
+	    for(int i = 0; i < MAX_EXEFS_SECTIONS; i++){
+	        u8 *key = NULL;
 
-			}
-			// Crypting ExeFs Header
-			CryptNcchRegion(exefs,sizeof(exefs_hdr),0x0,set->cryptoDetails.titleId,set->keys->aes.ncchKey0,ncch_exefs);
+	        if((memcmp(exefsHdr->fileHdr[i].name, "icon", 4) == 0 &&
+	            exefsHdr->fileHdr[i].name[4] == '\0') ||
+	           (memcmp(exefsHdr->fileHdr[i].name, "banner", 6) == 0 &&
+	            exefsHdr->fileHdr[i].name[6] == '\0'))
+	        {
+	            key = set->keys->aes.ncchKey0;
+	        }
+	        else
+	        {
+	            key = set->keys->aes.ncchKey1;
+	        }
 
-			if (set->options.verbose)
-				printf("Done!\n");
-		}
+	        u32 offset = u8_to_u32(exefsHdr->fileHdr[i].offset, LE)
+	                   + sizeof(exefs_hdr);
+
+	        u32 size = u8_to_u32(exefsHdr->fileHdr[i].size, LE);
+
+	        if(size)
+	            CryptNcchRegion(
+	                exefs + offset,
+	                align(size, set->options.blockSize),
+	                offset,
+	                set->cryptoDetails.titleId,
+	                key,
+	                ncch_exefs
+	            );
+	    }
+
+	    // Crypting ExeFs Header
+	    CryptNcchRegion(
+	        exefs,
+	        sizeof(exefs_hdr),
+	        0x0,
+	        set->cryptoDetails.titleId,
+	        set->keys->aes.ncchKey0,
+	        ncch_exefs
+	    );
+
+	    if (set->options.verbose)
+	        printf("Done!\n");
+	} //
 
 		// Crypting RomFs
 		if (set->cryptoDetails.romfsSize) {
