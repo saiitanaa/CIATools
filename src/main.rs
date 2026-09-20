@@ -8,7 +8,6 @@ mod smdhcreator;
 mod utils;
 
 use std::{fs, io, path::PathBuf, process::Command};
-
 use crossterm::event::{self, Event, KeyCode, KeyEventKind};
 
 use ratatui::{
@@ -23,9 +22,9 @@ use ratatui::{
 
 use crate::import::import_files;
 use crate::rsfcreator::rsf_config;
-
+const VERSION: &str = "v26.0.1";
 fn main() -> io::Result<()> {
-    print!("\x1b]0;CIATools v26.0.0\x07");
+    print!("\x1b]0;CIATools {VERSION}\x07");
 
     set_directories()?;
 
@@ -141,6 +140,9 @@ impl App {
                 Line::from(""),
                 Line::from("G : GitHub"),
                 Line::from("Q : Quit"),
+                Line::from(""),
+                Line::from(""),
+                Line::from("Y: Check Updates"),
             ])
             .block(
                 Block::new()
@@ -430,6 +432,37 @@ impl App {
                     #[cfg(target_os = "windows")]
                     let _ = Command::new("explorer").args(["https://github.com/saiitanaa/CIATools"]).spawn();
 
+                }
+
+                KeyCode::Char('y') | KeyCode::Char('Y') => {
+                    use serde::Deserialize;
+                    #[derive(Deserialize)]
+                    struct Release {
+                        tag_name: String,
+                    }
+                    self.output.push("[+] Check updates...".to_string());
+                   // GitHub API Calling
+                   match reqwest::blocking::Client::new()
+                        .get("https://api.github.com/repos/saiitanaa/CIATools/releases/latest")
+                        .header("User-Agent", "CIATools")
+                        .send()
+                        {
+                            Ok(response) => match response.json::<Release>() { // GitHub API Reponse
+                                Ok(release) => {
+                                    self.output.push(format!("[?] Latest release : {}", release.tag_name));
+                                    if release.tag_name != VERSION {
+                                        self.output.push("[!] New Update".to_string());
+                                    } else {
+                                        self.output.push("[+] Up to date ;3".to_string());
+                                    }
+                                } Err(_error) => {
+                                    self.output.push(format!("[!] Failed to parse!"));
+                                }
+                            },
+                            Err(_error) => {
+                                self.output.push(format!("[!] Check update failed!"));
+                            }
+                        }
                 }
 
                 KeyCode::Char('1') => {
