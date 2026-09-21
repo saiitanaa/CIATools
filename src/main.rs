@@ -185,7 +185,7 @@ impl App {
                 Line::from("2 : Create RSF"),
                 Line::from("3 : Create ICN"),
                 Line::from("4 : Set Author"),
-                Line::from("5 : TitleID Generator"),
+                //Line::from("5 : TitleID Generator"),
                 Line::from(""),
                 Line::from(r"C : Make ¯\_(ツ)_/¯"),
                 Line::from("0 : Clean USER_FILES"),
