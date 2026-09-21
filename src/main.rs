@@ -554,6 +554,7 @@ impl App {
                 }
 
                 KeyCode::Char('C') | KeyCode::Char('c') => {
+                    self.output.push("[+] CIA Compiling...".to_string());
                     match user_files_path() {
                         Ok(user_files) => {
                             let elf =
