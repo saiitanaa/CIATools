@@ -3,7 +3,7 @@ use std::io;
 use std::path::Path;
 
 unsafe extern "C" {
-    fn ciatools_make_smdh(
+    fn ciatools_make_icn(
         title: *const c_char,
         publisher: *const c_char,
         icon: *const c_char,
@@ -11,7 +11,7 @@ unsafe extern "C" {
     ) -> i32;
 }
 
-pub fn make_smdh(
+pub fn make_icn(
     title: &str,
     publisher: &str,
     icon: &Path,
@@ -30,7 +30,7 @@ pub fn make_smdh(
         .map_err(|_| io::Error::new(io::ErrorKind::InvalidInput, "Invalid output path"))?;
 
     let result = unsafe {
-        ciatools_make_smdh(
+        ciatools_make_icn(
             title.as_ptr(),
             publisher.as_ptr(),
             icon.as_ptr(),

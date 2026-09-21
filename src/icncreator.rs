@@ -11,7 +11,7 @@ const TILE_ORDER: [u8; 64] = [
     44, 45, 38, 39, 46, 47, 52, 53, 60, 61, 54, 55, 62, 63,
 ];
 
-pub const SMDH_LANGUAGES: [&str; 16] = [
+pub const ICN_LANGUAGES: [&str; 16] = [
     "Japanese",
     "English",
     "French",
@@ -60,7 +60,7 @@ struct SmdhSettings {
 }
 
 #[derive(Debug)]
-pub struct SmdhFile {
+pub struct IcnFile {
     titles: [SmdhTitle; 16],
     settings: SmdhSettings,
     reserved: [u8; 0x08],
@@ -68,13 +68,13 @@ pub struct SmdhFile {
     big_icon_data: [u16; 48 * 48],
 }
 
-impl Default for SmdhFile {
+impl Default for IcnFile {
     fn default() -> Self {
         Self::new()
     }
 }
 
-impl SmdhFile {
+impl IcnFile {
     pub fn new() -> Self {
         let mut smdh = Self {
             titles: [SmdhTitle::default(); 16],

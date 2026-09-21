@@ -4,7 +4,7 @@ mod make;
 mod makerom;
 mod picker;
 mod rsfcreator;
-mod smdhcreator;
+mod icncreator;
 mod utils;
 mod bannertool;
 
@@ -25,10 +25,10 @@ use ratatui::{
 use crate::import::import_files;
 use crate::rsfcreator::rsf_config;
 
-const VERSION: &str = "v26.1.0";
+const VERSION: &str = "v26.2.0";
 
 fn main() -> io::Result<()> {
-    print!("\x1b]0;CIATools {}\x07", VERSION);
+    print!("\x1b]0;CIAToolsN {}\x07", VERSION);
 
     set_directories()?;
 
@@ -67,13 +67,15 @@ pub struct App {
     rsf_input: String,
     rsf_config: rsf_config,
 
-    smdh_edit: bool,
-    smdh_field: usize,
-    smdh_language: usize,
-    smdh_input: String,
-    smdh_file: smdhcreator::SmdhFile,
-    smdh_select_language: bool,
-    smdh_select_icon: bool,
+    icn_edit: bool,
+    icn_field: usize,
+    icn_language: usize,
+    icn_input: String,
+    icn_file: icncreator::IcnFile,
+    icn_select_language: bool,
+    icn_select_icon: bool,
+
+    titleid_gen: bool,
 }
 
 fn set_directories() -> io::Result<PathBuf> {
@@ -146,7 +148,7 @@ impl App {
 
                     if release.tag_name != VERSION {
                         self.output
-                            .push("[+] New update ! Press : G".to_string());
+                            .push(r"[+] New update available :)".to_string());
                     } else {
                         self.output
                             .push("[+] Up to date ;3".to_string());
@@ -185,16 +187,15 @@ impl App {
                 Line::from("2 : Create RSF"),
                 Line::from("3 : Create ICN"),
                 Line::from("4 : Set Author"),
-                //Line::from("5 : TitleID Generator"),
+                Line::from("5 : Create TitleID"),
                 Line::from(""),
                 Line::from(r"C : Make ¯\_(ツ)_/¯"),
                 Line::from("0 : Clean USER_FILES"),
                 Line::from("9 : Open USER_FILES"),
                 Line::from(""),
-                Line::from("K : Clear Output"),
+                Line::from("K : Clear Console"),
                 Line::from("Q : Quit"),
                 Line::from(""),
-                Line::from("G : GitHub"),
                 Line::from("Y : Check Updates"),
             ])
             .block(
@@ -216,7 +217,7 @@ impl App {
                 Block::bordered()
                     .bold()
                     .fg(Color::Magenta)
-                    .title(" OUTPUT ".bold())
+                    .title(" CONSOLE ".bold())
                     .border_set(border::THICK),
             ),
             outer_layout[1],
@@ -311,30 +312,30 @@ impl App {
                 return Ok(());
             }
 
-            if self.smdh_edit {
-                if self.smdh_select_language {
+            if self.icn_edit {
+                if self.icn_select_language {
                     match key.code {
                         KeyCode::Left => {
-                            if self.smdh_language == 0 {
-                                self.smdh_language = 11;
+                            if self.icn_language == 0 {
+                                self.icn_language = 11;
                             } else {
-                                self.smdh_language -= 1;
+                                self.icn_language -= 1;
                             }
                         }
 
                         KeyCode::Right => {
-                            self.smdh_language =
-                                (self.smdh_language + 1) % 12;
+                            self.icn_language =
+                                (self.icn_language + 1) % 12;
                         }
 
                         KeyCode::Enter => {
-                            self.smdh_select_language = false;
+                            self.icn_select_language = false;
                         }
 
                         KeyCode::Esc => {
-                            self.smdh_edit = false;
-                            self.smdh_select_language = false;
-                            self.smdh_input.clear();
+                            self.icn_edit = false;
+                            self.icn_select_language = false;
+                            self.icn_input.clear();
                         }
 
                         _ => {}
@@ -343,7 +344,7 @@ impl App {
                     return Ok(());
                 }
 
-                if self.smdh_select_icon {
+                if self.icn_select_icon {
                     match key.code {
                         KeyCode::Enter => {
                             ratatui::restore();
@@ -356,21 +357,21 @@ impl App {
                                 Ok(Some(files)) => {
                                     if let Some(path) = files.first() {
                                         let title = self
-                                            .smdh_file
+                                            .icn_file
                                             .get_short_description(
-                                                self.smdh_language,
+                                                self.icn_language,
                                             );
 
                                         let publisher = self
-                                            .smdh_file
+                                            .icn_file
                                             .get_publisher(
-                                                self.smdh_language,
+                                                self.icn_language,
                                             );
 
                                         let output =
                                             user_files_path()?.join("icon.icn");
 
-                                        match crate::bannertool::make_smdh(
+                                        match crate::bannertool::make_icn(
                                             &title,
                                             &publisher,
                                             path,
@@ -382,8 +383,8 @@ impl App {
                                                     output.display()
                                                 ));
 
-                                                self.smdh_select_icon = false;
-                                                self.smdh_edit = false;
+                                                self.icn_select_icon = false;
+                                                self.icn_edit = false;
                                             }
 
                                             Err(error) => {
@@ -411,8 +412,8 @@ impl App {
                         }
 
                         KeyCode::Esc => {
-                            self.smdh_select_icon = false;
-                            self.smdh_edit = false;
+                            self.icn_select_icon = false;
+                            self.icn_edit = false;
                         }
 
                         _ => {}
@@ -423,50 +424,50 @@ impl App {
 
                 match key.code {
                     KeyCode::Esc => {
-                        self.smdh_edit = false;
-                        self.smdh_input.clear();
+                        self.icn_edit = false;
+                        self.icn_input.clear();
                     }
 
                     KeyCode::Backspace => {
-                        self.smdh_input.pop();
+                        self.icn_input.pop();
                     }
 
-                    KeyCode::Enter => match self.smdh_field {
+                    KeyCode::Enter => match self.icn_field {
                         0 => {
-                            self.smdh_file.set_short_description(
-                                self.smdh_language,
-                                &self.smdh_input,
+                            self.icn_file.set_short_description(
+                                self.icn_language,
+                                &self.icn_input,
                             );
 
-                            self.smdh_input.clear();
-                            self.smdh_field = 1;
+                            self.icn_input.clear();
+                            self.icn_field = 1;
                         }
 
                         1 => {
-                            self.smdh_file.set_long_description(
-                                self.smdh_language,
-                                &self.smdh_input,
+                            self.icn_file.set_long_description(
+                                self.icn_language,
+                                &self.icn_input,
                             );
 
-                            self.smdh_input.clear();
-                            self.smdh_field = 2;
+                            self.icn_input.clear();
+                            self.icn_field = 2;
                         }
 
                         2 => {
-                            self.smdh_file.set_publisher(
-                                self.smdh_language,
-                                &self.smdh_input,
+                            self.icn_file.set_publisher(
+                                self.icn_language,
+                                &self.icn_input,
                             );
 
-                            self.smdh_input.clear();
-                            self.smdh_select_icon = true;
+                            self.icn_input.clear();
+                            self.icn_select_icon = true;
                         }
 
                         _ => {}
                     },
 
                     KeyCode::Char(c) => {
-                        self.smdh_input.push(c);
+                        self.icn_input.push(c);
                     }
 
                     _ => {}
@@ -482,25 +483,6 @@ impl App {
 
                 KeyCode::Char('k') | KeyCode::Char('K') => {
                     self.output.clear();
-                }
-
-                KeyCode::Char('g') | KeyCode::Char('G') => {
-                    self.output.push("[+] Open GitHub".to_string());
-
-                    #[cfg(target_os = "macos")]
-                    let _ = Command::new("open")
-                        .args(["https://github.com/saiitanaa/CIATools"])
-                        .spawn();
-
-                    #[cfg(target_os = "linux")]
-                    let _ = Command::new("xdg-open")
-                        .args(["https://github.com/saiitanaa/CIATools"])
-                        .spawn();
-
-                    #[cfg(target_os = "windows")]
-                    let _ = Command::new("explorer")
-                        .args(["https://github.com/saiitanaa/CIATools"])
-                        .spawn();
                 }
 
                 KeyCode::Char('y') | KeyCode::Char('Y') => {
@@ -539,18 +521,22 @@ impl App {
                 }
 
                 KeyCode::Char('3') => {
-                    self.smdh_edit = true;
-                    self.smdh_select_language = true;
-                    self.smdh_select_icon = false;
-                    self.smdh_field = 0;
-                    self.smdh_language = 1;
-                    self.smdh_input.clear();
-                    self.smdh_file = smdhcreator::SmdhFile::new();
+                    self.icn_edit = true;
+                    self.icn_select_language = true;
+                    self.icn_select_icon = false;
+                    self.icn_field = 0;
+                    self.icn_language = 1;
+                    self.icn_input.clear();
+                    self.icn_file = icncreator::IcnFile::new();
                 }
 
                 KeyCode::Char('4') => {
                     self.author_input.clear();
                     self.editing_author = true;
+                }
+
+                KeyCode::Char('5') => {
+                    self.titleid_gen = true;   
                 }
 
                 KeyCode::Char('C') | KeyCode::Char('c') => {
@@ -770,7 +756,7 @@ impl Widget for &App {
             lines.push(Line::from(""));
             lines.push(
                 Line::from(format!(
-                    "Enter author -> {}",
+                    "Enter author: {}",
                     self.author_input
                 ))
                 .fg(Color::White),
@@ -796,7 +782,7 @@ impl Widget for &App {
             lines.push(
                 Line::from("RSF-Creator")
                     .bold()
-                    .fg(Color::LightBlue),
+                    .fg(Color::Yellow),
             );
             lines.push(Line::from(""));
 
@@ -828,22 +814,36 @@ impl Widget for &App {
             );
         }
 
-        if self.smdh_edit {
+        if self.titleid_gen {
+            lines.push(Line::from(""));
+            lines.push(
+                Line::from("TitleID Creator")
+                    .bold()
+                    .fg(Color::Yellow),
+            );
+            lines.push(Line::from(""));
+            lines.push(
+                Line::from("Enter: Select    Esc: Cancel")
+                    .fg(Color::DarkGray),
+            );
+        }
+
+        if self.icn_edit {
             lines.push(Line::from(""));
 
-            if self.smdh_select_language {
+            if self.icn_select_language {
                 lines.push(
-                    Line::from("ICN CREATOR")
+                    Line::from("ICN Creator")
                         .bold()
-                        .fg(Color::LightBlue),
+                        .fg(Color::Yellow),
                 );
                 lines.push(Line::from(""));
 
                 lines.push(
                     Line::from(format!(
                         "Language: {}",
-                        smdhcreator::SMDH_LANGUAGES[
-                            self.smdh_language
+                        icncreator::ICN_LANGUAGES[
+                            self.icn_language
                         ]
                     ))
                     .fg(Color::Yellow),
@@ -858,11 +858,11 @@ impl Widget for &App {
                     Line::from("Enter: Select    Esc: Cancel")
                         .fg(Color::DarkGray),
                 );
-            } else if self.smdh_select_icon {
+            } else if self.icn_select_icon {
                 lines.push(
-                    Line::from("ICN CREATOR")
+                    Line::from("ICN Creator")
                         .bold()
-                        .fg(Color::LightBlue),
+                        .fg(Color::Yellow),
                 );
                 lines.push(Line::from(""));
                 lines.push(
@@ -891,7 +891,7 @@ impl Widget for &App {
                         .fg(Color::DarkGray),
                 );
             } else {
-                let (prompt, example) = match self.smdh_field {
+                let (prompt, example) = match self.icn_field {
                     0 => ("Title:", "(Ex: My Homebrew)"),
                     1 => (
                         "Description:",
@@ -911,8 +911,8 @@ impl Widget for &App {
                 lines.push(
                     Line::from(format!(
                         "Language: {}",
-                        smdhcreator::SMDH_LANGUAGES[
-                            self.smdh_language
+                        icncreator::ICN_LANGUAGES[
+                            self.icn_language
                         ]
                     ))
                     .fg(Color::Yellow),
@@ -923,7 +923,7 @@ impl Widget for &App {
                     Line::from(format!(
                         "{} {}",
                         prompt,
-                        self.smdh_input
+                        self.icn_input
                     ))
                     .fg(Color::White),
                 );
@@ -940,7 +940,7 @@ impl Widget for &App {
             .centered()
             .block(
                 Block::bordered()
-                    .title(" CIATools -- Saiitanaa ".bold())
+                    .title(" CIAToolsN -- Saiitanaa ".bold())
                     .border_set(border::THICK),
             )
             .render(area, buf);

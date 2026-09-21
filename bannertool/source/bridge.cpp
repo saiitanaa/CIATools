@@ -1,6 +1,6 @@
 #include "cmd.h"
 
-extern "C" int ciatools_make_smdh(
+extern "C" int ciatools_make_icn(
     const char* title,
     const char* publisher,
     const char* icon,
