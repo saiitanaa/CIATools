@@ -82,14 +82,18 @@ To do this, **press** `C`.
 
 Dependencies of **CIAToolsN** (everything else in the `cargo tree` is just their transitive sub-dependencies):
 
-| Crate | Version | Role |
-|---|---|---|
-| **color-eyre** | 0.6.5 | Error handling with nice reports (backtrace, colors) |
-| **crossterm** | 0.29.0 | Cross-platform terminal (input, colors, raw mode) |
-| **fs** | 0.0.6 | Async file utilities (depends on `futures`) |
-| **hostname** | 0.4.2 | Get the machine's hostname |
-| **ratatui** | 0.30.2 | TUI framework (terminal UI) — biggest dependency, includes widgets, layout, etc. |
-| **rfd** | 0.14.1 | Native file dialogs ("Rust File Dialogs") |
+| Crate          | Version | Role                                                                             |
+| -------------- | ------: | -------------------------------------------------------------------------------- |
+| **color-eyre** |   0.6.5 | Error handling with nice reports (backtrace, colors)                             |
+| **crossterm**  |  0.29.0 | Cross-platform terminal (input, colors, raw mode)                                |
+| **fs**         |   0.0.6 | Async file utilities (depends on `futures`)                                      |
+| **hostname**   |   0.4.2 | Get the machine's hostname                                                       |
+| **rand**       |     0.9 | Random number generation                                                         |
+| **ratatui**    |  0.30.2 | TUI framework (terminal UI) — biggest dependency, includes widgets, layout, etc. |
+| **reqwest**    |    0.12 | HTTP client for TitleDB/NUS Info API access                                      |
+| **rfd**        |  0.14.1 | Native file dialogs ("Rust File Dialogs")                                        |
+| **serde**      |       1 | Serialization/deserialization framework                                          |
+| **serde_json** |       1 | JSON serialization/deserialization                                               |
 
 #### AI Utilisation
 
