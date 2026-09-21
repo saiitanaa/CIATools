@@ -113,13 +113,12 @@ void* lz11_compress(u32* size, void* input, u32 inputSize) {
 
     if(compressedLength % 4 != 0) {
         u32 padLength = 4 - (compressedLength % 4);
-        u8 pad[padLength];
-        memset(pad, 0, (size_t) padLength);
+        u8 pad[3] = {0, 0, 0};
 
         ss.write((char*) pad, padLength);
         compressedLength += padLength;
     }
-
+    
     void* buf = malloc((size_t) compressedLength);
     ss.read((char*) buf, compressedLength);
 
