@@ -104,6 +104,7 @@ fn main() {
     #[cfg(target_os = "linux")]
     {
         println!("cargo:rustc-link-lib=stdc++");
+        println!("cargo:rustc-link-arg-bins=-lstdc++");
     }
 
     #[cfg(all(target_os = "windows", target_env = "msvc"))]
