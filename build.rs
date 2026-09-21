@@ -100,4 +100,14 @@ fn main() {
         println!("cargo:rustc-link-lib=c++");
         println!("cargo:rustc-link-arg-bins=-lc++");
     }
+
+    #[cfg(target_os = "linux")]
+    {
+        println!("cargo:rustc-link-lib=stdc++");
+    }
+
+    #[cfg(all(target_os = "windows", target_env = "msvc"))]
+    {
+        //println!("cargo:rustc-link-lib=static=libcmt");
+    }
 }
