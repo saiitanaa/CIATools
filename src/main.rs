@@ -833,7 +833,7 @@ impl Widget for &App {
 
             if self.smdh_select_language {
                 lines.push(
-                    Line::from("SMDH CREATOR")
+                    Line::from("ICN CREATOR")
                         .bold()
                         .fg(Color::LightBlue),
                 );
@@ -860,7 +860,7 @@ impl Widget for &App {
                 );
             } else if self.smdh_select_icon {
                 lines.push(
-                    Line::from("SMDH CREATOR")
+                    Line::from("ICN CREATOR")
                         .bold()
                         .fg(Color::LightBlue),
                 );
@@ -873,7 +873,7 @@ impl Widget for &App {
                 lines.push(Line::from(""));
                 lines.push(
                     Line::from(
-                        "Select an image for the SMDH icon."
+                        "Select an image for the ICN icon."
                     )
                     .fg(Color::White),
                 );
@@ -902,7 +902,7 @@ impl Widget for &App {
                 };
 
                 lines.push(
-                    Line::from("SMDH CREATOR")
+                    Line::from("ICN CREATOR")
                         .bold()
                         .fg(Color::LightBlue),
                 );
