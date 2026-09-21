@@ -5,7 +5,7 @@
 **`CIATools`** is **all-in-one tool** for compiling your **projects** into `.cia` format with ease.
 
 ### Included :
-RSF File Creator, SMDH File Creator, Edit Author, 2D-3D banner support, No dependencies required, `makeROM` & `bannertool` librairies included
+RSF File Creator, SMDH File Creator, Edit Author, 2D-3D banner support, No dependencies required, `makeROM` & `bannertool` librairies included, ICN File Creator
 
 ## Downloads
 
