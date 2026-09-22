@@ -490,9 +490,7 @@ impl App {
                 }
 
                 KeyCode::Char('1') => {
-                    self.output
-                        .push("[?] Import FileDialog".to_string());
-
+                    self.output.push("[?] Import FileDialog".to_string());
                     ratatui::restore();
 
                     let result =

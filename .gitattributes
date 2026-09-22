@@ -1,7 +1,12 @@
 #Vendored
 makerom/** linguist-vendored
+bannertool/** linguist-vendored
 
 #except
 makerom/src/ciatools_api.c linguist-vendored=false
 makerom/src/ciatools_api.h linguist-vendored=false
 makerom/deps/libyaml/src/api.c linguist-vendored=false
+bannertool/source/pc/stb_image_impl.c linguist-vendored=false
+bannertool/source/pc/stb_vorbis.c linguist-vendored=false
+bannertool/source/3ds/lz11.cpp linguist-vendored=false
+bannertool/source/bridge.cpp linguist-vendored=false
