@@ -1,4 +1,4 @@
-# Contributing to CIAToolsR
+# Contributing to CIATools
 
 ### Reporting Bugs
 * Check the **Issues** tab to see if the bug has already been reported.
@@ -6,7 +6,7 @@
 
 ### Suggesting Enhancements
 * Open an issue with the tag `enhancement`.
-* Explain clearly what the feature is and why it would be useful for CIAToolsR.
+* Explain clearly what the feature is and why it would be useful for CIATools.
 
 ### Code Contributions
 1. **Fork** the repository.
