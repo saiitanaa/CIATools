@@ -4,11 +4,4 @@ makerom/** linguist-vendored
 #except
 makerom/src/ciatools_api.c linguist-vendored=false
 makerom/src/ciatools_api.h linguist-vendored=false
-makerom/src/crypto.c linguist-vendored=false
-makerom/src/lib.h linguist-vendored=false
-makerom/src/oschar.c linguist-vendored=false
-makerom/src/oschar.h linguist-vendored=false
-makerom/src/romfs_fs.c linguist-vendored=false
-makerom/src/user_settings.h linguist-vendored=false
-makerom/src/utils.c linguist-vendored=false
 makerom/deps/libyaml/src/api.c linguist-vendored=false
