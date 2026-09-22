@@ -346,7 +346,7 @@ static int cmd_make_smdh(SMDH& smdh, const std::string& icon, const std::string&
         return 1;
     }
 
-    printf("Created SMDH \"%s\".\n", output.c_str());
+    //printf("Created SMDH \"%s\".\n", output.c_str());
     return 0;
 }
 

@@ -8,7 +8,7 @@ mod icncreator;
 mod utils;
 mod bannertool;
 
-use std::{fs, io, path::PathBuf, process::Command};
+use std::{fs, io, path::PathBuf, process::Command };
 
 use crossterm::event::{self, Event, KeyCode, KeyEventKind};
 
@@ -132,8 +132,6 @@ impl App {
             tag_name: String,
         }
 
-        self.output.push("[?] Check updates...".to_string());
-
         match reqwest::blocking::Client::new()
             .get("https://api.github.com/repos/saiitanaa/CIATools/releases/latest")
             .header("User-Agent", "CIATools")
@@ -188,6 +186,7 @@ impl App {
                 Line::from("3 : Create ICN"),
                 Line::from("4 : Set Author"),
                 Line::from("5 : Create TitleID"),
+                Line::from("6 : Create UniqueID"),
                 Line::from(""),
                 Line::from(r"C : Make ¯\_(ツ)_/¯"),
                 Line::from("0 : Clean USER_FILES"),
@@ -195,6 +194,7 @@ impl App {
                 Line::from(""),
                 Line::from("K : Clear Console"),
                 Line::from("Q : Quit"),
+                Line::from("H : Help !!"),
                 Line::from(""),
                 Line::from("Y : Check Updates"),
             ])
@@ -479,6 +479,35 @@ impl App {
             match key.code {
                 KeyCode::Char('q') | KeyCode::Char('Q') => {
                     self.exit = true;
+                }
+
+                KeyCode::Char('h') | KeyCode::Char('H') => {
+                    #[cfg(target_os = "macos")]
+                    {
+                        self.output.push("[!] NO PROBLEM !!".to_string());
+                        Command::new("open")
+                            .arg("https://github.com/saiitanaa/CIATools/blob/main/README.md")
+                            .status()
+                            .ok();
+                    }
+
+                    #[cfg(target_os = "windows")]
+                    {
+                        self.output.push("[!] NO PROBLEM !!!".to_string());
+                        Command::new("start")
+                            .arg("https://github.com/saiitanaa/CIATools/blob/main/README.md")
+                            .status()
+                            .ok();
+                    }
+
+                    #[cfg(target_os = "linux")]
+                    {
+                        self.output.push("[!] NO PROBLEM !!!!".to_string());
+                        Command::new("xdg-open")
+                            .arg("https://github.com/saiitanaa/CIATools/blob/main/README.md")
+                            .status()
+                            .ok();
+                    }
                 }
 
                 KeyCode::Char('k') | KeyCode::Char('K') => {
@@ -900,9 +929,9 @@ impl Widget for &App {
                 };
 
                 lines.push(
-                    Line::from("ICN CREATOR")
+                    Line::from("ICN Creator")
                         .bold()
-                        .fg(Color::LightBlue),
+                        .fg(Color::Yellow),
                 );
                 lines.push(Line::from(""));
 

@@ -40,6 +40,18 @@ To do this, **press** `1`.
 
 **You're now in the file explorer!** Select all the **files** needed for **compilation**.
 
+**Don't have** an TitleID or UniqueID ? No problem ! we'll **create them for you** 😊
+
+To do this, **press** `5` for TitleID Generator or `6` for UniqueID Generator 
+
+#### For TitleID Creator
+
+![Not implemented](./assets/titleid_generator.png)
+
+#### For UniqueID Creator
+
+![Not implemented](./assets/uniqueid_generator.png)
+
 **Don't have** an `.rsf` or `.smdh` **file**? No problem—we'll **create them for you**!
 
 To do this, **press** `2` for RSF or `3` for SMDH.
@@ -48,9 +60,9 @@ To do this, **press** `2` for RSF or `3` for SMDH.
 
 ![Description](./assets/rsf_creator.png)
 
-#### For SMDH File: 
+#### For ICN File: 
 
-![Description](./assets/smdh_creator.png)
+![Description](./assets/icn_creator.png)
 
 **Perfect! Now let's define an author.** 
 
