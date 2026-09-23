@@ -8,10 +8,9 @@ fn collect_c_files(dir: &Path, build: &mut cc::Build) {
 
             if path.is_dir() {
                 collect_c_files(&path, build);
-            } else if path.extension().and_then(|s| s.to_str()) == Some("c") {
-                if path.file_name().and_then(|s| s.to_str()) != Some("makerom.c") {
+            } else if path.extension().and_then(|s| s.to_str()) == Some("c")
+                && path.file_name().and_then(|s| s.to_str()) != Some("makerom.c") {
                     build.file(path);
-                }
             }
         }
     }
@@ -24,10 +23,9 @@ fn collect_cpp_files(dir: &Path, build: &mut cc::Build) {
 
             if path.is_dir() {
                 collect_cpp_files(&path, build);
-            } else if path.extension().and_then(|s| s.to_str()) == Some("cpp") {
-                if path.file_name().and_then(|s| s.to_str()) != Some("main.cpp") {
+            } else if path.extension().and_then(|s| s.to_str()) == Some("cpp")
+                && path.file_name().and_then(|s| s.to_str()) != Some("main.cpp") {
                     build.file(path);
-                }
             }
         }
     }
@@ -44,10 +42,7 @@ fn main() {
         .include("makerom/deps/libblz/include");
 
     if cfg!(target_env = "msvc") {
-        makerom
-            .flag("/wd4996")
-            .flag("/wd4244")
-            .flag("/wd4245");
+        makerom.flag("/wd4996").flag("/wd4244").flag("/wd4245");
     }
 
     collect_c_files(Path::new("makerom/src"), &mut makerom);
@@ -68,11 +63,7 @@ fn main() {
         .include("bannertool/source/3ds")
         .include("bannertool/source/pc");
 
-    collect_cpp_files(
-        Path::new("bannertool/source"),
-        &mut bannertool,
-    );
-
+    collect_cpp_files(Path::new("bannertool/source"), &mut bannertool);
     bannertool.compile("bannertool_core");
 
     let mut bannertool_c = cc::Build::new();

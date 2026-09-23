@@ -1,4 +1,4 @@
-use std::ffi::{c_char, CString};
+use std::ffi::{CString, c_char};
 use std::io;
 use std::path::Path;
 
@@ -11,12 +11,7 @@ unsafe extern "C" {
     ) -> i32;
 }
 
-pub fn make_icn(
-    title: &str,
-    publisher: &str,
-    icon: &Path,
-    output: &Path,
-) -> io::Result<()> {
+pub fn make_icn(title: &str, publisher: &str, icon: &Path, output: &Path) -> io::Result<()> {
     let title = CString::new(title)
         .map_err(|_| io::Error::new(io::ErrorKind::InvalidInput, "Invalid title"))?;
 
@@ -39,10 +34,7 @@ pub fn make_icn(
     };
 
     if result != 0 {
-        return Err(io::Error::other(
-            "bannertool failed to create SMDH",
-        ));
+        return Err(io::Error::other("bannertool failed to create SMDH"));
     }
-
     Ok(())
 }

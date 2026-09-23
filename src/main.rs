@@ -1,25 +1,23 @@
+mod bannertool;
 mod delete;
+mod icncreator;
 mod import;
 mod make;
 mod makerom;
 mod picker;
 mod rsfcreator;
-mod icncreator;
 mod utils;
-mod bannertool;
 
-use std::{fs, io, path::PathBuf, process::Command };
-
+use std::{fs, io, path::PathBuf, process::Command};
 use crossterm::event::{self, Event, KeyCode, KeyEventKind};
-
 use ratatui::{
+    DefaultTerminal, Frame,
     buffer::Buffer,
     layout::{Constraint, Direction, Layout, Rect},
     style::{Color, Stylize},
     symbols::border,
     text::Line,
     widgets::{Block, Borders, Paragraph, Widget},
-    DefaultTerminal, Frame,
 };
 
 use crate::import::import_files;
@@ -92,14 +90,12 @@ fn set_directories() -> io::Result<PathBuf> {
     Ok(user_files)
 }
 
-fn find_file_with_extension(
-    directory: &PathBuf,
-    extension: &str,
-) -> io::Result<PathBuf> {
+fn find_file_with_extension(directory: &PathBuf, extension: &str) -> io::Result<PathBuf> {
     for entry in fs::read_dir(directory)? {
         let path = entry?.path();
 
-        if path.extension()
+        if path
+            .extension()
             .and_then(|ext| ext.to_str())
             .is_some_and(|ext| ext.eq_ignore_ascii_case(extension))
         {
@@ -116,7 +112,6 @@ fn find_file_with_extension(
 impl App {
     pub fn run(&mut self, terminal: &mut DefaultTerminal) -> io::Result<()> {
         terminal.draw(|frame| self.draw(frame))?;
-
         while !self.exit {
             self.handle_events(terminal)?;
             terminal.draw(|frame| self.draw(frame))?;
@@ -140,29 +135,22 @@ impl App {
         {
             Ok(response) => match response.json::<Release>() {
                 Ok(release) => {
-                    self.output.push(format!(
-                        "[!] Latest release: {}",
-                        release.tag_name
-                    ));
+                    self.output.push(format!("[!] Latest release: {}", release.tag_name));
 
                     if release.tag_name != VERSION {
-                        self.output
-                            .push(r"[+] New update available :)".to_string());
+                        self.output.push(r"[+] New update available :)".to_string());
                     } else {
-                        self.output
-                            .push("[+] Up to date ;3".to_string());
+                        self.output.push("[+] Up to date ;3".to_string());
                     }
                 }
 
                 Err(_) => {
-                    self.output
-                        .push("[!] Failed to parse!".to_string());
+                    self.output.push("[!] Failed to parse!".to_string());
                 }
             },
 
             Err(_) => {
-                self.output
-                    .push("[!] Check update failed!".to_string());
+                self.output.push("[!] Check update failed!".to_string());
             }
         }
     }
@@ -237,8 +225,7 @@ impl App {
                         self.author = self.author_input.clone();
                         save_author(&self.author)?;
                         self.editing_author = false;
-                        self.output
-                            .push(format!("[+] Author set to: {}", self.author));
+                        self.output.push(format!("[+] Author set to: {}", self.author));
                     }
 
                     KeyCode::Backspace => {
@@ -291,9 +278,7 @@ impl App {
                             let path = user_files_path()?.join("config.rsf");
 
                             fs::write(path, content)?;
-
-                            self.output
-                                .push("[+] RSF file created.".to_string());
+                            self.output.push("[+] RSF file created.".to_string());
                         }
                     }
 
@@ -320,8 +305,7 @@ impl App {
                         }
 
                         KeyCode::Right => {
-                            self.icn_language =
-                                (self.icn_language + 1) % 12;
+                            self.icn_language = (self.icn_language + 1) % 12;
                         }
 
                         KeyCode::Enter => {
@@ -364,8 +348,7 @@ impl App {
                                                 self.icn_language,
                                             );
 
-                                        let output =
-                                            user_files_path()?.join("icon.icn");
+                                        let output = user_files_path()?.join("icon.icn");
 
                                         match crate::bannertool::make_icn(
                                             &title,
@@ -374,35 +357,24 @@ impl App {
                                             &output,
                                         ) {
                                             Ok(()) => {
-                                                self.output.push(format!(
-                                                    "[+] ICN created: {}",
-                                                    output.display()
-                                                ));
-
+                                                self.output.push(format!("[+] ICN created: {}", output.display()));
                                                 self.icn_select_icon = false;
                                                 self.icn_edit = false;
                                             }
 
                                             Err(error) => {
-                                                self.output.push(format!(
-                                                    "[!] bannertool failed: {}",
-                                                    error
-                                                ));
+                                                self.output.push(format!("[!] bannertool failed: {}", error));
                                             }
                                         }
                                     }
                                 }
 
                                 Ok(None) => {
-                                    self.output
-                                        .push("[!] No icon selected.".to_string());
+                                    self.output.push("[!] No icon selected.".to_string());
                                 }
 
                                 Err(error) => {
-                                    self.output.push(format!(
-                                        "[!] Icon picker error: {}",
-                                        error
-                                    ));
+                                    self.output.push(format!("[!] Icon picker error: {}", error));
                                 }
                             }
                         }
@@ -430,31 +402,19 @@ impl App {
 
                     KeyCode::Enter => match self.icn_field {
                         0 => {
-                            self.icn_file.set_short_description(
-                                self.icn_language,
-                                &self.icn_input,
-                            );
-
+                            self.icn_file.set_short_description(self.icn_language, &self.icn_input);
                             self.icn_input.clear();
                             self.icn_field = 1;
                         }
 
                         1 => {
-                            self.icn_file.set_long_description(
-                                self.icn_language,
-                                &self.icn_input,
-                            );
-
+                            self.icn_file.set_long_description(self.icn_language, &self.icn_input);
                             self.icn_input.clear();
                             self.icn_field = 2;
                         }
 
                         2 => {
-                            self.icn_file.set_publisher(
-                                self.icn_language,
-                                &self.icn_input,
-                            );
-
+                            self.icn_file.set_publisher(self.icn_language, &self.icn_input);
                             self.icn_input.clear();
                             self.icn_select_icon = true;
                         }
@@ -474,9 +434,7 @@ impl App {
 
             if self.titleid_gen {
                 match key.code {
-                    KeyCode::Enter => {
-
-                    }
+                    KeyCode::Enter => {}
 
                     KeyCode::Esc => {
                         self.titleid_gen = false;
@@ -488,9 +446,7 @@ impl App {
 
             if self.uniqueid_gen {
                 match key.code {
-                    KeyCode::Enter => {
-
-                    }
+                    KeyCode::Enter => {}
 
                     KeyCode::Esc => {
                         self.uniqueid_gen = false;
@@ -546,9 +502,7 @@ impl App {
                     self.output.push("[?] Import FileDialog".to_string());
                     ratatui::restore();
 
-                    let result =
-                        user_files_path().and_then(import_files);
-
+                    let result = user_files_path().and_then(import_files);
                     *terminal = ratatui::init();
 
                     match result {
@@ -597,16 +551,11 @@ impl App {
                     self.output.push("[+] CIA Compiling...".to_string());
                     match user_files_path() {
                         Ok(user_files) => {
-                            let elf =
-                                match find_file_with_extension(
-                                    &user_files,
-                                    "elf",
-                                ) {
+                            let elf = match find_file_with_extension(&user_files, "elf") {
                                     Ok(path) => path,
 
                                     Err(error) => {
-                                        self.output
-                                            .push(format!("[!] {error}"));
+                                        self.output.push(format!("[!] {error}"));
                                         return Ok(());
                                     }
                                 };
@@ -619,8 +568,7 @@ impl App {
                                     Ok(path) => path,
 
                                     Err(error) => {
-                                        self.output
-                                            .push(format!("[!] {error}"));
+                                        self.output.push(format!("[!] {error}"));
                                         return Ok(());
                                     }
                                 };
@@ -633,35 +581,21 @@ impl App {
                                     Ok(path) => path,
 
                                     Err(error) => {
-                                        self.output
-                                            .push(format!("[!] {error}"));
+                                        self.output.push(format!("[!] {error}"));
                                         return Ok(());
                                     }
                                 };
 
-                            let banner = find_file_with_extension(
-                                &user_files,
-                                "bin",
-                            )
+                            let banner = find_file_with_extension(&user_files, "bin")
                             .or_else(|_| {
-                                find_file_with_extension(
-                                    &user_files,
-                                    "bnr",
-                                )
+                                find_file_with_extension(&user_files, "bnr")
                             })
                             .ok();
 
                             let output = elf.with_extension("cia");
+                            self.output.push(format!("[+] Building CIA: {}", elf.display()));
 
-                            self.output.push(format!(
-                                "[+] Building CIA: {}",
-                                elf.display()
-                            ));
-
-                            let result = crate::makerom::build_cia(
-                                elf.to_string_lossy().as_ref(),
-                                rsf.to_string_lossy().as_ref(),
-                                icon.to_string_lossy().as_ref(),
+                            let result = crate::makerom::build_cia(elf.to_string_lossy().as_ref(), rsf.to_string_lossy().as_ref(), icon.to_string_lossy().as_ref(),
                                 banner
                                     .as_ref()
                                     .map(|path| {
@@ -672,20 +606,14 @@ impl App {
                             );
 
                             if result == 0 {
-                                self.output.push(format!(
-                                    "[+] CIA created: {}",
-                                    output.display()
-                                ));
+                                self.output.push(format!("[+] CIA created: {}", output.display()));
                             } else {
-                                self.output.push(format!(
-                                    "[!] makerom failed with code: {result}"
-                                ));
+                                self.output.push(format!("[!] makerom failed with code: {result}"));
                             }
                         }
 
                         Err(error) => {
-                            self.output
-                                .push(format!("[!] {error}"));
+                            self.output.push(format!("[!] {error}"));
                         }
                     }
                 }
@@ -694,15 +622,11 @@ impl App {
                     Ok(path) => {
                         match crate::delete::clean_user_files(path) {
                             Ok(()) => {
-                                self.output.push(
-                                    "[-] USER_FILES cleaned.".to_string(),
-                                );
+                                self.output.push("[-] USER_FILES cleaned.".to_string());
                             }
 
                             Err(error) => {
-                                self.output.push(format!(
-                                    "[!] {error}"
-                                ));
+                                self.output.push(format!("[!] {error}"));
                             }
                         }
                     }
@@ -729,23 +653,17 @@ impl App {
 
                             match result {
                                 Ok(_) => {
-                                    self.output.push(
-                                        "[+] Open USER_FILES".to_string(),
-                                    );
+                                    self.output.push("[+] Open USER_FILES".to_string());
                                 }
 
                                 Err(error) => {
-                                    self.output.push(format!(
-                                        "[!] Failed to open USER_FILES: {error}"
-                                    ));
+                                    self.output.push(format!("[!] Failed to open USER_FILES: {error}"));
                                 }
                             }
                         }
 
                         Err(error) => {
-                            self.output.push(format!(
-                                "[!] Failed to open USER_FILES: {error}"
-                            ));
+                            self.output.push(format!("[!] Failed to open USER_FILES: {error}"));
                         }
                     }
                 }
@@ -769,7 +687,6 @@ fn user_files_path() -> io::Result<PathBuf> {
     let user_files = bin_path.join("DATA").join("USER_FILES");
 
     fs::create_dir_all(&user_files)?;
-
     Ok(user_files)
 }
 
@@ -779,15 +696,12 @@ fn load_author() -> io::Result<String> {
     if path.exists() {
         return Ok(fs::read_to_string(path)?.trim().to_string());
     }
-
     Ok(String::new())
 }
 
 fn save_author(author: &str) -> io::Result<()> {
     let path = user_files_path()?.join("author.txt");
-
     fs::write(path, author)?;
-
     Ok(())
 }
 
@@ -797,47 +711,22 @@ impl Widget for &App {
         area: Rect,
         buf: &mut Buffer,
     ) {
-        let hostname = hostname::get()
-            .map(|h| h.to_string_lossy().into_owned())
-            .unwrap_or_else(|_| "unknown".to_string());
-
-        let mut lines = vec![
-            Line::from(""),
-            Line::from(format!("Hi ! {hostname} 👋")),
-        ];
+        let hostname = hostname::get().map(|h| h.to_string_lossy().into_owned()).unwrap_or_else(|_| "unknown".to_string());
+        let mut lines = vec![Line::from(""), Line::from(format!("Hi ! {hostname} 👋"))];
 
         if self.editing_author {
             lines.push(Line::from(""));
-            lines.push(
-                Line::from(format!(
-                    "Enter author: {}",
-                    self.author_input
-                ))
-                .fg(Color::White),
-            );
+            lines.push(Line::from(format!("Enter author: {}", self.author_input)).fg(Color::White));
 
-            lines.push(
-                Line::from("Enter: Next    Esc: Cancel")
-                    .fg(Color::DarkGray),
-            );
+            lines.push(Line::from("Enter: Next    Esc: Cancel").fg(Color::DarkGray));
         } else if !self.author.is_empty() {
             lines.push(Line::from(""));
-            lines.push(
-                Line::from(format!(
-                    "Author defined: {}",
-                    self.author
-                ))
-                .fg(Color::White),
-            );
+            lines.push(Line::from(format!("Author defined: {}", self.author)).fg(Color::White));
         }
 
         if self.rsf_edit {
             lines.push(Line::from(""));
-            lines.push(
-                Line::from("RSF-Creator")
-                    .bold()
-                    .fg(Color::Yellow),
-            );
+            lines.push(Line::from("RSF-Creator").bold().fg(Color::Yellow));
             lines.push(Line::from(""));
 
             let (prompt, example) = match self.rsf_field {
@@ -851,112 +740,46 @@ impl Widget for &App {
                 _ => ("", ""),
             };
 
-            lines.push(
-                Line::from(format!(
-                    "{} {}",
-                    prompt,
-                    self.rsf_input
-                ))
-                .fg(Color::White),
-            );
-
+            lines.push(Line::from(format!("{} {}", prompt, self.rsf_input)).fg(Color::White));
             lines.push(Line::from(example).fg(Color::DarkGray));
             lines.push(Line::from(""));
-            lines.push(
-                Line::from("Enter: Next    Esc: Cancel")
-                    .fg(Color::DarkGray),
-            );
+            lines.push(Line::from("Enter: Next    Esc: Cancel").fg(Color::DarkGray));
         }
 
         if self.titleid_gen {
             lines.push(Line::from(""));
-            lines.push(
-                Line::from("TitleID Creator")
-                    .bold()
-                    .fg(Color::Yellow),
-            );
+            lines.push(Line::from("TitleID Creator").bold().fg(Color::Yellow));
             lines.push(Line::from(""));
-            lines.push(
-                Line::from("Enter: Select    Esc: Cancel")
-                    .fg(Color::DarkGray),
-            );
+            lines.push(Line::from("Enter: Select    Esc: Cancel").fg(Color::DarkGray));
         }
 
         if self.uniqueid_gen {
             lines.push(Line::from(""));
-            lines.push(
-                Line::from("UniqueID Creator")
-                    .bold()
-                    .fg(Color::Yellow),
-            );
+            lines.push(Line::from("UniqueID Creator").bold().fg(Color::Yellow));
             lines.push(Line::from(""));
-            lines.push(
-                Line::from("Enter: Select    Esc: Cancel")
-            );
+            lines.push(Line::from("Enter: Select    Esc: Cancel"));
         }
 
         if self.icn_edit {
             lines.push(Line::from(""));
 
             if self.icn_select_language {
-                lines.push(
-                    Line::from("ICN Creator")
-                        .bold()
-                        .fg(Color::Yellow),
-                );
+                lines.push(Line::from("ICN Creator").bold().fg(Color::Yellow));
                 lines.push(Line::from(""));
-
-                lines.push(
-                    Line::from(format!(
-                        "Language: {}",
-                        icncreator::ICN_LANGUAGES[
-                            self.icn_language
-                        ]
-                    ))
-                    .fg(Color::Yellow),
-                );
-
+                lines.push(Line::from(format!("Language: {}", icncreator::ICN_LANGUAGES[self.icn_language])).fg(Color::Yellow));
                 lines.push(Line::from(""));
-                lines.push(
-                    Line::from("<- / -> Change language")
-                        .fg(Color::DarkGray),
-                );
-                lines.push(
-                    Line::from("Enter: Select    Esc: Cancel")
-                        .fg(Color::DarkGray),
-                );
+                lines.push(Line::from("<- / -> Change language").fg(Color::DarkGray));
+                lines.push(Line::from("Enter: Select    Esc: Cancel").fg(Color::DarkGray));
             } else if self.icn_select_icon {
-                lines.push(
-                    Line::from("ICN Creator")
-                        .bold()
-                        .fg(Color::Yellow),
-                );
+                lines.push(Line::from("ICN Creator").bold().fg(Color::Yellow));
                 lines.push(Line::from(""));
-                lines.push(
-                    Line::from("Icon")
-                        .bold()
-                        .fg(Color::Yellow),
-                );
+                lines.push(Line::from("Icon").bold().fg(Color::Yellow));
                 lines.push(Line::from(""));
-                lines.push(
-                    Line::from(
-                        "Select an image for the ICN icon."
-                    )
-                    .fg(Color::White),
-                );
-                lines.push(
-                    Line::from("PNG / JPG / WebP")
-                        .fg(Color::DarkGray),
-                );
+                lines.push(Line::from("Select an image for the ICN icon.").fg(Color::White));
+                lines.push(Line::from("PNG / JPG / WebP").fg(Color::DarkGray));
                 lines.push(Line::from(""));
-                lines.push(
-                    Line::from("Enter: Select icon")
-                        .fg(Color::DarkGray),
-                );
-                lines.push(
-                    Line::from("Esc: Cancel")
-                        .fg(Color::DarkGray),
-                );
+                lines.push(Line::from("Enter: Select icon").fg(Color::DarkGray));
+                lines.push(Line::from("Esc: Cancel").fg(Color::DarkGray));
             } else {
                 let (prompt, example) = match self.icn_field {
                     0 => ("Title:", "(Ex: My Homebrew)"),
@@ -968,38 +791,14 @@ impl Widget for &App {
                     _ => ("", ""),
                 };
 
-                lines.push(
-                    Line::from("ICN Creator")
-                        .bold()
-                        .fg(Color::Yellow),
-                );
+                lines.push(Line::from("ICN Creator").bold().fg(Color::Yellow));
                 lines.push(Line::from(""));
-
-                lines.push(
-                    Line::from(format!(
-                        "Language: {}",
-                        icncreator::ICN_LANGUAGES[
-                            self.icn_language
-                        ]
-                    ))
-                    .fg(Color::Yellow),
-                );
-
+                lines.push(Line::from(format!("Language: {}", icncreator::ICN_LANGUAGES[self.icn_language])).fg(Color::Yellow));
                 lines.push(Line::from(""));
-                lines.push(
-                    Line::from(format!(
-                        "{} {}",
-                        prompt,
-                        self.icn_input
-                    ))
-                    .fg(Color::White),
-                );
+                lines.push(Line::from(format!("{} {}", prompt, self.icn_input)).fg(Color::White));
                 lines.push(Line::from(example).fg(Color::DarkGray));
                 lines.push(Line::from(""));
-                lines.push(
-                    Line::from("Enter: Next    Esc: Cancel")
-                        .fg(Color::DarkGray),
-                );
+                lines.push(Line::from("Enter: Next    Esc: Cancel").fg(Color::DarkGray));
             }
         }
 
