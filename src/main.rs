@@ -6,6 +6,7 @@ mod make;
 mod makerom;
 mod picker;
 mod rsfcreator;
+mod titleid;
 mod utils;
 
 use std::{fs, io, path::PathBuf, process::Command};
@@ -23,7 +24,7 @@ use ratatui::{
 use crate::import::import_files;
 use crate::rsfcreator::rsf_config;
 
-const VERSION: &str = "v26.2.0";
+const VERSION: &str = "v26.3.0";
 
 fn main() -> io::Result<()> {
     print!("\x1b]0;CIAToolsN {}\x07", VERSION);
@@ -74,7 +75,9 @@ pub struct App {
     icn_select_icon: bool,
 
     titleid_gen: bool,
+    titleid: String,
     uniqueid_gen: bool,
+    uniqueid: String,
 }
 
 fn set_directories() -> io::Result<PathBuf> {
@@ -174,8 +177,8 @@ impl App {
                 Line::from("2 : Create RSF"),
                 Line::from("3 : Create ICN"),
                 Line::from("4 : Set Author"),
-                //Line::from("5 : Create TitleID"),
-                //Line::from("6 : Create UniqueID"),
+                Line::from("5 : Create TitleID"),
+                Line::from("6 : Create UniqueID"),
                 Line::from(""),
                 Line::from(r"C : Make ¯\_(ツ)_/¯"),
                 Line::from("0 : Clean USER_FILES"),
@@ -434,7 +437,13 @@ impl App {
 
             if self.titleid_gen {
                 match key.code {
-                    KeyCode::Enter => {}
+                    KeyCode::Enter => {
+                               
+                    }
+
+                    KeyCode::Char('r') | KeyCode::Char('R') => {
+                        self.titleid = crate::titleid::generate();
+                    }
 
                     KeyCode::Esc => {
                         self.titleid_gen = false;
@@ -540,7 +549,8 @@ impl App {
                 }
 
                 KeyCode::Char('5') => {
-                    self.titleid_gen = true;   
+                    self.titleid_gen = true;
+                    self.titleid = crate::titleid::generate();   
                 }
 
                 KeyCode::Char('6') => {
@@ -750,7 +760,9 @@ impl Widget for &App {
             lines.push(Line::from(""));
             lines.push(Line::from("TitleID Creator").bold().fg(Color::Yellow));
             lines.push(Line::from(""));
-            lines.push(Line::from("Enter: Select    Esc: Cancel").fg(Color::DarkGray));
+            lines.push(Line::from(self.titleid.as_str()).fg(Color::White));
+            lines.push(Line::from(""));
+            lines.push(Line::from("Enter: Copy  R: New  Esc: Cancel").fg(Color::DarkGray));
         }
 
         if self.uniqueid_gen {

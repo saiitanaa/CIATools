@@ -12,6 +12,7 @@ dependencies = [
  "fs",
  "hostname",
  "image",
+ "rand 0.9.5",
  "ratatui",
  "reqwest",
  "rfd",
