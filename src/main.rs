@@ -76,6 +76,7 @@ pub struct App {
     icn_select_icon: bool,
 
     titleid_gen: bool,
+    uniqueid_gen: bool,
 }
 
 fn set_directories() -> io::Result<PathBuf> {
@@ -234,12 +235,8 @@ impl App {
                 match key.code {
                     KeyCode::Enter => {
                         self.author = self.author_input.clone();
-
                         save_author(&self.author)?;
-
-                        self.author_input.clear();
                         self.editing_author = false;
-
                         self.output
                             .push(format!("[+] Author set to: {}", self.author));
                     }
@@ -253,7 +250,6 @@ impl App {
                     }
 
                     KeyCode::Esc => {
-                        self.author_input.clear();
                         self.editing_author = false;
                     }
 
@@ -476,6 +472,34 @@ impl App {
                 return Ok(());
             }
 
+            if self.titleid_gen {
+                match key.code {
+                    KeyCode::Enter => {
+
+                    }
+
+                    KeyCode::Esc => {
+                        self.titleid_gen = false;
+                    }
+                    _ => {}
+                }
+                return Ok(());
+            }
+
+            if self.uniqueid_gen {
+                match key.code {
+                    KeyCode::Enter => {
+
+                    }
+
+                    KeyCode::Esc => {
+                        self.uniqueid_gen = false;
+                    }
+                    _ => {}
+                }
+                return Ok(());
+            }
+
             match key.code {
                 KeyCode::Char('q') | KeyCode::Char('Q') => {
                     self.exit = true;
@@ -558,12 +582,15 @@ impl App {
                 }
 
                 KeyCode::Char('4') => {
-                    self.author_input.clear();
                     self.editing_author = true;
                 }
 
                 KeyCode::Char('5') => {
                     self.titleid_gen = true;   
+                }
+
+                KeyCode::Char('6') => {
+                    self.uniqueid_gen = true;
                 }
 
                 KeyCode::Char('C') | KeyCode::Char('c') => {
@@ -852,6 +879,19 @@ impl Widget for &App {
             lines.push(
                 Line::from("Enter: Select    Esc: Cancel")
                     .fg(Color::DarkGray),
+            );
+        }
+
+        if self.uniqueid_gen {
+            lines.push(Line::from(""));
+            lines.push(
+                Line::from("UniqueID Creator")
+                    .bold()
+                    .fg(Color::Yellow),
+            );
+            lines.push(Line::from(""));
+            lines.push(
+                Line::from("Enter: Select    Esc: Cancel")
             );
         }
 
