@@ -24,6 +24,8 @@ use ratatui::{
 use crate::import::import_files;
 use crate::rsfcreator::rsf_config;
 
+use arboard::Clipboard;
+
 const VERSION: &str = "v26.3.0";
 
 fn main() -> io::Result<()> {
@@ -77,7 +79,7 @@ pub struct App {
     titleid_gen: bool,
     titleid: String,
     uniqueid_gen: bool,
-    uniqueid: String,
+    //uniqueid: String,
 }
 
 fn set_directories() -> io::Result<PathBuf> {
@@ -438,7 +440,18 @@ impl App {
             if self.titleid_gen {
                 match key.code {
                     KeyCode::Enter => {
-                               
+                        let mut clipboard = Clipboard::new().unwrap();
+                        match arboard::Clipboard::new()
+                            .and_then(|mut clipboard| clipboard.set_text(&self.titleid))
+                        {
+                            Ok(()) => {
+                                self.output.push("[+] Copied to clipboard.".to_string());
+                            }
+
+                            Err(error) => {
+                                self.output.push(format!("[!] Clipboard error: {error}"));
+                            }
+                        }
                     }
 
                     KeyCode::Char('r') | KeyCode::Char('R') => {
