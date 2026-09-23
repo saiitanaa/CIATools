@@ -18,6 +18,13 @@ RSF File Creator, SMDH File Creator, Edit Author, 2D-3D banner support, No depen
 | Windows | x64 | [Download](https://github.com/saiitanaa/CIATools/releases/latest/download/CIAToolsN-Win-x64.exe) |
 | Windows | Aarch64 | [Download](https://github.com/saiitanaa/CIATools/releases/latest/download/CIAToolsN-Win-aarch64.exe) |
 
+### Audit Security
+
+| Version | Link |
+|  ----:  | ---- |
+| 26.2.0  | [AUDIT](https://github.com/saiitanaa/CIATools/blob/main/AUDIT.md#ciatoolsn-v2620) |
+
+
 ### What's Changed ?
 
 **Switching to the CLI interface**. Faster for low-end PC and Better compatibility
