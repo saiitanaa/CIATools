@@ -51,13 +51,9 @@ To do this, **press** `1`.
 
 To do this, **press** `5` for TitleID Generator or `6` for UniqueID Generator 
 
-#### For TitleID Creator
+#### For TitleID & UniqueID Creator
 
-![Not implemented](./assets/titleid_generator.png)
-
-#### For UniqueID Creator
-
-![Not implemented](./assets/uniqueid_generator.png)
+![Demo image](./assets/titleid_creator.png)
 
 **Don't have** an `.rsf` or `.smdh` **file**? No problem—we'll **create them for you**!
 
@@ -65,23 +61,23 @@ To do this, **press** `2` for RSF or `3` for SMDH.
 
 #### For RSF File :
 
-![Description](./assets/rsf_creator.png)
+![Demo image](./assets/rsf_creator.png)
 
 #### For ICN File: 
 
-![Description](./assets/icn_creator.png)
+![Demo image](./assets/icn_creator.png)
 
 **Perfect! Now let's define an author.** 
 
 To do this, **press** `4`.
 
-![Description](./assets/author_dialog.png)
+![Demo image](./assets/author_dialog.png)
 
 **Now we can compile the homebrew!**
 
 To do this, **press** `C`.
 
-![Description](./assets/compile.png)
+![Demo image](./assets/compile.png)
 
 
 

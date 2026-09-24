@@ -27,7 +27,7 @@ use crate::rsfcreator::rsf_config;
 
 use arboard::Clipboard;
 
-const VERSION: &str = "v26.3.0";
+const VERSION: &str = "v26.2.1";
 
 fn main() -> io::Result<()> {
     print!("\x1b]0;CIAToolsN {}\x07", VERSION);
