@@ -22,8 +22,8 @@ RSF File Creator, SMDH File Creator, Edit Author, 2D-3D banner support, No depen
 
 | Version | Link |
 |  ----:  | ---- |
-| 26.2.0  | [AUDIT](https://github.com/saiitanaa/CIATools/blob/main/AUDIT.md#ciatoolsn-v2620) |
 | 26.2.1  | [AUDIT](https://github.com/saiitanaa/CIATools/blob/main/AUDIT.md#ciatoolsn-v2621) |
+| Other  | [AUDIT](https://github.com/saiitanaa/CIATools/blob/main/AUDIT.md) |
 
 ### What's Changed ?
 

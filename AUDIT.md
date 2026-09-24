@@ -1,7 +1,8 @@
 ### Audit History :
 ---
 
-#### CIAToolsN v26.2.0
+### Actual Version: 
+#### CIAToolsN v26.2.1
 
 Crate:     paste
 Version:   1.0.15
@@ -13,7 +14,11 @@ URL:       https://rustsec.org/advisories/RUSTSEC-2024-0436
 
 warning: 1 allowed warning found
 
-#### CIAToolsN v26.2.1
+---
+
+### Old versions: 
+
+#### CIAToolsN v26.2.0
 
 Crate:     paste
 Version:   1.0.15
