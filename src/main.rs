@@ -7,6 +7,7 @@ mod makerom;
 mod picker;
 mod rsfcreator;
 mod titleid;
+mod uniqueid;
 mod utils;
 
 use std::{fs, io, path::PathBuf, process::Command};
@@ -79,7 +80,7 @@ pub struct App {
     titleid_gen: bool,
     titleid: String,
     uniqueid_gen: bool,
-    //uniqueid: String,
+    uniqueid: String,
 }
 
 fn set_directories() -> io::Result<PathBuf> {
@@ -180,7 +181,6 @@ impl App {
                 Line::from("3 : Create ICN"),
                 Line::from("4 : Set Author"),
                 Line::from("5 : Create TitleID"),
-                Line::from("6 : Create UniqueID"),
                 Line::from(""),
                 Line::from(r"C : Make ¯\_(ツ)_/¯"),
                 Line::from("0 : Clean USER_FILES"),
@@ -441,11 +441,24 @@ impl App {
                 match key.code {
                     KeyCode::Enter => {
                         let mut clipboard = Clipboard::new().unwrap();
-                        match arboard::Clipboard::new()
-                            .and_then(|mut clipboard| clipboard.set_text(&self.titleid))
-                        {
+
+                        match clipboard.set_text(&self.uniqueid) {
                             Ok(()) => {
-                                self.output.push("[+] Copied to clipboard.".to_string());
+                                self.output.push("[+] UniqueID copied to clipboard.".to_string());
+                            }
+
+                            Err(error) => {
+                                self.output.push(format!("[!] Clipboard error: {error}"));
+                            }
+                        }
+                    }
+
+                    KeyCode::Char('t') | KeyCode::Char('T') => {
+                        let mut clipboard = Clipboard::new().unwrap();
+
+                        match clipboard.set_text(&self.titleid) {
+                            Ok(()) => {
+                                self.output.push("[+] TitleID copied to clipboard.".to_string());
                             }
 
                             Err(error) => {
@@ -456,25 +469,18 @@ impl App {
 
                     KeyCode::Char('r') | KeyCode::Char('R') => {
                         self.titleid = crate::titleid::generate();
+                        self.uniqueid = crate::uniqueid::from_title_id(&self.titleid);
+
+                        self.output.push("[+] New TitleID Generated".to_string());
                     }
 
                     KeyCode::Esc => {
                         self.titleid_gen = false;
                     }
+
                     _ => {}
                 }
-                return Ok(());
-            }
 
-            if self.uniqueid_gen {
-                match key.code {
-                    KeyCode::Enter => {}
-
-                    KeyCode::Esc => {
-                        self.uniqueid_gen = false;
-                    }
-                    _ => {}
-                }
                 return Ok(());
             }
 
@@ -568,6 +574,7 @@ impl App {
 
                 KeyCode::Char('6') => {
                     self.uniqueid_gen = true;
+                    self.uniqueid = crate::uniqueid::from_title_id(&self.titleid);
                 }
 
                 KeyCode::Char('C') | KeyCode::Char('c') => {
@@ -757,7 +764,7 @@ impl Widget for &App {
                 1 => ("CompanyCode:", "(Ex: SAAA)"),
                 2 => ("ProductCode:", "(Ex: CTR-P-XXXX)"),
                 3 => ("RomFs Path:", "(Ex: ./romfs)"),
-                4 => ("UniqueId:", "(Ex: 0x7BE00)"),
+                4 => ("UniqueId:", "No UniqueID? Press 5"),
                 5 => ("SaveDataSize:", "(Ex: 128KB)"),
                 6 => ("CpuSpeed:", "(804MHz New 3DS, 268MHz Old 3DS)"),
                 _ => ("", ""),
@@ -771,18 +778,16 @@ impl Widget for &App {
 
         if self.titleid_gen {
             lines.push(Line::from(""));
-            lines.push(Line::from("TitleID Creator").bold().fg(Color::Yellow));
+            lines.push(Line::from("TitleID & UniqueID Creator").bold().fg(Color::Yellow));
             lines.push(Line::from(""));
+            lines.push(Line::from("TitleID:"));
             lines.push(Line::from(self.titleid.as_str()).fg(Color::White));
             lines.push(Line::from(""));
-            lines.push(Line::from("Enter: Copy  R: New  Esc: Cancel").fg(Color::DarkGray));
-        }
-
-        if self.uniqueid_gen {
+            lines.push(Line::from("UniqueID:"));
+            lines.push(Line::from(crate::uniqueid::from_title_id(&self.titleid)).fg(Color::White));
             lines.push(Line::from(""));
-            lines.push(Line::from("UniqueID Creator").bold().fg(Color::Yellow));
-            lines.push(Line::from(""));
-            lines.push(Line::from("Enter: Select    Esc: Cancel"));
+            lines.push(Line::from("Enter: Copy UniqueID  T: Copy TitleID").fg(Color::DarkGray));
+            lines.push(Line::from("R: New  Esc: Cancel").fg(Color::DarkGray));
         }
 
         if self.icn_edit {
