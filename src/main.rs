@@ -148,7 +148,7 @@ impl App {
                     self.output.push(format!("[!] Latest release: {}", release.tag_name));
 
                     if release.tag_name != VERSION {
-                        self.output.push(r"[+] New update available :)".to_string());
+                        self.output.push(r"[+] New update available :D".to_string());
                     } else {
                         self.output.push("[+] Up to date ;3".to_string());
                     }
@@ -190,11 +190,11 @@ impl App {
                 Line::from("- Editor Tools -"),
                 Line::from("6 : Edit RSF"),
                 Line::from(""),
-                Line::from("- Project Options -"),
+                Line::from("- Project Manager -"),
                 Line::from(r"C : Make ¯\_(ツ)_/¯"),
-                Line::from("S : Save Project ^^"),
                 Line::from("0 : Clean USER_FILES"),
                 Line::from("9 : Open USER_FILES"),
+                Line::from("S : Save Project"),
                 Line::from(""),
                 Line::from("- CIATools Options -"),
                 Line::from("K : Clear Console"),
@@ -774,6 +774,9 @@ impl Widget for &App {
             lines.push(Line::from(""));
             lines.push(Line::from(format!("Add a project name : {}", self.project)).fg(Color::White));
             lines.push(Line::from("Enter: Confirm    Esc: Cancel").fg(Color::DarkGray));
+        } else if !self.project.is_empty() {
+            lines.push(Line::from(""));
+            lines.push(Line::from(format!("Project name defined: {}", self.project)).fg(Color::White));
         }
 
         if self.rsf_edit {
