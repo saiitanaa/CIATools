@@ -112,7 +112,7 @@ Dependencies of **CIAToolsN** (everything else in the `cargo tree` is just their
 
 #### AI Utilisation
 
-Artificial intelligence was **used** only for complex compilation **errors**. It was **not** used to generate assets or ready-made code.
+Artificial intelligence is **no longer** used in **ANY** context; **complex problems** are no longer solved by AI. They are **solved** by **my brain** 🙈
 
 ### Credit <3
 
