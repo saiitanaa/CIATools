@@ -27,7 +27,7 @@ use crate::rsfcreator::rsf_config;
 
 use arboard::Clipboard;
 
-const VERSION: &str = "v26.2.1";
+const VERSION: &str = "v26.3.1";
 
 fn main() -> io::Result<()> {
     print!("\x1b]0;CIAToolsN {}\x07", VERSION);
@@ -64,6 +64,10 @@ pub struct App {
     author_input: String,
     editing_author: bool,
 
+    project: String,
+    project_input: String,
+    add_project: bool,
+
     rsf_edit: bool,
     rsf_field: usize,
     rsf_input: String,
@@ -90,9 +94,9 @@ fn set_directories() -> io::Result<PathBuf> {
         .to_path_buf();
 
     let user_files = bin_path.join("DATA").join("USER_FILES");
-
+    let project_folder = bin_path.join("DATA").join("PROJECT_DATA");
     fs::create_dir_all(&user_files)?;
-
+    fs::create_dir_all(&project_folder)?;
     Ok(user_files)
 }
 
@@ -176,16 +180,23 @@ impl App {
 
         frame.render_widget(
             Paragraph::new(vec![
+                Line::from("- Creator Tools -"),
                 Line::from("1 : Import HB Files"),
                 Line::from("2 : Create RSF"),
                 Line::from("3 : Create ICN"),
                 Line::from("4 : Set Author"),
                 Line::from("5 : Create TitleID"),
                 Line::from(""),
+                Line::from("- Editor Tools -"),
+                Line::from("6 : Edit RSF"),
+                Line::from(""),
+                Line::from("- Project Options -"),
                 Line::from(r"C : Make ¯\_(ツ)_/¯"),
+                Line::from("S : Save Project ^^"),
                 Line::from("0 : Clean USER_FILES"),
                 Line::from("9 : Open USER_FILES"),
                 Line::from(""),
+                Line::from("- CIATools Options -"),
                 Line::from("K : Clear Console"),
                 Line::from("Q : Quit"),
                 Line::from("H : Help !!"),
@@ -249,6 +260,15 @@ impl App {
                 }
 
                 return Ok(());
+            }
+
+            if self.add_project {
+                match key.code {
+                    KeyCode::Esc => {
+                        self.add_project = false;
+                    }
+                    _ => {}
+                }
             }
 
             if self.rsf_edit {
@@ -490,8 +510,7 @@ impl App {
                 }
 
                 KeyCode::Char('h') | KeyCode::Char('H') => {
-                    #[cfg(target_os = "macos")]
-                    {
+                    #[cfg(target_os = "macos")] {
                         self.output.push("[!] NO PROBLEM !!".to_string());
                         Command::new("open")
                             .arg("https://github.com/saiitanaa/CIATools/blob/main/README.md")
@@ -499,8 +518,7 @@ impl App {
                             .ok();
                     }
 
-                    #[cfg(target_os = "windows")]
-                    {
+                    #[cfg(target_os = "windows")] {
                         self.output.push("[!] NO PROBLEM !!!".to_string());
                         Command::new("start")
                             .arg("https://github.com/saiitanaa/CIATools/blob/main/README.md")
@@ -508,14 +526,18 @@ impl App {
                             .ok();
                     }
 
-                    #[cfg(target_os = "linux")]
-                    {
+                    #[cfg(target_os = "linux")] {
                         self.output.push("[!] NO PROBLEM !!!!".to_string());
                         Command::new("xdg-open")
                             .arg("https://github.com/saiitanaa/CIATools/blob/main/README.md")
                             .status()
                             .ok();
                     }
+                }
+
+                KeyCode::Char('s') | KeyCode::Char('S') => {
+                    self.output.push("[+] Save DATA/PROJECT_DATA...".to_string());
+                    self.add_project = true;
                 }
 
                 KeyCode::Char('k') | KeyCode::Char('K') => {
@@ -570,12 +592,7 @@ impl App {
                 KeyCode::Char('5') => {
                     self.titleid_gen = true;
                     self.titleid = crate::titleid::generate();   
-                }
-
-                KeyCode::Char('6') => {
-                    self.uniqueid_gen = true;
-                    self.uniqueid = crate::uniqueid::from_title_id(&self.titleid);
-                }
+                }  
 
                 KeyCode::Char('C') | KeyCode::Char('c') => {
                     self.output.push("[+] CIA Compiling...".to_string());
@@ -715,7 +732,6 @@ fn user_files_path() -> io::Result<PathBuf> {
         .to_path_buf();
 
     let user_files = bin_path.join("DATA").join("USER_FILES");
-
     fs::create_dir_all(&user_files)?;
     Ok(user_files)
 }
@@ -752,6 +768,12 @@ impl Widget for &App {
         } else if !self.author.is_empty() {
             lines.push(Line::from(""));
             lines.push(Line::from(format!("Author defined: {}", self.author)).fg(Color::White));
+        }
+
+        if self.add_project {
+            lines.push(Line::from(""));
+            lines.push(Line::from(format!("Add a project name : {}", self.project)).fg(Color::White));
+            lines.push(Line::from("Enter: Confirm    Esc: Cancel").fg(Color::DarkGray));
         }
 
         if self.rsf_edit {
