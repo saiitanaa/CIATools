@@ -264,11 +264,22 @@ impl App {
 
             if self.add_project {
                 match key.code {
+                    KeyCode::Enter => {
+                        self.add_project = false;
+                        self.output.push(format!("result : {}", self.project_input));
+                    }
+
+                    KeyCode::Backspace => {
+                        self.project_input.pop();
+                    }
+
                     KeyCode::Esc => {
                         self.add_project = false;
                     }
+
                     _ => {}
                 }
+                return Ok(());
             }
 
             if self.rsf_edit {
@@ -535,11 +546,6 @@ impl App {
                     }
                 }
 
-                KeyCode::Char('s') | KeyCode::Char('S') => {
-                    self.output.push("[+] Save DATA/PROJECT_DATA...".to_string());
-                    self.add_project = true;
-                }
-
                 KeyCode::Char('k') | KeyCode::Char('K') => {
                     self.output.clear();
                 }
@@ -587,6 +593,11 @@ impl App {
 
                 KeyCode::Char('4') => {
                     self.editing_author = true;
+                }
+
+                KeyCode::Char('S') | KeyCode::Char('s') => {
+                    self.output.push("[+] Save DATA/PROJECT_DATA...".to_string());
+                    self.add_project = true;
                 }
 
                 KeyCode::Char('5') => {
@@ -718,7 +729,6 @@ impl App {
                 _ => {}
             }
         }
-
         Ok(())
     }
 }
@@ -772,7 +782,7 @@ impl Widget for &App {
 
         if self.add_project {
             lines.push(Line::from(""));
-            lines.push(Line::from(format!("Add a project name : {}", self.project)).fg(Color::White));
+            lines.push(Line::from(format!("Add a project name : {}", self.project_input)).fg(Color::White));
             lines.push(Line::from("Enter: Confirm    Esc: Cancel").fg(Color::DarkGray));
         } else if !self.project.is_empty() {
             lines.push(Line::from(""));
