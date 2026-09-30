@@ -196,7 +196,7 @@ impl App {
                 Line::from(""),
                 // Project management
                 Line::from("---- Project Manager ---"),
-                Line::from(r"C : Make ¯\_(ツ)_/¯    |"),
+                Line::from("C : Make CIA           |"),
                 Line::from("0 : Clean USER_FILES   |"),
                 Line::from("9 : Open USER_FILES    |"),
                 Line::from("S : Save Project       |"),
@@ -207,8 +207,6 @@ impl App {
                 Line::from("K : Clear Console      |"),
                 Line::from("Q : Quit               |"),
                 Line::from("H : Help !!            |"),
-                Line::from("                       |"),
-                Line::from("Y : Check Updates      |"),
                 Line::from("------------------------"),
             ])
             .block(
@@ -273,11 +271,10 @@ impl App {
             if self.add_project {
                 match key.code {
                     KeyCode::Enter => {
+                        self.project = self.project_input.clone();
+                        save_project(&self.project)?;
                         self.add_project = false;
-                            let _ = Command::new("mkdir")
-                                .arg(format!("target/debug/DATA/PROJECT_DATA/{}", self.project_input))
-                                .output()
-                                .expect("[!] Project Creation Failed!");
+                        self.output.push(format!("[+] name: {}", self.project));
                     }
 
                     KeyCode::Backspace => {
@@ -565,10 +562,6 @@ impl App {
                     self.output.clear();
                 }
 
-                KeyCode::Char('y') | KeyCode::Char('Y') => {
-                    self.update();
-                }
-
                 KeyCode::Char('1') => {
                     self.output.push("[?] Import FileDialog".to_string());
                     ratatui::restore();
@@ -679,7 +672,7 @@ impl App {
                             );
 
                             if result == 0 {
-                                self.output.push(format!("[+] CIA created: {}", output.display()));
+                                self.output.push(format!(r"[+] CIA created ¯\_(ツ)_/¯ :  {}", output.display()));
                             } else {
                                 self.output.push(format!("[!] makerom failed with code: {result}"));
                             }
@@ -761,6 +754,19 @@ fn user_files_path() -> io::Result<PathBuf> {
     Ok(user_files)
 }
 
+fn project_folder_path() -> io::Result<PathBuf> {
+    let project_path = std::env::current_exe()?
+        .parent()
+        .ok_or_else(|| {
+            io::Error::other("[!] Project Folder PATH error!")
+        })?
+        .to_path_buf();
+
+    let project_folder = project_path.join("DATA").join("PROJECT_DATA");
+    fs::create_dir_all(&project_folder)?;
+    Ok(project_folder)
+}
+
 fn load_author() -> io::Result<String> {
     let path = user_files_path()?.join("author.txt");
 
@@ -773,6 +779,12 @@ fn load_author() -> io::Result<String> {
 fn save_author(author: &str) -> io::Result<()> {
     let path = user_files_path()?.join("author.txt");
     fs::write(path, author)?;
+    Ok(())
+}
+
+fn save_project(project: &str) -> io::Result<()> {
+    let path = project_folder_path()?.join(format!("{}", project));
+    fs::create_dir(path)?;
     Ok(())
 }
 
