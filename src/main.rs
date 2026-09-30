@@ -181,34 +181,35 @@ impl App {
         frame.render_widget(
             Paragraph::new(vec![
                 // HB Management
-                Line::from("----- Creator Tools ----"),
-                Line::from("1 : Import HB Files    |"),
-                Line::from("2 : Create RSF         |"),
-                Line::from("3 : Create ICN         |"),
-                Line::from("4 : Set Author         |"),
-                Line::from("5 : Create TitleID     |"),
-                Line::from("------------------------"),
+                Line::from("----- Creator Tools -----"),
+                Line::from("1 : Import HB Files     |"),
+                Line::from("2 : Create RSF          |"),
+                Line::from("3 : Create ICN          |"),
+                Line::from("4 : Set Author          |"),
+                Line::from("5 : Create TitleID      |"),
+                Line::from("-------------------------"),
                 Line::from(""),
                 // File management
-                Line::from("----- Editor Tools -----"),
-                Line::from("6 : Edit RSF           |"),
-                Line::from("------------------------"),
+                Line::from("----- Editor Tools ------"),
+                Line::from("6 : Edit RSF            |"),
+                Line::from("-------------------------"),
                 Line::from(""),
                 // Project management
-                Line::from("---- Project Manager ---"),
-                Line::from("C : Make CIA           |"),
-                Line::from("0 : Clean USER_FILES   |"),
-                Line::from("9 : Open USER_FILES    |"),
-                Line::from("O : Open PROJECT_DATA  |"),
-                Line::from("S : Save Project       |"),
-                Line::from("------------------------"),
+                Line::from("---- Project Manager ----"),
+                Line::from("C : Make CIA            |"),
+                Line::from("S : Save Project        |"),
+                Line::from("0 : Clean USER_FILES    |"),
+                Line::from("9 : Open USER_FILES     |"),
+                Line::from("O : Open PROJECT_DATA   |"),
+                Line::from("-------------------------"),
                 Line::from(""),
                 // CIATools settings
-                Line::from("--- CIATools Options ---"),
-                Line::from("K : Clear Console      |"),
-                Line::from("Q : Quit               |"),
-                Line::from("H : Help !!            |"),
-                Line::from("------------------------"),
+                Line::from("--- CIATools Options ----"),
+                Line::from("L : List Project Folder |"),
+                Line::from("K : Clear Console       |"),
+                Line::from("Q : Quit                |"),
+                Line::from("H : Using CIAToolsN     |"),
+                Line::from("-------------------------"),
             ])
             .block(
                 Block::new()
@@ -563,6 +564,10 @@ impl App {
                     self.output.clear();
                 }
 
+                KeyCode::Char('l') | KeyCode::Char('L') => {
+                    self.output.push("[+] List Project Folder".to_string());
+                }
+
                 KeyCode::Char('1') => {
                     self.output.push("[?] Import FileDialog".to_string());
                     ratatui::restore();
@@ -759,7 +764,6 @@ impl App {
                                 }
                             }
                         }
-
                 _ => {}
             }
         }
