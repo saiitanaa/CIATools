@@ -199,6 +199,7 @@ impl App {
                 Line::from("C : Make CIA           |"),
                 Line::from("0 : Clean USER_FILES   |"),
                 Line::from("9 : Open USER_FILES    |"),
+                Line::from("O : Open PROJECT_DATA  |"),
                 Line::from("S : Save Project       |"),
                 Line::from("------------------------"),
                 Line::from(""),
@@ -706,16 +707,13 @@ impl App {
                     match user_files_path() {
                         Ok(path) => {
                             #[cfg(target_os = "macos")]
-                            let result =
-                                Command::new("open").arg(&path).spawn();
+                            let result = Command::new("open").arg(&path).spawn();
 
                             #[cfg(target_os = "linux")]
-                            let result =
-                                Command::new("xdg-open").arg(&path).spawn();
+                            let result = Command::new("xdg-open").arg(&path).spawn();
 
                             #[cfg(target_os = "windows")]
-                            let result =
-                                Command::new("explorer").arg(&path).spawn();
+                            let result = Command::new("explorer").arg(&path).spawn();
 
                             match result {
                                 Ok(_) => {
@@ -733,6 +731,34 @@ impl App {
                         }
                     }
                 }
+
+                KeyCode::Char('O') | KeyCode::Char('o') => {
+                    match project_folder_path() {
+                        Ok(path) => {
+                            #[cfg(target_os = "macos")]
+                            let result = Command::new("open").arg(&path).spawn();
+
+                            #[cfg(target_os = "linux")]
+                            let result = Command::new("xdg-open").arg(&path).spawn();
+
+                            #[cfg(target_os = "windows")]
+                            let result = Command::new("explorer").arg(&path).spawn();
+
+                            match result {
+                                Ok(_) => {
+                                    self.output.push("[+] Open PROJECT_DATA".to_string());
+                                }
+
+                                Err(error) => {
+                                    self.output.push(format!("[!] Failed to open PROJECT_DATA: {error}"));
+                                }
+                            }
+                        }
+                                Err(error) => {
+                                    self.output.push(format!("[!] Failed to open PROJECT_DATA: {error}"));
+                                }
+                            }
+                        }
 
                 _ => {}
             }
