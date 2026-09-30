@@ -266,7 +266,11 @@ impl App {
                 match key.code {
                     KeyCode::Enter => {
                         self.add_project = false;
-                        self.output.push(format!("result : {}", self.project_input));
+                        #[cfg(target_os = "macos")]
+                            let _ = Command::new("mkdir")
+                                .arg(format!("target/debug/DATA/PROJECT_DATA/{}", self.project_input))
+                                .output()
+                                .expect("[!] Project Creation Failed!");
                     }
 
                     KeyCode::Backspace => {
