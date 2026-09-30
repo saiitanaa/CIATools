@@ -148,7 +148,7 @@ impl App {
                     self.output.push(format!("[!] Latest release: {}", release.tag_name));
 
                     if release.tag_name != VERSION {
-                        self.output.push(r"[+] New update available :D".to_string());
+                        self.output.push(r"[+] New Version available :D".to_string());
                     } else {
                         self.output.push("[+] Up to date ;3".to_string());
                     }
@@ -172,36 +172,44 @@ impl App {
             .constraints([
                 Constraint::Percentage(40),
                 Constraint::Percentage(40),
-                Constraint::Percentage(20),
+                Constraint::Percentage(30),
             ])
             .split(frame.area());
 
-        frame.render_widget(self, outer_layout[0]);
+        frame.render_widget(self, outer_layout[1]);
 
         frame.render_widget(
             Paragraph::new(vec![
-                Line::from("- Creator Tools -"),
-                Line::from("1 : Import HB Files"),
-                Line::from("2 : Create RSF"),
-                Line::from("3 : Create ICN"),
-                Line::from("4 : Set Author"),
-                Line::from("5 : Create TitleID"),
+                // HB Management
+                Line::from("----- Creator Tools ----"),
+                Line::from("1 : Import HB Files    |"),
+                Line::from("2 : Create RSF         |"),
+                Line::from("3 : Create ICN         |"),
+                Line::from("4 : Set Author         |"),
+                Line::from("5 : Create TitleID     |"),
+                Line::from("------------------------"),
                 Line::from(""),
-                Line::from("- Editor Tools -"),
-                Line::from("6 : Edit RSF"),
+                // File management
+                Line::from("----- Editor Tools -----"),
+                Line::from("6 : Edit RSF           |"),
+                Line::from("------------------------"),
                 Line::from(""),
-                Line::from("- Project Manager -"),
-                Line::from(r"C : Make ¯\_(ツ)_/¯"),
-                Line::from("0 : Clean USER_FILES"),
-                Line::from("9 : Open USER_FILES"),
-                Line::from("S : Save Project"),
+                // Project management
+                Line::from("---- Project Manager ---"),
+                Line::from(r"C : Make ¯\_(ツ)_/¯    |"),
+                Line::from("0 : Clean USER_FILES   |"),
+                Line::from("9 : Open USER_FILES    |"),
+                Line::from("S : Save Project       |"),
+                Line::from("------------------------"),
                 Line::from(""),
-                Line::from("- CIATools Options -"),
-                Line::from("K : Clear Console"),
-                Line::from("Q : Quit"),
-                Line::from("H : Help !!"),
-                Line::from(""),
-                Line::from("Y : Check Updates"),
+                // CIATools settings
+                Line::from("--- CIATools Options ---"),
+                Line::from("K : Clear Console      |"),
+                Line::from("Q : Quit               |"),
+                Line::from("H : Help !!            |"),
+                Line::from("                       |"),
+                Line::from("Y : Check Updates      |"),
+                Line::from("------------------------"),
             ])
             .block(
                 Block::new()
@@ -225,7 +233,7 @@ impl App {
                     .title(" CONSOLE ".bold())
                     .border_set(border::THICK),
             ),
-            outer_layout[1],
+            outer_layout[0],
         );
     }
 
@@ -266,7 +274,6 @@ impl App {
                 match key.code {
                     KeyCode::Enter => {
                         self.add_project = false;
-                        #[cfg(target_os = "macos")]
                             let _ = Command::new("mkdir")
                                 .arg(format!("target/debug/DATA/PROJECT_DATA/{}", self.project_input))
                                 .output()
