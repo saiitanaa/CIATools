@@ -5,7 +5,17 @@
 **`CIATools`** is **all-in-one tool** for compiling your **projects** into `.cia` format with ease.
 
 ### Included :
-RSF File Creator, SMDH File Creator, Edit Author, 2D-3D banner support, No dependencies required, `makeROM` & `bannertool` librairies included, ICN File Creator
+RSF File Creator, SMDH File Creator, Edit Author, 2D-3D banner support, No dependencies required, `makeROM` & `bannertool` librairies included, ICN File Creator, Long-term support with regular updates.
+
+## Index
+
+> Security : <a href="https://github.com/saiitanaa/CIATools/blob/main/AUDIT.md">Check Audit</a>
+
+> Usage : <a href="https://github.com/saiitanaa/CIATools/blob/main/USAGE.md">Use CIATools</a>
+
+> Contributing : <a href="#contribute-to-ciatools">Check</a>
+
+> Credits : <a href="#credits-3">Check</a> | History : <a href="#history">Look</a>
 
 ## Downloads
 
@@ -13,89 +23,26 @@ RSF File Creator, SMDH File Creator, Edit Author, 2D-3D banner support, No depen
 |---|---|---|
 | macOS | Aarch64 | [Download](https://github.com/saiitanaa/CIATools/releases/latest/download/CIAToolsN-OSX-aarch64) |
 | macOS | x64 | [Compile Required](#compiling) |
-| Linux | x64 | [Download](https://github.com/saiitanaa/CIATools/releases/download/v26.0.0/CIAToolsN-Linux-x64) |
+| Linux | x64 | [Download](https://github.com/saiitanaa/CIATools/releases/latest/download/CIAToolsN-Linux-x64) |
 | Linux | Aarch64 | [Download](https://github.com/saiitanaa/CIATools/releases/latest/download/CIAToolsN-Linux-aarch64) |
 | Windows | x64 | [Download](https://github.com/saiitanaa/CIATools/releases/latest/download/CIAToolsN-Win-x64.exe) |
 | Windows | Aarch64 | [Download](https://github.com/saiitanaa/CIATools/releases/latest/download/CIAToolsN-Win-aarch64.exe) |
 
-### Audit Security
+## What's changed with CIAToolsN? 
 
-| Version | Link |
-|  ----:  | ---- |
-| 26.2.1  | [AUDIT](https://github.com/saiitanaa/CIATools/blob/main/AUDIT.md#ciatoolsn-v2621) |
-| Other  | [AUDIT](https://github.com/saiitanaa/CIATools/blob/main/AUDIT.md) |
+**Switching to the CLI interface**. **Faster** for low-end PC and **Better** compatibility
 
-### What's Changed ?
+**Rewrite to full Rust**. Fast, easier contribution & single standalone binary
 
-**Switching to the CLI interface**. Faster for low-end PC and Better compatibility
+**Full cleaned code**. Cleaned **obsolete** code & functions, **complete** code **overhaul**
 
-**Passage to full Rust**. Very (very) **simple** for **compile** CIATools 
+**100% Native**. The **makeROM** and **Bannertool** libraries are **included** in the same executable file 
 
-**Full cleaned code**. Cleaned obsolete code & functions. Fast and light
+## Contribute to CIATools
 
-**Console**. Yes, finally a veritable console for debug !
+### Dependencies
 
-**100% Native**. The makeROM and Bannertool libraries are included in the same executable file 
-
-## Usage
-
-**Welcome to the interface!** To get started, **import the files** needed to create your **Homebrew** in `.cia` format.
-
-To do this, **press** `1`. 
-
-![Description](./assets/finder_select.png)
-
-**You're now in the file explorer!** Select all the **files** needed for **compilation**.
-
-**Don't have** an TitleID or UniqueID ? No problem ! we'll **create them for you** 😊
-
-To do this, **press** `5` for TitleID Generator or `6` for UniqueID Generator 
-
-#### For TitleID & UniqueID Creator
-
-![Demo image](./assets/titleid_creator.png)
-
-**Don't have** an `.rsf` or `.smdh` **file**? No problem—we'll **create them for you**!
-
-To do this, **press** `2` for RSF or `3` for SMDH.
-
-#### For RSF File :
-
-![Demo image](./assets/rsf_creator.png)
-
-#### For ICN File: 
-
-![Demo image](./assets/icn_creator.png)
-
-**Perfect! Now let's define an author.** 
-
-To do this, **press** `4`.
-
-![Demo image](./assets/author_dialog.png)
-
-**Now we can compile the homebrew!**
-
-To do this, **press** `C`.
-
-![Demo image](./assets/compile.png)
-
-
-
-### History
-
-**13-21 December 2025 | `CIATools`** -- Written in C# WinForms (only for Windows). Slow but stable (v1.0 -> v5)
-
-[Original Branch](https://github.com/saiitanaa/CIATools/tree/winforms)
-
-**29 May to 6 September 2026 | `CIAToolsR`** -- Written in C# (Windows, Linux, macOS). Fast but an interface that's too cluttered is less stable (v6-R -> v10.1.0)
-
-[Original Branch](https://github.com/saiitanaa/CIATools/tree/ciatoolsr)
-
-**Current | `CIAToolsN`** -- Written in Rust (Windows, Linux, macOS). Very Fast, CLI, Stable, Simple, Best compatibility (v26.0.0 and later...)
-
-## Compiling
-
-Dependencies of **CIAToolsN** (everything else in the `cargo tree` is just their transitive sub-dependencies):
+**Everything else in the `cargo tree` is just their transitive sub-dependencies**
 
 | Crate          | Version | Role                                                                             |
 | -------------- | ------: | -------------------------------------------------------------------------------- |
@@ -110,12 +57,54 @@ Dependencies of **CIAToolsN** (everything else in the `cargo tree` is just their
 | **serde**      |       1 | Serialization/deserialization framework                                          |
 | **serde_json** |       1 | JSON serialization/deserialization                                               |
 
-#### AI Utilisation
+---
 
-Artificial intelligence is **no longer** used in **ANY** context; **complex problems** are no longer solved by AI. They are **solved** by **my brain** 🙈
+### Project architecture
 
-### Credit <3
+| File           | Utility                                                                          |
+| -------------- | -------------------------------------------------------------------------------- |
+| `src/main.rs` | Manages the graphical user interface, inputs, and all features |
+| `src/rsfcreator.rs` | Manages RSF Creator backend |
+| `src/icncreator.rs` | Manages ICN Creator backend |
+| `src/uniqueid.rs` | Generate a random UniqueID for TitleID & UniqueID Creator |
+| `src/makerom.rs` | Manage makerom C librairies |
+| `src/build.rs` | Managing the Compilation of the Final Binary |
+| `makerom/` | MakeROM C libraries |
+| `bannetool/` | Bannertool C libraries |
+
+---
+
+### Compile
+
+**Necessary** file for **compilation** : `src/build.rs`
+
+Make **sure** you're in the project's **root** directory
+
+#### Release binary -> `cargo build --release`
+
+#### Debug/Dev binary -> `cargo build` 
+
+---
+
+## History
+
+**13-21 December 2025 | `CIATools`** -- Written in C# WinForms (only for Windows). Slow but stable (v1.0 -> v5)
+
+[Original Branch](https://github.com/saiitanaa/CIATools/tree/winforms)
+
+**29 May to 6 September 2026 | `CIAToolsR`** -- Written in C# (Windows, Linux, macOS). Fast but an interface that's too cluttered is less stable (v6-R -> v10.1.0)
+
+[Original Branch](https://github.com/saiitanaa/CIATools/tree/ciatoolsr)
+
+**Current | `CIAToolsN`** -- Written in Rust (Windows, Linux, macOS). Very Fast, CLI, Stable, Simple, Best compatibility (v26.0.0 and later...)
+
+
+## Credits <3
 
 Thanks for makeROM source code : https://github.com/3DSGuy/Project_CTR
 
 Thanks for bannertool source code : https://github.com/diasurgical/bannertool
+
+### AI Utilisation
+
+Artificial intelligence is **no longer** used in any context, **complex problems** are no longer solved by AI.
