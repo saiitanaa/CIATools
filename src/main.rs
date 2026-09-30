@@ -170,9 +170,9 @@ impl App {
             .direction(Direction::Horizontal)
             .margin(1)
             .constraints([
-                Constraint::Percentage(40),
-                Constraint::Percentage(40),
-                Constraint::Percentage(30),
+                Constraint::Percentage(35),
+                Constraint::Percentage(45),
+                Constraint::Percentage(20),
             ])
             .split(frame.area());
 
