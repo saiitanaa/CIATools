@@ -4,14 +4,16 @@
 
 **`CIATools`** is **all-in-one tool** for compiling your **projects** into `.cia` format with ease.
 
-### Included :
-RSF File Creator, SMDH File Creator, Edit Author, 2D-3D banner support, No dependencies required, `makeROM` & `bannertool` librairies included, ICN File Creator, Long-term support with regular updates.
+### Features :
+RSF File Creator, SMDH File Creator, ICN File Creator, Edit Author, 2D-3D banner support, 
+
+No dependencies required "*except for contributions*", `makeROM` & `bannertool` librairies included, Actively maintained.
 
 ## Index
 
 > Security : <a href="https://github.com/saiitanaa/CIATools/blob/main/AUDIT.md">Check Audit</a>
 
-> Usage : <a href="https://github.com/saiitanaa/CIATools/blob/main/USAGE.md">Use CIATools</a>
+> Usage & Installation : <a href="https://github.com/saiitanaa/CIATools/blob/main/USAGE.md">Use CIATools</a>
 
 > Contributing : <a href="#contribute-to-ciatools">Check</a>
 
@@ -30,13 +32,13 @@ RSF File Creator, SMDH File Creator, Edit Author, 2D-3D banner support, No depen
 
 ## What's changed with CIAToolsN? 
 
-**Switching to the CLI interface**. **Faster** for low-end PC and **Better** compatibility
+**Switching to the TUI** | **Faster** for **low-end** PC
 
-**Rewrite to full Rust**. Fast, easier contribution & single standalone binary
+**Rewrite to Full Rust** | **Native** standalone **binary** with no .NET runtime required
 
-**Full cleaned code**. Cleaned **obsolete** code & functions, **complete** code **overhaul**
+**Full cleaned code** | Better file organization, **Complete** code **overhaul** with `CIAToolsR`
 
-**100% Native**. The **makeROM** and **Bannertool** libraries are **included** in the same executable file 
+**Better Compatibility** | The **makeROM** and **Bannertool** libraries are **included** in the same executable **binary** 
 
 ## Contribute to CIATools
 
@@ -63,20 +65,20 @@ RSF File Creator, SMDH File Creator, Edit Author, 2D-3D banner support, No depen
 
 | File           | Utility                                                                          |
 | -------------- | -------------------------------------------------------------------------------- |
-| `src/main.rs` | Manages the graphical user interface, inputs, and all features |
+| `src/main.rs` | Manages the user interface, inputs, and all features |
 | `src/rsfcreator.rs` | Manages RSF Creator backend |
 | `src/icncreator.rs` | Manages ICN Creator backend |
-| `src/uniqueid.rs` | Generate a random UniqueID for TitleID & UniqueID Creator |
+| `src/uniqueid.rs` | Generates a random UniqueID for **TitleID & UniqueID Creator** |
 | `src/makerom.rs` | Manage makerom C librairies |
-| `src/build.rs` | Managing the Compilation of the Final Binary |
+| `src/build.rs` | Manages compilation of the Final Binary |
 | `makerom/` | MakeROM C libraries |
-| `bannetool/` | Bannertool C libraries |
+| `bannertool/` | Bannertool C libraries |
 
 ---
 
 ### Compile
 
-**Necessary** file for **compilation** : `src/build.rs`
+Necessary file for **compilation** : `src/build.rs`
 
 Make **sure** you're in the project's **root** directory
 
@@ -96,7 +98,7 @@ Make **sure** you're in the project's **root** directory
 
 [Original Branch](https://github.com/saiitanaa/CIATools/tree/ciatoolsr)
 
-**Current | `CIAToolsN`** -- Written in Rust (Windows, Linux, macOS). Very Fast, CLI, Stable, Simple, Best compatibility (v26.0.0 and later...)
+**Current | `CIAToolsN`** -- Written in Rust (Windows, Linux, macOS). Fast, TUI, Stable, Simple, Best compatibility (v26.0.0 and later...)
 
 
 ## Credits <3
@@ -107,4 +109,4 @@ Thanks for bannertool source code : https://github.com/diasurgical/bannertool
 
 ### AI Utilisation
 
-Artificial intelligence is **no longer** used in any context, **complex problems** are no longer solved by AI.
+AI is no longer used in the project

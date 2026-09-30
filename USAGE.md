@@ -1,3 +1,12 @@
+# Installation
+
+| Platform ||
+|---|---|
+| macOS | `chmod +x ./path/to/CIAToolsN` && `./CIAToolsN` | 
+| Windows | Execute `.exe` file |
+| Linux | `chmod +x ./path/to/CIAToolsN` && `./CIAToolsN` |
+
+
 # Usage
 
 **Welcome to the interface!** To get started, **import the files** needed to create your **Homebrew** in `.cia` format.
