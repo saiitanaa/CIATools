@@ -273,6 +273,10 @@ impl App {
                         self.project_input.pop();
                     }
 
+                    KeyCode::Char(c) => {
+                        self.project_input.push(c);
+                    }
+
                     KeyCode::Esc => {
                         self.add_project = false;
                     }
