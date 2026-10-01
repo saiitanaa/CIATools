@@ -145,13 +145,7 @@ impl App {
         {
             Ok(response) => match response.json::<Release>() {
                 Ok(release) => {
-                    self.output.push(format!("[!] Latest release: {}", release.tag_name));
-
-                    if release.tag_name != VERSION {
-                        self.output.push(r"[+] New Version available :D".to_string());
-                    } else {
-                        self.output.push("[+] Up to date ;3".to_string());
-                    }
+                    self.output.push(format!("[!] Latest GitHub release: {}", release.tag_name));
                 }
 
                 Err(_) => {
@@ -181,35 +175,31 @@ impl App {
         frame.render_widget(
             Paragraph::new(vec![
                 // HB Management
-                Line::from("----- Creator Tools -----"),
-                Line::from("1 : Import HB Files     |"),
-                Line::from("2 : Create RSF          |"),
-                Line::from("3 : Create ICN          |"),
-                Line::from("4 : Set Author          |"),
-                Line::from("5 : Create TitleID      |"),
-                Line::from("-------------------------"),
+                Line::from("●   Creator Tools"),
+                Line::from("1 : Import HB Files"),
+                Line::from("2 : Create RSF"),
+                Line::from("3 : Create ICN"),
+                Line::from("4 : Set Author"),
+                Line::from("5 : Create TitleID"),
                 Line::from(""),
                 // File management
-                Line::from("----- Editor Tools ------"),
-                Line::from("6 : Edit RSF            |"),
-                Line::from("-------------------------"),
+                Line::from("●   Editor Tools"),
+                Line::from("6 : Edit RSF"),
                 Line::from(""),
                 // Project management
-                Line::from("---- Project Manager ----"),
-                Line::from("C : Make CIA            |"),
-                Line::from("S : Save Project        |"),
-                Line::from("0 : Clean USER_FILES    |"),
-                Line::from("9 : Open USER_FILES     |"),
-                Line::from("O : Open PROJECT_DATA   |"),
-                Line::from("-------------------------"),
+                Line::from("●   Project Manager"),
+                Line::from("C : Make CIA"),
+                Line::from("S : Save Project"),
+                Line::from("0 : Clean USER_FILES"),
+                Line::from("9 : Open USER_FILES"),
+                Line::from("O : Open PROJECT_DATA"),
                 Line::from(""),
                 // CIATools settings
-                Line::from("--- CIATools Options ----"),
-                Line::from("L : List Project Folder |"),
-                Line::from("K : Clear Console       |"),
-                Line::from("Q : Quit                |"),
-                Line::from("H : Using CIAToolsN     |"),
-                Line::from("-------------------------"),
+                Line::from("●   CIATools Options"),
+                Line::from("L : List Project Folder"),
+                Line::from("K : Clear Console"),
+                Line::from("Q : Quit"),
+                Line::from("H : Using CIAToolsN"),
             ])
             .block(
                 Block::new()
@@ -536,25 +526,25 @@ impl App {
 
                 KeyCode::Char('h') | KeyCode::Char('H') => {
                     #[cfg(target_os = "macos")] {
-                        self.output.push("[!] NO PROBLEM !!".to_string());
+                        self.output.push("[!] Redirect to USAGE.md".to_string());
                         Command::new("open")
-                            .arg("https://github.com/saiitanaa/CIATools/blob/main/README.md")
+                            .arg("https://github.com/saiitanaa/CIATools/blob/main/USAGE.md")
                             .status()
                             .ok();
                     }
 
                     #[cfg(target_os = "windows")] {
-                        self.output.push("[!] NO PROBLEM !!!".to_string());
+                        self.output.push("[!] Redirect to USAGE.md".to_string());
                         Command::new("start")
-                            .arg("https://github.com/saiitanaa/CIATools/blob/main/README.md")
+                            .arg("https://github.com/saiitanaa/CIATools/blob/main/USAGE.md")
                             .status()
                             .ok();
                     }
 
                     #[cfg(target_os = "linux")] {
-                        self.output.push("[!] NO PROBLEM !!!!".to_string());
+                        self.output.push("[!] Redirect to USAGE.md".to_string());
                         Command::new("xdg-open")
-                            .arg("https://github.com/saiitanaa/CIATools/blob/main/README.md")
+                            .arg("https://github.com/saiitanaa/CIATools/blob/main/USAGE.md")
                             .status()
                             .ok();
                     }
