@@ -10,7 +10,7 @@ mod titleid;
 mod uniqueid;
 mod utils;
 
-use std::{fs, io, path::PathBuf, process::Command};
+use std::{fs, io, env, path::PathBuf, process::Command};
 use crossterm::event::{self, Event, KeyCode, KeyEventKind};
 use ratatui::{
     DefaultTerminal, Frame,
@@ -566,6 +566,11 @@ impl App {
 
                 KeyCode::Char('l') | KeyCode::Char('L') => {
                     self.output.push("[+] List Project Folder".to_string());
+                    match env::current_exe() {
+                        Ok(exe_path) => self.output.push(format!("{}", exe_path.display())),
+                        Err(e) => self.output.push(format!("failed to get current exe path: {e}").to_string()),
+                    };
+
                 }
 
                 KeyCode::Char('1') => {
