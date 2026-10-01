@@ -565,12 +565,20 @@ impl App {
                 }
 
                 KeyCode::Char('l') | KeyCode::Char('L') => {
-                    self.output.push("[+] List Project Folder".to_string());
-                    match env::current_exe() {
-                        Ok(exe_path) => self.output.push(format!("{}", exe_path.display())),
-                        Err(e) => self.output.push(format!("failed to get current exe path: {e}").to_string()),
-                    };
+                    let project_dir = env::current_exe()
+                        .unwrap()
+                        .parent()
+                        .unwrap()
+                        .join("DATA/PROJECT_DATA");
 
+                    match std::fs::read_dir(project_dir) {
+                        Ok(entries) => {
+                            for entry in entries.flatten() {
+                                self.output.push(format!("- {}", entry.file_name().to_string_lossy()));
+                            }
+                        }
+                        Err(e) => self.output.push(format!("[!] - {e}")),
+                    }
                 }
 
                 KeyCode::Char('1') => {
