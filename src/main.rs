@@ -623,7 +623,7 @@ impl App {
                 }  
 
                 KeyCode::Char('6') => {
-                    self.output.push("[+] Edit: USER_FILES -> .rsf".to_string());
+                    self.output.push("[!] Please create .rsf file".to_string());
 
                     if let Some(file) = std::fs::read_dir(user_files_path().unwrap())
                         .ok()
