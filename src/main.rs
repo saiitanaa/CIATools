@@ -622,6 +622,26 @@ impl App {
                     self.titleid = crate::titleid::generate();   
                 }  
 
+                KeyCode::Char('6') => {
+                    self.output.push("[+] Edit: USER_FILES -> .rsf".to_string());
+
+                    if let Some(file) = std::fs::read_dir(user_files_path().unwrap())
+                        .ok()
+                        .and_then(|mut r| {
+                            r.find_map(|e| {
+                                let p = e.ok()?.path();
+                                (p.extension()? == "rsf").then_some(p)
+                            })
+                        })
+                    {
+                        #[cfg(target_os = "windows")]
+                        Command::new("notepad").arg(&file).status().ok();
+
+                        #[cfg(not(target_os = "windows"))]
+                        Command::new("nano").arg(&file).status().ok();
+                    }
+                }
+
                 KeyCode::Char('C') | KeyCode::Char('c') => {
                     self.output.push("[+] CIA Compiling...".to_string());
                     match user_files_path() {
