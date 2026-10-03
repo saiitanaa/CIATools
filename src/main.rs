@@ -27,7 +27,7 @@ use crate::rsfcreator::rsf_config;
 
 use arboard::Clipboard;
 
-const VERSION: &str = "v26.3.2";
+const VERSION: &str = "v26.4.2";
 
 fn main() -> io::Result<()> {
     print!("\x1b]0;CIAToolsN {}\x07", VERSION);
@@ -149,7 +149,7 @@ impl App {
                 }
 
                 Err(_) => {
-                    self.output.push("[!] Failed to parse!".to_string());
+                    self.output.push("[UPDATE] Failed to parse!".to_string());
                 }
             },
 
@@ -242,9 +242,12 @@ fn draw(&self, frame: &mut Frame) {
         Paragraph::new(vec![
             Line::from("C : Make CIA"),
             Line::from("S : Save Project"),
-            Line::from("0 : Clean USER_FILES"),
             Line::from("9 : Open USER_FILES"),
-            Line::from("O : Open PROJECT_DATA"),
+            Line::from("0 : Open PROJECT_DATA"),
+            //rm -rf boum zone
+            Line::from(""),
+            Line::from("WARNING ZONE").fg(Color::Red),
+            Line::from("O : Clean USER_FILES"),
         ])
         .block(
             Block::bordered()
@@ -786,7 +789,7 @@ fn draw(&self, frame: &mut Frame) {
                     }
                 }
 
-                KeyCode::Char('0') => match user_files_path() {
+                KeyCode::Char('O') | KeyCode::Char('o') => match user_files_path() {
                     Ok(path) => {
                         match crate::delete::clean_user_files(path) {
                             Ok(()) => {
@@ -833,7 +836,7 @@ fn draw(&self, frame: &mut Frame) {
                     }
                 }
 
-                KeyCode::Char('O') | KeyCode::Char('o') => {
+                KeyCode::Char('0') => {
                     match project_folder_path() {
                         Ok(path) => {
                             #[cfg(target_os = "macos")]
@@ -894,7 +897,7 @@ fn project_folder_path() -> io::Result<PathBuf> {
 }
 
 fn load_author() -> io::Result<String> {
-    let path = user_files_path()?.join("author.txt");
+    let path = user_files_path()?.join("AUTHOR.txt");
 
     if path.exists() {
         return Ok(fs::read_to_string(path)?.trim().to_string());
@@ -903,14 +906,14 @@ fn load_author() -> io::Result<String> {
 }
 
 fn save_author(author: &str) -> io::Result<()> {
-    let path = user_files_path()?.join("author.txt");
+    let path = user_files_path()?.join("AUTHOR.txt");
     fs::write(path, author)?;
     Ok(())
 }
 
 fn save_project(project: &str) -> io::Result<()> {
     let path = project_folder_path()?.join(format!("{}", project));
-    fs::create_dir(path)?;
+    fs::create_dir(&path)?;
     Ok(())
 }
 
