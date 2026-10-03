@@ -262,6 +262,7 @@ fn draw(&self, frame: &mut Frame) {
             Line::from("L : List Project Folder"),
             Line::from("K : Clear Console"),
             Line::from("Q : Quit"),
+            Line::from(""),
             Line::from("H : Using CIAToolsN"),
             Line::from("P : Report Bug"),
         ])
@@ -269,7 +270,7 @@ fn draw(&self, frame: &mut Frame) {
             Block::bordered()
                 .bold()
                 .fg(Color::LightCyan)
-                .title(" Options ".bold()),
+                .title(format!(" Options | {}, Saiitanaa ", VERSION.bold())),
         ),
         input_layout[3],
     );
@@ -919,7 +920,7 @@ impl Widget for &App {
         buf: &mut Buffer,
     ) {
         let hostname = hostname::get().map(|h| h.to_string_lossy().into_owned()).unwrap_or_else(|_| "unknown".to_string());
-        let mut lines = vec![Line::from(""), Line::from(format!("Hi ! {hostname} 👋"))];
+        let mut lines = vec![Line::from(""), Line::from(format!("Bonjour {hostname} !"))];
 
         if self.editing_author {
             lines.push(Line::from(""));
@@ -1022,7 +1023,7 @@ impl Widget for &App {
             .centered()
             .block(
                 Block::bordered()
-                    .title(" CIAToolsN -- Saiitanaa ".bold())
+                    .title(" Main UI ".bold())
                     .border_set(border::THICK),
             )
             .render(area, buf);
