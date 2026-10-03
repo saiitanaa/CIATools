@@ -145,7 +145,7 @@ impl App {
         {
             Ok(response) => match response.json::<Release>() {
                 Ok(release) => {
-                    self.output.push(format!("[!] Latest GitHub release: {}", release.tag_name));
+                    self.output.push(format!("[?] Latest GitHub release: {}", release.tag_name));
                 }
 
                 Err(_) => {
@@ -178,7 +178,7 @@ fn draw(&self, frame: &mut Frame) {
         .split(main_layout[0]);
 
     // Console/output
-    let output_lines: Vec<Line> = std::iter::once(Line::from(">_ "))
+    let output_lines: Vec<Line> = std::iter::once(Line::from(""))
         .chain(self.output.iter().map(|s| Line::from(s.as_str())))
         .collect();
 
@@ -208,15 +208,13 @@ fn draw(&self, frame: &mut Frame) {
     // Creator Tools
     frame.render_widget(
         Paragraph::new(vec![
-            Line::from("1 : Import HB Files"),
-            Line::from("2 : Create RSF"),
-            Line::from("3 : Create ICN"),
-            Line::from("4 : Set Author"),
-            Line::from("5 : Create TitleID"),
+            Line::from("[1] Import HB Files"),
+            Line::from("[2] Create RSF"),
+            Line::from("[3] Create ICN"),
+            Line::from("[5] Create TitleID"),
         ])
         .block(
             Block::bordered()
-                .bold()
                 .fg(Color::White)
                 .title(" Creator Tools ".bold()),
         ),
@@ -226,11 +224,11 @@ fn draw(&self, frame: &mut Frame) {
     // Editor Tools
     frame.render_widget(
         Paragraph::new(vec![
-            Line::from("6 : Edit RSF"),
+            Line::from("[6] Edit RSF"),
+            Line::from("[4] Set Author"),
         ])
         .block(
             Block::bordered()
-                .bold()
                 .fg(Color::White)
                 .title(" Editor Tools ".bold()),
         ),
@@ -240,18 +238,17 @@ fn draw(&self, frame: &mut Frame) {
     // Project Manager
     frame.render_widget(
         Paragraph::new(vec![
-            Line::from("C : Make CIA"),
-            Line::from("S : Save Project"),
-            Line::from("9 : Open USER_FILES"),
-            Line::from("0 : Open PROJECT_DATA"),
+            Line::from("[C] Make CIA"),
+            Line::from("[S] Save Project"),
+            Line::from("[9] Open USER_FILES"),
+            Line::from("[0] Open PROJECT_DATA"),
             //rm -rf boum zone
             Line::from(""),
-            Line::from("WARNING ZONE").fg(Color::Red),
-            Line::from("O : Clean USER_FILES"),
+            Line::from("WARNING ZONE").fg(Color::Red).bold(),
+            Line::from("[O] Wipe USER_FILES"),
         ])
         .block(
             Block::bordered()
-                .bold()
                 .fg(Color::White)
                 .title(" Project Manager ".bold()),
         ),
@@ -262,18 +259,18 @@ fn draw(&self, frame: &mut Frame) {
     // CIATools Options
     frame.render_widget(
         Paragraph::new(vec![
-            Line::from("L : List Project Folder").fg(Color::White),
-            Line::from("K : Clear Console").fg(Color::White),
-            Line::from("Q : Quit").fg(Color::White),
+            Line::from("[L] List Project Folder").fg(Color::White),
+            Line::from("[K] Clear Console").fg(Color::White),
+            Line::from("[Q] Quit").fg(Color::White),
             Line::from(""),
-            Line::from("H : Using CIAToolsN").fg(Color::LightYellow),
-            Line::from("P : Report Bug").fg(Color::LightYellow),
+            Line::from("[H] Using CIAToolsN").fg(Color::White),
+            Line::from("[P] Report Bug").fg(Color::White),
         ])
         .block(
             Block::bordered()
-                .bold()
+                //.bold()
                 .fg(Color::LightCyan)
-                .title(format!(" Options | {}, Saiitanaa ", VERSION.bold())),
+                .title(" Options ".bold()),
         ),
         input_layout[3],
     );
@@ -924,7 +921,7 @@ impl Widget for &App {
         buf: &mut Buffer,
     ) {
         let hostname = hostname::get().map(|h| h.to_string_lossy().into_owned()).unwrap_or_else(|_| "unknown".to_string());
-        let mut lines = vec![Line::from(""), Line::from(format!("Bonjour {hostname} !"))];
+        let mut lines = vec![Line::from(""), Line::from(format!("Bonjour, {hostname} !")), Line::from(format!("{VERSION} - Saiitanaa"))];
 
         if self.editing_author {
             lines.push(Line::from(""));
