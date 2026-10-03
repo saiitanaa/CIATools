@@ -172,8 +172,8 @@ fn draw(&self, frame: &mut Frame) {
     let top_layout = Layout::default()
         .direction(Direction::Horizontal)
         .constraints([
-            Constraint::Percentage(50), // Console
-            Constraint::Percentage(50), // CIAToolsN
+            Constraint::Percentage(40), // Console
+            Constraint::Percentage(60), // CIAToolsN
         ])
         .split(main_layout[0]);
 
@@ -190,11 +190,11 @@ fn draw(&self, frame: &mut Frame) {
                 .title(" CONSOLE ".bold())
                 .border_set(border::THICK),
         ),
-        top_layout[0],
+        top_layout[1],
     );
 
     // Main UI
-    frame.render_widget(self, top_layout[1]);
+    frame.render_widget(self, top_layout[0]);
     let input_layout = Layout::default()
         .direction(Direction::Horizontal)
         .constraints([
@@ -314,7 +314,7 @@ fn draw(&self, frame: &mut Frame) {
                         self.project = self.project_input.clone();
                         save_project(&self.project)?;
                         self.add_project = false;
-                        self.output.push(format!("[+] name: {}", self.project));
+                        self.output.push(format!("[+] Name: {}", self.project));
                     }
 
                     KeyCode::Backspace => {
