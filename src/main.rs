@@ -259,12 +259,12 @@ fn draw(&self, frame: &mut Frame) {
     // CIATools Options
     frame.render_widget(
         Paragraph::new(vec![
-            Line::from("L : List Project Folder"),
-            Line::from("K : Clear Console"),
-            Line::from("Q : Quit"),
+            Line::from("L : List Project Folder").fg(Color::White),
+            Line::from("K : Clear Console").fg(Color::White),
+            Line::from("Q : Quit").fg(Color::White),
             Line::from(""),
-            Line::from("H : Using CIAToolsN"),
-            Line::from("P : Report Bug"),
+            Line::from("H : Using CIAToolsN").fg(Color::LightYellow),
+            Line::from("P : Report Bug").fg(Color::LightYellow),
         ])
         .block(
             Block::bordered()
@@ -446,13 +446,13 @@ fn draw(&self, frame: &mut Frame) {
                                             &output,
                                         ) {
                                             Ok(()) => {
-                                                self.output.push(format!("[+] ICN created: {}", output.display()));
+                                                self.output.push(format!("[+] ICN Created: {}", output.display()));
                                                 self.icn_select_icon = false;
                                                 self.icn_edit = false;
                                             }
 
                                             Err(error) => {
-                                                self.output.push(format!("[!] bannertool failed: {}", error));
+                                                self.output.push(format!("[!] Bannertool Failed: {}", error));
                                             }
                                         }
                                     }
@@ -695,8 +695,6 @@ fn draw(&self, frame: &mut Frame) {
                 }  
 
                 KeyCode::Char('6') => {
-                    self.output.push("[!] Please create .rsf file".to_string());
-
                     if let Some(file) = std::fs::read_dir(user_files_path().unwrap())
                         .ok()
                         .and_then(|mut r| {
@@ -707,10 +705,13 @@ fn draw(&self, frame: &mut Frame) {
                         })
                     {
                         #[cfg(target_os = "windows")]
-                        Command::new("notepad").arg(&file).status().ok();
+                            Command::new("notepad").arg(&file).status().ok();
 
-                        #[cfg(not(target_os = "windows"))]
-                        Command::new("nano").arg(&file).status().ok();
+                        #[cfg(target_os = "macos")]
+                            Command::new("open").arg("-e").arg(&file).status().ok();
+
+                        #[cfg(target_os = "linux")]
+                            Command::new("xdg-open").arg(&file).status().ok();
                     }
                 }
 
