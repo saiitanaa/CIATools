@@ -27,7 +27,7 @@ use crate::rsfcreator::rsf_config;
 
 use arboard::Clipboard;
 
-const VERSION: &str = "v26.3.1";
+const VERSION: &str = "v26.3.2";
 
 fn main() -> io::Result<()> {
     print!("\x1b]0;CIAToolsN {}\x07", VERSION);
@@ -159,73 +159,121 @@ impl App {
         }
     }
 
-    fn draw(&self, frame: &mut Frame) {
-        let outer_layout = Layout::default()
-            .direction(Direction::Horizontal)
-            .margin(1)
-            .constraints([
-                Constraint::Percentage(35),
-                Constraint::Percentage(45),
-                Constraint::Percentage(20),
-            ])
-            .split(frame.area());
+fn draw(&self, frame: &mut Frame) {
+    let main_layout = Layout::default()
+        .direction(Direction::Vertical)
+        .margin(1)
+        .constraints([
+            Constraint::Min(0), 
+            Constraint::Length(10), 
+        ])
+        .split(frame.area());
 
-        frame.render_widget(self, outer_layout[1]);
+    let top_layout = Layout::default()
+        .direction(Direction::Horizontal)
+        .constraints([
+            Constraint::Percentage(50), // Console
+            Constraint::Percentage(50), // CIAToolsN
+        ])
+        .split(main_layout[0]);
 
-        frame.render_widget(
-            Paragraph::new(vec![
-                // HB Management
-                Line::from("●   Creator Tools"),
-                Line::from("1 : Import HB Files"),
-                Line::from("2 : Create RSF"),
-                Line::from("3 : Create ICN"),
-                Line::from("4 : Set Author"),
-                Line::from("5 : Create TitleID"),
-                Line::from(""),
-                // File management
-                Line::from("●   Editor Tools"),
-                Line::from("6 : Edit RSF"),
-                Line::from(""),
-                // Project management
-                Line::from("●   Project Manager"),
-                Line::from("C : Make CIA"),
-                Line::from("S : Save Project"),
-                Line::from("0 : Clean USER_FILES"),
-                Line::from("9 : Open USER_FILES"),
-                Line::from("O : Open PROJECT_DATA"),
-                Line::from(""),
-                // CIATools settings
-                Line::from("●   CIATools Options"),
-                Line::from("L : List Project Folder"),
-                Line::from("K : Clear Console"),
-                Line::from("Q : Quit"),
-                Line::from("H : Using CIAToolsN"),
-            ])
-            .block(
-                Block::new()
-                    .bold()
-                    .fg(Color::LightBlue)
-                    .title(" INPUT ".bold())
-                    .borders(Borders::ALL),
-            ),
-            outer_layout[2],
-        );
+    // Console/output
+    let output_lines: Vec<Line> = std::iter::once(Line::from(">_ "))
+        .chain(self.output.iter().map(|s| Line::from(s.as_str())))
+        .collect();
 
-        let output_lines: Vec<Line> = std::iter::once(Line::from(">_ "))
-            .chain(self.output.iter().map(|s| Line::from(s.as_str())))
-            .collect();
+    frame.render_widget(
+        Paragraph::new(output_lines).style(Color::White).block(
+            Block::bordered()
+                .bold()
+                .fg(Color::Magenta)
+                .title(" CONSOLE ".bold())
+                .border_set(border::THICK),
+        ),
+        top_layout[0],
+    );
 
-        frame.render_widget(
-            Paragraph::new(output_lines).style(Color::White).block(
-                Block::bordered()
-                    .bold()
-                    .fg(Color::Magenta)
-                    .title(" CONSOLE ".bold())
-                    .border_set(border::THICK),
-            ),
-            outer_layout[0],
-        );
-    }
+    // Main UI
+    frame.render_widget(self, top_layout[1]);
+    let input_layout = Layout::default()
+        .direction(Direction::Horizontal)
+        .constraints([
+            Constraint::Percentage(25), // Creator Tools
+            Constraint::Percentage(20), // Editor Tools
+            Constraint::Percentage(30), // Project Manager
+            Constraint::Percentage(25), // CIATools Options
+        ])
+        .split(main_layout[1]);
+
+    // Creator Tools
+    frame.render_widget(
+        Paragraph::new(vec![
+            Line::from("1 : Import HB Files"),
+            Line::from("2 : Create RSF"),
+            Line::from("3 : Create ICN"),
+            Line::from("4 : Set Author"),
+            Line::from("5 : Create TitleID"),
+        ])
+        .block(
+            Block::bordered()
+                .bold()
+                .fg(Color::White)
+                .title(" Creator Tools ".bold()),
+        ),
+        input_layout[0],
+    );
+
+    // Editor Tools
+    frame.render_widget(
+        Paragraph::new(vec![
+            Line::from("6 : Edit RSF"),
+        ])
+        .block(
+            Block::bordered()
+                .bold()
+                .fg(Color::White)
+                .title(" Editor Tools ".bold()),
+        ),
+        input_layout[1],
+    );
+
+    // Project Manager
+    frame.render_widget(
+        Paragraph::new(vec![
+            Line::from("C : Make CIA"),
+            Line::from("S : Save Project"),
+            Line::from("0 : Clean USER_FILES"),
+            Line::from("9 : Open USER_FILES"),
+            Line::from("O : Open PROJECT_DATA"),
+        ])
+        .block(
+            Block::bordered()
+                .bold()
+                .fg(Color::White)
+                .title(" Project Manager ".bold()),
+        ),
+
+        input_layout[2],
+    );
+
+    // CIATools Options
+    frame.render_widget(
+        Paragraph::new(vec![
+            Line::from("L : List Project Folder"),
+            Line::from("K : Clear Console"),
+            Line::from("Q : Quit"),
+            Line::from("H : Using CIAToolsN"),
+            Line::from("P : Report Bug"),
+        ])
+        .block(
+            Block::bordered()
+                .bold()
+                .fg(Color::LightCyan)
+                .title(" Options ".bold()),
+        ),
+        input_layout[3],
+    );
+}
 
     fn handle_events(&mut self, terminal: &mut DefaultTerminal) -> io::Result<()> {
         if let Event::Key(key) = event::read()? {
@@ -549,6 +597,29 @@ impl App {
                             .ok();
                     }
                 }
+
+                KeyCode::Char('p') | KeyCode::Char('P') => {
+                    #[cfg(target_os = "macos")]
+                        self.output.push("[!] Redirect to ISSUES".to_string());
+                        Command::new("open")
+                            .arg("https://github.com/saiitanaa/CIATools/issues")
+                            .status()
+                            .ok();
+
+                    #[cfg(target_os = "windows")]
+                        self.output.push("[!] Redirect to ISSUES".to_string());
+                        Command::new("start")
+                            .arg("https://github.com/saiitanaa/issues")
+                            .status()
+                            .ok();
+
+                    #[cfg(target_os = "linux")]
+                        self.output.push("[!] Redirect to ISSUES".to_string());
+                        Command::new("xdg-open")
+                            .arg("https://github.com/saiitanaa/issues")
+                            .status()
+                            .ok();
+                }  
 
                 KeyCode::Char('k') | KeyCode::Char('K') => {
                     self.output.clear();
