@@ -265,8 +265,10 @@ fn draw(&self, frame: &mut Frame) {
             Line::from("[K] Clear Console").fg(Color::White),
             Line::from("[Q] Quit").fg(Color::White),
             Line::from(""),
+            Line::from("[D] Download Latest Version").fg(Color::Green),
             Line::from("[H] Using CIAToolsN").fg(Color::White),
             Line::from("[P] Report Bug").fg(Color::White),
+            Line::from("[R] Submit a request <3").fg(Color::White),
         ])
         .block(
             Block::bordered()
@@ -624,6 +626,28 @@ fn draw(&self, frame: &mut Frame) {
                             .ok();
                 }  
 
+                KeyCode::Char('r') | KeyCode::Char('R') => {
+                    #[cfg(target_os = "macos")]
+                    self.output.push("[!] Redirect to PR".to_string());
+                    Command::new("open")
+                        .arg("https://github.com/saiitanaa/CIATools/pulls")
+                        .status()
+                        .ok();
+                    #[cfg(target_os = "windows")]
+                        self.output.push("[!] Redirect to PR".to_string());
+                        Command::new("start")
+                            .arg("https://github.com/saiitanaa/pulls")
+                            .status()
+                            .ok();
+
+                    #[cfg(target_os = "linux")]
+                        self.output.push("[!] Redirect to PR".to_string());
+                        Command::new("xdg-open")
+                            .arg("https://github.com/saiitanaa/pulls")
+                            .status()
+                            .ok();
+                }
+
                 KeyCode::Char('k') | KeyCode::Char('K') => {
                     self.output.clear();
                 }
@@ -824,6 +848,53 @@ fn draw(&self, frame: &mut Frame) {
                         self.output.push(format!("[!] {error}"));
                     }
                 },
+
+                KeyCode::Char('D') | KeyCode::Char('d') => {
+                    #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+                        Command::new("curl")
+                            .args(["-L","-s","-f","-o","CIAToolsN",
+                                "https://github.com/saiitanaa/CIATools/releases/latest/download/CIAToolsN-OSX-aarch64",
+                            ])
+                            .stdout(std::process::Stdio::null())
+                            .stderr(std::process::Stdio::null())
+                            .status()?;
+
+                    #[cfg(all(target_os = "windows", target_arch = "aarch64"))]
+                        Command::new("curl.exe")
+                            .args(["-L","-s","-f","-o","CIAToolsN.exe",
+                                "https://github.com/saiitanaa/CIATools/releases/latest/download/CIAToolsN-Win-aarch64.exe",
+                            ])
+                            .stdout(std::process::Stdio::null())
+                            .stderr(std::process::Stdio::null())
+                            .status()?;
+
+                    #[cfg(all(target_os = "windows", target_arch = "x86_64"))]        
+                        Command::new("curl.exe")
+                            .args(["-L","-s","-f","-o","CIAToolsN.exe",
+                                "https://github.com/saiitanaa/CIATools/releases/latest/download/CIAToolsN-Win-x64.exe",
+                            ])
+                            .stdout(std::process::Stdio::null())
+                            .stderr(std::process::Stdio::null())
+                            .status()?;
+
+                    #[cfg(all(target_os = "linux", target_arch = "x86_64"))]
+                        Command::new("curl")
+                            .args(["-L","-s","-f","-o","CIAToolsN",
+                                "https://github.com/saiitanaa/CIATools/releases/latest/download/CIAToolsN-Linux-x64",
+                            ])
+                            .stdout(std::process::Stdio::null())
+                            .stderr(std::process::Stdio::null())
+                            .status()?;
+
+                    #[cfg(all(target_os = "linux", target_arch = "aarch64"))]
+                        Command::new("curl")
+                            .args(["-L","-s","-f","-o","CIAToolsN",
+                                "https://github.com/saiitanaa/CIATools/releases/latest/download/CIAToolsN-Linux-x64",
+                            ])
+                            .stdout(std::process::Stdio::null())
+                            .stderr(std::process::Stdio::null())
+                            .status()?;
+                }
 
                 KeyCode::Char('9') => {
                     match user_files_path() {
