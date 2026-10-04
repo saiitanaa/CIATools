@@ -2,6 +2,7 @@ mod bannertool;
 mod delete;
 mod icncreator;
 mod import;
+mod project;
 mod make;
 mod makerom;
 mod picker;
@@ -738,6 +739,7 @@ fn draw(&self, frame: &mut Frame) {
 
                                     Err(error) => {
                                         self.output.push(format!("[!] {error}"));
+
                                         return Ok(());
                                     }
                                 };
@@ -928,10 +930,23 @@ fn save_author(author: &str) -> io::Result<()> {
 }
 
 fn save_project(project: &str) -> io::Result<()> {
-    let path = project_folder_path()?.join(format!("{}", project));
-    fs::create_dir(&path)?;
+    let path = project_folder_path()?.join(project);
+
+    fs::create_dir_all(&path)?;
+
+    let user_files = user_files_path()?;
+
+    for entry in fs::read_dir(&user_files)? {
+        let entry = entry?;
+        let source = entry.path();
+        let destination = path.join(entry.file_name());
+
+        fs::rename(source, destination)?;
+    }
+
     Ok(())
 }
+
 
 impl Widget for &App {
     fn render(
@@ -967,7 +982,7 @@ impl Widget for &App {
             lines.push(Line::from(""));
 
             let (prompt, example) = match self.rsf_field {
-                0 => ("Title:", "(Ex: The best Homebrew)"),
+                0 => ("Title:", "(Ex: My Homebrew)"),
                 1 => ("CompanyCode:", "(Ex: SAAA)"),
                 2 => ("ProductCode:", "(Ex: CTR-P-XXXX)"),
                 3 => ("RomFs Path:", "(Ex: ./romfs)"),
