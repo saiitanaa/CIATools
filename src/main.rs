@@ -245,7 +245,7 @@ fn draw(&self, frame: &mut Frame) {
             Line::from("[0] Open PROJECT_DATA"),
             //rm -rf boum zone
             Line::from(""),
-            Line::from("WARNING ZONE").fg(Color::Red).bold(),
+            Line::from("DANGER ZONE").fg(Color::Red).bold(),
             Line::from("[O] Wipe USER_FILES"),
             Line::from("[J] Wipe PROJECT_DATA"),
         ])
@@ -801,7 +801,7 @@ fn draw(&self, frame: &mut Frame) {
                             );
 
                             if result == 0 {
-                                self.output.push(format!(r"[+] CIA created ¯\_(ツ)_/¯ :  {}", output.display()));
+                                self.output.push(format!(r"[+] CIA created :  {}", output.display()));
                             } else {
                                 self.output.push(format!("[!] makerom failed with code: {result}"));
                             }
