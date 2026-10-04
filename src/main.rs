@@ -2,7 +2,6 @@ mod bannertool;
 mod delete;
 mod icncreator;
 mod import;
-mod project;
 mod make;
 mod makerom;
 mod picker;
