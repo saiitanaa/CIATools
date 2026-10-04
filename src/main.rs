@@ -246,6 +246,7 @@ fn draw(&self, frame: &mut Frame) {
             Line::from(""),
             Line::from("WARNING ZONE").fg(Color::Red).bold(),
             Line::from("[O] Wipe USER_FILES"),
+            Line::from("[J] Wipe PROJECT_DATA"),
         ])
         .block(
             Block::bordered()
@@ -791,6 +792,24 @@ fn draw(&self, frame: &mut Frame) {
                         match crate::delete::clean_user_files(path) {
                             Ok(()) => {
                                 self.output.push("[-] USER_FILES cleaned.".to_string());
+                            }
+
+                            Err(error) => {
+                                self.output.push(format!("[!] {error}"));
+                            }
+                        }
+                    }
+
+                    Err(error) => {
+                        self.output.push(format!("[!] {error}"));
+                    }
+                },
+
+                KeyCode::Char('J') | KeyCode::Char('j') => match project_folder_path() {
+                    Ok(path) => {
+                        match crate::delete::clean_project_data(path) {
+                            Ok(()) => {
+                                self.output.push("[-] PROJECT_DATA cleaned.".to_string());
                             }
 
                             Err(error) => {
