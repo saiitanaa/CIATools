@@ -19,7 +19,7 @@ use ratatui::{
     style::{Color, Stylize},
     symbols::border,
     text::Line,
-    widgets::{Block, Borders, Paragraph, Widget},
+    widgets::{Block, Paragraph, Widget},
 };
 
 use crate::import::import_files;
