@@ -588,7 +588,7 @@ fn draw(&self, frame: &mut Frame) {
 
                     #[cfg(target_os = "windows")] {
                         self.output.push("[!] Redirect to USAGE.md".to_string());
-                        Command::new("start")
+                        Command::new("explorer")
                             .arg("https://github.com/saiitanaa/CIATools/blob/main/USAGE.md")
                             .status()
                             .ok();
@@ -613,15 +613,15 @@ fn draw(&self, frame: &mut Frame) {
 
                     #[cfg(target_os = "windows")]
                         self.output.push("[!] Redirect to ISSUES".to_string());
-                        Command::new("start")
-                            .arg("https://github.com/saiitanaa/issues")
+                        Command::new("explorer")
+                            .arg("https://github.com/saiitanaa/CIATools/issues")
                             .status()
                             .ok();
 
                     #[cfg(target_os = "linux")]
                         self.output.push("[!] Redirect to ISSUES".to_string());
                         Command::new("xdg-open")
-                            .arg("https://github.com/saiitanaa/issues")
+                            .arg("https://github.com/saiitanaa/CIATools/issues")
                             .status()
                             .ok();
                 }  
@@ -635,15 +635,15 @@ fn draw(&self, frame: &mut Frame) {
                         .ok();
                     #[cfg(target_os = "windows")]
                         self.output.push("[!] Redirect to PR".to_string());
-                        Command::new("start")
-                            .arg("https://github.com/saiitanaa/pulls")
+                        Command::new("explorer")
+                            .arg("https://github.com/saiitanaa/CIATools/pulls")
                             .status()
                             .ok();
 
                     #[cfg(target_os = "linux")]
                         self.output.push("[!] Redirect to PR".to_string());
                         Command::new("xdg-open")
-                            .arg("https://github.com/saiitanaa/pulls")
+                            .arg("https://github.com/saiitanaa/CIATools/pulls")
                             .status()
                             .ok();
                 }
