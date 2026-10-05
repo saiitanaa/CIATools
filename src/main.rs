@@ -10,6 +10,7 @@ mod titleid;
 mod uniqueid;
 mod utils;
 
+
 use std::{fs, io, env, path::PathBuf, process::Command};
 use crossterm::event::{self, Event, KeyCode, KeyEventKind};
 use ratatui::{
