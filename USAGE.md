@@ -1,11 +1,16 @@
 # Installation
 
-| Platform ||
+| Platform | Commands |
 |---|---|
-| macOS | `chmod +x ./path/to/CIAToolsN` && `./CIAToolsN` | 
+| macOS & Linux | `chmod +x ./path/to/CIAToolsN` **&&** `./CIAToolsN` | 
 | Windows | Execute `.exe` file |
-| Linux | `chmod +x ./path/to/CIAToolsN` && `./CIAToolsN` |
 
+# Requirement
+| File | Usage |
+|---|---|
+| .png & .bin | 2D-3D Banner | 
+| .3dsx & .elf | Homebrew executable |
+| .rsf & .icn | Homebrew Configuration |
 
 # Usage
 
