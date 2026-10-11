@@ -24,7 +24,7 @@ No dependencies required "*except for contributions*", `makeROM` & `bannertool` 
 | Platform | Architecture | Download |
 |---|---|---|
 | macOS | Aarch64 | [Download](https://github.com/saiitanaa/CIATools/releases/latest/download/CIAToolsN-OSX-aarch64) |
-| macOS | x64 | [Compile Required](#compiling) |
+| macOS | x64 | [Compile Required](#compile) |
 | Linux | x64 | [Download](https://github.com/saiitanaa/CIATools/releases/latest/download/CIAToolsN-Linux-x64) |
 | Linux | Aarch64 | [Download](https://github.com/saiitanaa/CIATools/releases/latest/download/CIAToolsN-Linux-aarch64) |
 | Windows | x64 | [Download](https://github.com/saiitanaa/CIATools/releases/latest/download/CIAToolsN-Win-x64.exe) |
