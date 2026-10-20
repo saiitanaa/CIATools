@@ -1054,7 +1054,7 @@ impl Widget for &App {
 
             let (prompt, example) = match self.rsf_field {
                 0 => ("Title:", "(Ex: My Homebrew)"),
-                1 => ("CompanyCode:", "(Ex: SAAA)"),
+                1 => ("CompanyCode:", "(Ex: 00)"),
                 2 => ("ProductCode:", "(Ex: CTR-P-XXXX)"),
                 3 => ("RomFs Path:", "(Ex: ./romfs)"),
                 4 => ("UniqueId:", "No UniqueID? Press 5"),
