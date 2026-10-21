@@ -38,12 +38,7 @@ fn main() -> io::Result<()> {
     let romfs_path = std::env::current_dir()?.join("romfs");
     fs::create_dir_all(&romfs_path)?;
 
-    let author = load_author()?;
-
-    let mut app = App {
-        author,
-        ..App::default()
-    };
+    let mut app = App::default();
 
     app.update();
 
@@ -60,10 +55,6 @@ fn main() -> io::Result<()> {
 pub struct App {
     exit: bool,
     output: Vec<String>,
-
-    author: String,
-    author_input: String,
-    editing_author: bool,
 
     project: String,
     project_input: String,
@@ -233,7 +224,6 @@ fn draw(&self, frame: &mut Frame) {
     frame.render_widget(
         Paragraph::new(vec![
             Line::from("[6] Edit RSF"),
-            Line::from("[4] Set Author"),
         ])
         .block(
             Block::bordered()
@@ -290,33 +280,6 @@ fn draw(&self, frame: &mut Frame) {
     fn handle_events(&mut self, terminal: &mut DefaultTerminal) -> io::Result<()> {
         if let Event::Key(key) = event::read()? {
             if key.kind != KeyEventKind::Press {
-                return Ok(());
-            }
-
-            if self.editing_author {
-                match key.code {
-                    KeyCode::Enter => {
-                        self.author = self.author_input.clone();
-                        save_author(&self.author)?;
-                        self.editing_author = false;
-                        self.output.push(format!("[+] Author set to: {}", self.author));
-                    }
-
-                    KeyCode::Backspace => {
-                        self.author_input.pop();
-                    }
-
-                    KeyCode::Char(c) => {
-                        self.author_input.push(c);
-                    }
-
-                    KeyCode::Esc => {
-                        self.editing_author = false;
-                    }
-
-                    _ => {}
-                }
-
                 return Ok(());
             }
 
@@ -720,10 +683,6 @@ fn draw(&self, frame: &mut Frame) {
                     self.icn_file = icncreator::IcnFile::new();
                 }
 
-                KeyCode::Char('4') => {
-                    self.editing_author = true;
-                }
-
                 KeyCode::Char('S') | KeyCode::Char('s') => {
                     self.output.push("[+] Save DATA/PROJECT_DATA...".to_string());
                     self.add_project = true;
@@ -999,21 +958,6 @@ fn project_folder_path() -> io::Result<PathBuf> {
     Ok(project_folder)
 }
 
-fn load_author() -> io::Result<String> {
-    let path = user_files_path()?.join("AUTHOR.txt");
-
-    if path.exists() {
-        return Ok(fs::read_to_string(path)?.trim().to_string());
-    }
-    Ok(String::new())
-}
-
-fn save_author(author: &str) -> io::Result<()> {
-    let path = user_files_path()?.join("AUTHOR.txt");
-    fs::write(path, author)?;
-    Ok(())
-}
-
 fn save_project(project: &str) -> io::Result<()> {
     let path = project_folder_path()?.join(project);
 
@@ -1041,16 +985,6 @@ impl Widget for &App {
     ) {
         let hostname = hostname::get().map(|h| h.to_string_lossy().into_owned()).unwrap_or_else(|_| "unknown".to_string());
         let mut lines = vec![Line::from(""), Line::from(format!("Bonjour, {hostname} !")), Line::from(format!("{VERSION} - Saiitanaa"))];
-
-        if self.editing_author {
-            lines.push(Line::from(""));
-            lines.push(Line::from(format!("Enter author: {}", self.author_input)).fg(Color::White));
-
-            lines.push(Line::from("Enter: Next    Esc: Cancel").fg(Color::DarkGray));
-        } else if !self.author.is_empty() {
-            lines.push(Line::from(""));
-            lines.push(Line::from(format!("Author defined: {}", self.author)).fg(Color::White));
-        }
 
         if self.add_project {
             lines.push(Line::from(""));

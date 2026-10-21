@@ -42,12 +42,6 @@ To do this, **press** `2` for RSF or `3` for SMDH.
 
 ![Demo image](./assets/icn_creator.png)
 
-**Perfect! Now let's define an author.** 
-
-To do this, **press** `4`.
-
-![Demo image](./assets/author_dialog.png)
-
 **Now we can compile the homebrew!**
 
 To do this, **press** `C`.
