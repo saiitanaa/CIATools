@@ -28,7 +28,7 @@ use crate::rsfcreator::rsf_config;
 
 use arboard::Clipboard;
 
-const VERSION: &str = "v26.4.2";
+const VERSION: &str = "v26.4.3";
 
 fn main() -> io::Result<()> {
     print!("\x1b]0;CIAToolsN {}\x07", VERSION);
@@ -188,7 +188,7 @@ fn draw(&self, frame: &mut Frame) {
             Block::bordered()
                 .bold()
                 .fg(Color::Magenta)
-                .title(" CONSOLE ".bold())
+                .title(" Console ".bold())
                 .border_set(border::THICK),
         ),
         top_layout[1],
@@ -1129,7 +1129,7 @@ impl Widget for &App {
             .centered()
             .block(
                 Block::bordered()
-                    .title(" Main UI ".bold())
+                    .title(" Editor ".bold())
                     .border_set(border::THICK),
             )
             .render(area, buf);
