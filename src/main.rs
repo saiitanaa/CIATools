@@ -102,6 +102,13 @@ fn set_directories() -> io::Result<PathBuf> {
 }
 
 fn find_file_with_extension(directory: &PathBuf, extension: &str) -> io::Result<PathBuf> {
+    if extension.eq_ignore_ascii_case("icn") {
+        let generated_icon = directory.join("icon.icn");
+        if generated_icon.is_file() {
+            return Ok(generated_icon);
+        }
+    }
+
     for entry in fs::read_dir(directory)? {
         let path = entry?.path();
 
@@ -435,6 +442,12 @@ fn draw(&self, frame: &mut Frame) {
                                                 self.icn_language,
                                             );
 
+                                        let description = self
+                                            .icn_file
+                                            .get_long_description(
+                                                self.icn_language,
+                                            );
+
                                         let publisher = self
                                             .icn_file
                                             .get_publisher(
@@ -445,6 +458,7 @@ fn draw(&self, frame: &mut Frame) {
 
                                         match crate::bannertool::make_icn(
                                             &title,
+                                            &description,
                                             &publisher,
                                             path,
                                             &output,

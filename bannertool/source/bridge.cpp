@@ -2,6 +2,7 @@
 
 extern "C" int ciatools_make_icn(
     const char* title,
+    const char* description,
     const char* publisher,
     const char* icon,
     const char* output
@@ -12,7 +13,7 @@ extern "C" int ciatools_make_icn(
         const_cast<char*>("-s"),
         const_cast<char*>(title),
         const_cast<char*>("-l"),
-        const_cast<char*>(title),
+        const_cast<char*>(description),
         const_cast<char*>("-p"),
         const_cast<char*>(publisher),
         const_cast<char*>("-i"),

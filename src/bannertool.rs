@@ -5,18 +5,28 @@ use std::path::Path;
 unsafe extern "C" {
     fn ciatools_make_icn(
         title: *const c_char,
+        description: *const c_char,
         publisher: *const c_char,
         icon: *const c_char,
         output: *const c_char,
     ) -> i32;
 }
 
-pub fn make_icn(title: &str, publisher: &str, icon: &Path, output: &Path) -> io::Result<()> {
+pub fn make_icn(
+    title: &str,
+    description: &str,
+    publisher: &str,
+    icon: &Path,
+    output: &Path,
+) -> io::Result<()> {
     let title = CString::new(title)
         .map_err(|_| io::Error::new(io::ErrorKind::InvalidInput, "Invalid title"))?;
 
     let publisher = CString::new(publisher)
         .map_err(|_| io::Error::new(io::ErrorKind::InvalidInput, "Invalid publisher"))?;
+
+    let description = CString::new(description)
+        .map_err(|_| io::Error::new(io::ErrorKind::InvalidInput, "Invalid description"))?;
 
     let icon = CString::new(icon.to_string_lossy().as_bytes())
         .map_err(|_| io::Error::new(io::ErrorKind::InvalidInput, "Invalid icon path"))?;
@@ -27,6 +37,7 @@ pub fn make_icn(title: &str, publisher: &str, icon: &Path, output: &Path) -> io:
     let result = unsafe {
         ciatools_make_icn(
             title.as_ptr(),
+            description.as_ptr(),
             publisher.as_ptr(),
             icon.as_ptr(),
             output.as_ptr(),
