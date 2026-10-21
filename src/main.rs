@@ -328,13 +328,14 @@ fn draw(&self, frame: &mut Frame) {
                             4 => self.rsf_config.uniqueId = self.rsf_input.clone(),
                             5 => self.rsf_config.saveDataSize = self.rsf_input.clone(),
                             6 => self.rsf_config.cpuSpeed = self.rsf_input.clone(),
+                            7 => self.rsf_config.remasterVersion = self.rsf_input.clone(),
                             _ => {}
                         }
 
                         self.rsf_input.clear();
                         self.rsf_field += 1;
 
-                        if self.rsf_field > 6 {
+                        if self.rsf_field > 7 {
                             self.rsf_edit = false;
 
                             let content = self.rsf_config.generate();
@@ -1008,6 +1009,7 @@ impl Widget for &App {
                 4 => ("UniqueId:", "No UniqueID? Press 5"),
                 5 => ("SaveDataSize:", "(Ex: 128KB)"),
                 6 => ("CpuSpeed:", "(804MHz New 3DS, 268MHz Old 3DS)"),
+                7 => ("Version:", "(RemasterVersion; default: 1)"),
                 _ => ("", ""),
             };
 

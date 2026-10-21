@@ -12,6 +12,7 @@ pub struct rsf_config {
     pub uniqueId: String,
     pub saveDataSize: String,
     pub cpuSpeed: String, // 804Mhz New 3DS, 268MHz Old 3DS
+    pub remasterVersion: String,
 }
 
 impl rsf_config {
@@ -45,7 +46,7 @@ Option:
 
 SystemControlInfo:
   SaveDataSize: {saveDataSize}
-  RemasterVersion: 0
+  RemasterVersion: {remasterVersion}
   StackSize: 0x40000
 
 # DO NOT EDIT BELOW HERE OR PROGRAMS WILL NOT LAUNCH (most likely)
@@ -218,6 +219,7 @@ SystemControlInfo:
             uniqueId = self.uniqueId,
             saveDataSize = self.saveDataSize,
             cpuSpeed = self.cpuSpeed,
+            remasterVersion = if self.remasterVersion.is_empty() { "1" } else { self.remasterVersion.as_str() },
         )
     }
 }
